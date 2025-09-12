@@ -30,17 +30,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const storedToken = Cookies.get('accessToken')
     if (storedToken) {
       setToken(storedToken)
-      // Decode JWT to get user info (you might want to add a library like jwt-decode)
       try {
         const payload = JSON.parse(atob(storedToken.split('.')[1]))
         setUser({ email: payload.email, id: payload.id })
       } catch (error) {
         console.error('Failed to decode token:', error)
         Cookies.remove('accessToken')
+        router.replace('/login')
       }
+    } else {
+      router.replace('/login')
     }
     setIsLoading(false)
-  }, [])
+  }, [router])
 
   const login = async (email: string, password: string) => {
     try {
@@ -52,14 +54,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const { token: accessToken } = response.data.data
 
       Cookies.set('accessToken', accessToken, {
-        expires: 7, // 7 days
+        expires: 7,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',
       })
 
       setToken(accessToken)
 
-      // Decode JWT to get user info
       const payload = JSON.parse(atob(accessToken.split('.')[1]))
       setUser({ email: payload.email, id: payload.id })
     } catch (error) {
