@@ -62,7 +62,7 @@ export default function HomePage() {
               </CardHeader>
               <CardContent className="pt-0">
                 <div className="flex flex-col lg:flex-row items-center gap-8">
-                  <DonutChart data={expenseData} width={380} height={380} />
+                  <DonutChart data={expenseData} width={300} height={300} />
 
                   {/* Legend */}
                   <div className="space-y-4 w-full lg:w-auto">

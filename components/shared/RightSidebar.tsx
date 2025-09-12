@@ -1,92 +1,67 @@
-"use client"
+'use client'
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { 
-  FolderTree, 
-  CreditCard, 
-  DollarSign, 
-  Settings,
-  X
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from "@/components/ui/sidebar"
+import { cn } from '@/lib/utils'
+import { CreditCard, DollarSign, FolderTree, Settings } from 'lucide-react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
 const navigationItems = [
   {
-    title: "Categories",
+    title: 'Categories',
     icon: FolderTree,
-    href: "/categories",
+    href: '/categories',
   },
   {
-    title: "Accounts",
+    title: 'Accounts',
     icon: CreditCard,
-    href: "/accounts",
+    href: '/accounts',
   },
   {
-    title: "Currencies",
+    title: 'Currencies',
     icon: DollarSign,
-    href: "/currencies",
+    href: '/currencies',
   },
   {
-    title: "Settings",
+    title: 'Settings',
     icon: Settings,
-    href: "/settings",
+    href: '/settings',
   },
 ]
 
 interface RightSidebarProps {
-  onToggle: () => void
+  className?: string
 }
 
-export default function RightSidebar({ onToggle }: RightSidebarProps) {
+export default function RightSidebar({ className }: RightSidebarProps) {
   const pathname = usePathname()
 
   return (
-    <Sidebar side="right" className="w-64">
-      <SidebarContent>
-        <div className="flex justify-start p-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onToggle}
-            className="h-8 w-8 p-0"
-          >
-            <X className="h-4 w-4" />
-          </Button>
+    <div className={cn('w-64 h-full border-l bg-background flex flex-col', className)}>
+      <div className="flex-1 p-4">
+        <div className="mb-4">
+          <h3 className="text-sm font-medium text-muted-foreground px-2 mb-2">Navigation</h3>
+          <nav className="space-y-1">
+            {navigationItems.map((item) => {
+              const Icon = item.icon
+              const isActive = pathname === item.href
+
+              return (
+                <Link
+                  key={item.title}
+                  href={item.href}
+                  className={cn(
+                    'flex items-center gap-3 rounded-md px-2 py-2 text-sm font-medium transition-colors',
+                    isActive ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                  )}
+                >
+                  <Icon className="h-4 w-4" />
+                  <span>{item.title}</span>
+                </Link>
+              )
+            })}
+          </nav>
         </div>
-        <SidebarGroup>
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {navigationItems.map((item) => {
-                const Icon = item.icon
-                const isActive = pathname === item.href
-                
-                return (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild isActive={isActive}>
-                      <Link href={item.href}>
-                        <Icon className="h-4 w-4" />
-                        <span>{item.title}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                )
-              })}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-    </Sidebar>
+      </div>
+    </div>
   )
 }

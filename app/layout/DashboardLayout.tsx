@@ -20,15 +20,18 @@ function DashboardContent({ children }: DashboardLayoutProps) {
     <>
       <LeftSidebar />
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+        <header className="flex h-16 items-center gap-2 border-b px-4 justify-between">
           <Button variant="ghost" size="icon" onClick={() => setOpen(!open)} className="h-8 w-8">
             <PanelLeft className="h-4 w-4" />
           </Button>
           <div className="flex-1" />
+          <Button variant="ghost" size="icon" onClick={() => setRightSidebarOpen(!rightSidebarOpen)} className="h-8 w-8">
+            <PanelLeft className="h-4 w-4" />
+          </Button>
         </header>
         <div className="flex flex-1">
           <main className="flex-1 overflow-auto p-4">{children}</main>
-          {rightSidebarOpen && <RightSidebar onToggle={() => setRightSidebarOpen(false)} />}
+          {rightSidebarOpen && <RightSidebar />}
         </div>
       </SidebarInset>
     </>
