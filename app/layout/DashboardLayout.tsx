@@ -11,7 +11,6 @@ interface DashboardLayoutProps {
   children: React.ReactNode
 }
 
-// Inner component that can use useSidebar hook
 function DashboardContent({ children }: DashboardLayoutProps) {
   const [rightSidebarOpen, setRightSidebarOpen] = useState(true)
   const { open, setOpen } = useSidebar()

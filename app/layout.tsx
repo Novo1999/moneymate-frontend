@@ -2,6 +2,7 @@ import { AuthProvider } from '@/app/contexts/AuthContext'
 import { QueryProvider } from '@/app/provider/QueryProvider'
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
+import { Toaster } from 'sonner'
 import './globals.css'
 
 const geistSans = Geist({
@@ -29,6 +30,7 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <QueryProvider>
           <AuthProvider>{children}</AuthProvider>
+          <Toaster />
         </QueryProvider>
       </body>
     </html>

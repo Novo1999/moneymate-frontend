@@ -1,8 +1,9 @@
 'use client'
 
-import axiosInstance from '@/lib/axios'
+import AuthApiService from '@/app/ApiService/AuthApiService'
 import Cookies from 'js-cookie'
-import { useRouter } from 'next/navigation'
+import { Loader } from 'lucide-react'
+import { usePathname, useRouter } from 'next/navigation'
 import React, { createContext, useContext, useEffect, useState } from 'react'
 
 interface User {
@@ -25,36 +26,63 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
+  const pathname = usePathname()
 
+  const publicRoutes = ['/login', '/signup']
   useEffect(() => {
     const storedToken = Cookies.get('accessToken')
+
     if (storedToken) {
       setToken(storedToken)
       try {
         const payload = JSON.parse(atob(storedToken.split('.')[1]))
-        setUser({ email: payload.email, id: payload.id })
+
+        AuthApiService.getUser(payload.id)
+          .then((res) => {
+            if (res?.data) {
+              const userData = res.data
+              setUser({ email: userData.email, id: userData.id })
+
+              // If user is logged in and on login/signup page, redirect to home
+              if (publicRoutes.includes(pathname)) {
+                router.replace('/')
+              }
+            }
+            setIsLoading(false)
+          })
+          .catch((error) => {
+            console.error('Failed to fetch user:', error)
+            Cookies.remove('accessToken')
+            setToken(null)
+            if (!publicRoutes.includes(pathname)) {
+              router.replace('/login')
+            }
+            setIsLoading(false)
+          })
       } catch (error) {
         console.error('Failed to decode token:', error)
         Cookies.remove('accessToken')
-        router.replace('/login')
+        setToken(null)
+        if (!publicRoutes.includes(pathname)) {
+          router.replace('/login')
+        }
+        setIsLoading(false)
       }
     } else {
-      router.replace('/login')
+      // No token, redirect to login if not on public routes
+      if (!publicRoutes.includes(pathname)) {
+        router.replace('/login')
+      }
+      setIsLoading(false)
     }
-    setIsLoading(false)
-  }, [router])
+  }, [router, pathname])
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await axiosInstance.post('/auth/login', {
-        email,
-        password,
-      })
-
-      const { token: accessToken } = response.data.data
+      const accessToken = await AuthApiService.login(email, password)
 
       Cookies.set('accessToken', accessToken, {
-        expires: 7,
+        expires: 1,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',
       })
@@ -63,6 +91,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       const payload = JSON.parse(atob(accessToken.split('.')[1]))
       setUser({ email: payload.email, id: payload.id })
+
+      router.push('/')
     } catch (error) {
       console.error('Login failed:', error)
       throw error
@@ -84,7 +114,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     isLoading,
   }
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+  return (
+    <AuthContext.Provider value={value}>
+      {isLoading ? (
+        <div className="min-h-[90vh] flex justify-center items-center">
+          <Loader className="animate-spin size-24" />
+        </div>
+      ) : (
+        // Only render children when user is logged in OR on public routes
+        (user || publicRoutes.includes(pathname)) && children
+      )}
+    </AuthContext.Provider>
+  )
 }
 
 export function useAuth() {

@@ -1,5 +1,6 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import { toast } from 'sonner';
 
 const axiosInstance = axios.create({
   baseURL: 'http://localhost:8000/api/v1/',
@@ -17,6 +18,7 @@ axiosInstance.interceptors.request.use(
     return config;
   },
   (error) => {
+    toast.error("Authentication Error")
     return Promise.reject(error);
   }
 );
