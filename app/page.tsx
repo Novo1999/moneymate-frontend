@@ -1,7 +1,7 @@
 'use client'
 
 import { useAuth } from '@/app/contexts/AuthContext'
-import DonutChart from '@/components/shared/DonutChart'
+import RechartsDonutChart from '@/components/shared/RechartsDonutChart'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -29,14 +29,14 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 p-6">
       {/* Header */}
-      <div className="max-w-7xl mx-auto mb-8">
+      <div className="max-w-7xl mb-8">
         <Card className="bg-white/80 backdrop-blur-sm shadow-sm">
           <CardContent className="p-6">
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
                   <span className="text-md font-bold text-white">{user?.currency}</span>
-                </div>
+              </div>
                 <div>
                   <h1 className="text-3xl font-bold text-foreground">MoneyMate</h1>
                   <p className="text-muted-foreground mt-1">
@@ -52,33 +52,16 @@ export default function HomePage() {
         </Card>
       </div>
 
-      <div className="max-w-7xl mx-auto grid grid-cols-1 xl:grid-cols-3 gap-6">
+      <div className="max-w-7xl grid grid-cols-1 xl:grid-cols-3 gap-6">
         {/* Chart Section */}
         <div className="lg:col-span-2">
           <Card className="shadow-lg">
             <CardHeader className="pb-4">
               <CardTitle className="text-2xl">Expense Overview</CardTitle>
             </CardHeader>
-            <CardContent className="pt-0">
+            <CardContent className="pt-0 px-0">
               <div className="flex flex-col lg:flex-row justify-between items-center gap-8">
-                <DonutChart data={expenseData} width={300} height={300} />
-
-                {/* Legend */}
-                <div className="space-y-4 w-full lg:w-auto">
-                  {expenseData.map((item) => (
-                    <div key={item.category} className="flex items-center gap-4 p-3 rounded-xl bg-muted hover:bg-muted/80 transition-colors">
-                      <div className="w-5 h-5 rounded-full shadow-sm" style={{ backgroundColor: item.color }} />
-                      <div className="flex-1 min-w-0">
-                        <div className="flex justify-between gap-6 items-center">
-                          <span className="font-semibold text-foreground">{item.category}</span>
-                          <p className="text-foreground font-bold">
-                            {item.amount.toLocaleString()} {user?.currency}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                <RechartsDonutChart data={expenseData} />
               </div>
             </CardContent>
           </Card>
@@ -123,7 +106,7 @@ export default function HomePage() {
       </div>
 
       {/* Recent Transactions */}
-      <div className="max-w-7xl mx-auto mt-8">
+      <div className="max-w-7xl mt-8">
         <Card className="shadow-lg">
           <CardHeader className="pb-4">
             <CardTitle className="text-2xl">Recent Transactions</CardTitle>
