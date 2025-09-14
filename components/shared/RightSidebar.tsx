@@ -36,7 +36,7 @@ export default function RightSidebar({ className }: RightSidebarProps) {
   const pathname = usePathname()
 
   return (
-    <div className={cn('w-64 h-full border-l bg-background flex flex-col', className)}>
+    <div className={cn('w-64 h-full border-l right-0 absolute bg-background flex flex-col', className)}>
       <div className="flex-1 p-4">
         <div className="mb-4">
           <h3 className="text-sm font-medium text-muted-foreground px-2 mb-2">Navigation</h3>

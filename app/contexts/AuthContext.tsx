@@ -1,28 +1,26 @@
 'use client'
 
 import AuthApiService from '@/app/ApiService/AuthApiService'
+import UserApiService from '@/app/ApiService/UserApiService'
+import { UserDto } from '@/app/dto/UserDto'
 import Cookies from 'js-cookie'
 import { Loader } from 'lucide-react'
 import { usePathname, useRouter } from 'next/navigation'
-import React, { createContext, useContext, useEffect, useState } from 'react'
-
-interface User {
-  email: string
-  id: number
-}
+import React, { createContext, Dispatch, SetStateAction, useContext, useEffect, useState } from 'react'
 
 interface AuthContextType {
-  user: User | null
+  user: UserDto | null
   token: string | null
   login: (email: string, password: string) => Promise<void>
   logout: () => void
   isLoading: boolean
+  setUser: Dispatch<SetStateAction<UserDto | null>>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
+  const [user, setUser] = useState<UserDto | null>(null)
   const [token, setToken] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
@@ -37,11 +35,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         const payload = JSON.parse(atob(storedToken.split('.')[1]))
 
-        AuthApiService.getUser(payload.id)
+        UserApiService.getUser(payload.id)
           .then((res) => {
             if (res?.data) {
               const userData = res.data
-              setUser({ email: userData.email, id: userData.id })
+              setUser(userData)
 
               // If user is logged in and on login/signup page, redirect to home
               if (publicRoutes.includes(pathname)) {
@@ -90,7 +88,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setToken(accessToken)
 
       const payload = JSON.parse(atob(accessToken.split('.')[1]))
-      setUser({ email: payload.email, id: payload.id })
+      setUser(payload)
 
       router.push('/')
     } catch (error) {
@@ -112,6 +110,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     login,
     logout,
     isLoading,
+    setUser,
   }
 
   return (

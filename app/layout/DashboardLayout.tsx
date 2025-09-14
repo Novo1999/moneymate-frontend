@@ -12,7 +12,7 @@ interface DashboardLayoutProps {
 }
 
 function DashboardContent({ children }: DashboardLayoutProps) {
-  const [rightSidebarOpen, setRightSidebarOpen] = useState(true)
+  const [rightSidebarOpen, setRightSidebarOpen] = useState(false)
   const { open, setOpen } = useSidebar()
 
   return (

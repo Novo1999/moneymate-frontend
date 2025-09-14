@@ -34,16 +34,4 @@ export default class AuthApiService {
       throw error
     }
   }
-
-  static async getUser(id: number) {
-    try {
-      const response = await axiosInstance.get(`/auth/user/${id}`)
-
-      return response.data
-    } catch (error: any) {
-      const errorMessage = error?.response?.data?.message || 'Failed to fetch user'
-      toast.error(errorMessage)
-      throw error
-    }
-  }
 }

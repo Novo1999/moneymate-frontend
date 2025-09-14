@@ -1,5 +1,6 @@
 'use client'
 
+import { useAuth } from '@/app/contexts/AuthContext'
 import * as d3 from 'd3'
 import React, { useEffect, useRef } from 'react'
 
@@ -17,6 +18,7 @@ interface DonutChartProps {
 
 export default function DonutChart({ data, width = 300, height = 300 }: DonutChartProps) {
   const svgRef = useRef<SVGSVGElement>(null)
+  const { user } = useAuth()
 
   useEffect(() => {
     if (!data || data.length === 0) return
@@ -102,10 +104,10 @@ export default function DonutChart({ data, width = 300, height = 300 }: DonutCha
     g.append('text')
       .attr('text-anchor', 'middle')
       .attr('dy', '1.2em')
-      .style('font-size', '24px')
+      .style('font-size', '20px')
       .style('font-weight', 'bold')
       .style('fill', '#059669')
-      .text(`$${d3.sum(data, (d) => d.amount).toLocaleString()}`)
+      .text(`${d3.sum(data, (d) => d.amount).toLocaleString()} ${user?.currency}`)
   }, [data, width, height])
 
   return (

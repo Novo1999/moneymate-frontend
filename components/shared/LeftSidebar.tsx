@@ -1,20 +1,26 @@
 'use client'
 
+import AccountTypeApiService from '@/app/ApiService/AccountTypeApiService'
+import { useAuth } from '@/app/contexts/AuthContext'
 import { Button } from '@/components/ui/button'
 import { Calendar as CalendarComponent } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar'
+import { Skeleton } from '@/components/ui/skeleton'
+import { useQuery } from '@tanstack/react-query'
 import { format } from 'date-fns'
 import { BarChart3, Calendar, CalendarIcon, Clock, Eye } from 'lucide-react'
-import { useState } from 'react'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
 
-const accountTypes = [
-  { value: 'personal', label: 'Personal' },
-  { value: 'business', label: 'Business' },
-  { value: 'joint', label: 'Joint Account' },
-  { value: 'savings', label: 'Savings' },
-]
+interface AccountType {
+  id: number
+  name: string
+  type: string
+  balance?: number
+  description?: string
+}
 
 const viewModes = [
   { value: 'day', label: 'Day', icon: Clock },
@@ -26,35 +32,85 @@ const viewModes = [
 ]
 
 export default function LeftSidebar() {
-  const [accountType, setAccountType] = useState('personal')
+  const [accountType, setAccountType] = useState<string>('')
   const [activeView, setActiveView] = useState('month')
   const [date, setDate] = useState<Date>()
+  const { user } = useAuth()
+
+  // Fetch account types using TanStack Query
+  const {
+    data: accountTypes,
+    isLoading: isLoadingAccountTypes,
+    isError: isErrorAccountTypes,
+    error: accountTypesError,
+  } = useQuery({
+    queryKey: ['accountTypes'],
+    queryFn: AccountTypeApiService.getUserAccountTypes,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+  })
+
+  // Set default account type when data loads
+  useEffect(() => {
+    if (accountTypes && accountTypes.length > 0 && !accountType) {
+      setAccountType(accountTypes[0].id.toString())
+    }
+  }, [accountTypes, accountType])
+
+  const renderAccountTypeSelect = () => {
+    if (isLoadingAccountTypes) {
+      return (
+        <div className="px-2">
+          <Skeleton className="h-10 w-full" />
+        </div>
+      )
+    }
+
+    if (isErrorAccountTypes) {
+      return (
+        <div className="px-2">
+          <div className="text-sm text-destructive">Failed to load account types</div>
+        </div>
+      )
+    }
+
+    return (
+      <div className="px-2">
+        <Select value={accountType} onValueChange={setAccountType}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select account type" />
+          </SelectTrigger>
+          <SelectContent>
+            {accountTypes?.map((type: AccountType) => (
+              <SelectItem key={type.id} value={type.id.toString()}>
+                <div className="flex items-center gap-4">
+                  <span>{type.name}</span>
+                  {type.balance !== undefined && (
+                    <span className="text-xs text-muted-foreground">
+                      Balance: {type.balance.toLocaleString()} {user?.currency}
+                    </span>
+                  )}
+                </div>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+    )
+  }
 
   return (
     <Sidebar>
       <SidebarHeader>
-        <h2 className="text-lg font-semibold px-4 py-2">Finance Tracker</h2>
+        <Link href={'/'} className="text-lg font-semibold px-2 py-2">
+          Moneymate
+        </Link>
       </SidebarHeader>
 
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Account Type</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <div className="px-2">
-              <Select value={accountType} onValueChange={setAccountType}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {accountTypes.map((type) => (
-                    <SelectItem key={type.value} value={type.value}>
-                      {type.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </SidebarGroupContent>
+          <SidebarGroupContent>{renderAccountTypeSelect()}</SidebarGroupContent>
         </SidebarGroup>
 
         <SidebarGroup>

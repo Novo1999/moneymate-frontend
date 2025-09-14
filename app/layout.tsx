@@ -1,4 +1,5 @@
 import { AuthProvider } from '@/app/contexts/AuthContext'
+import DashboardLayout from '@/app/layout/DashboardLayout'
 import { QueryProvider } from '@/app/provider/QueryProvider'
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
@@ -29,7 +30,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <QueryProvider>
-          <AuthProvider>{children}</AuthProvider>
+          <AuthProvider>
+            <DashboardLayout>{children}</DashboardLayout>
+          </AuthProvider>
           <Toaster />
         </QueryProvider>
       </body>
