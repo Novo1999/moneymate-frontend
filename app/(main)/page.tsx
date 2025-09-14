@@ -1,10 +1,12 @@
 'use client'
 
 import { useAuth } from '@/app/contexts/AuthContext'
+import { activeViewAtom } from '@/components/shared/LeftSidebar'
 import RechartsDonutChart from '@/components/shared/RechartsDonutChart'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useAtom, useAtomValue } from 'jotai'
 
 const expenseData = [
   { category: 'Food', amount: 850, color: '#059669' },
@@ -26,6 +28,8 @@ const recentTransactions = [
 export default function HomePage() {
   const { user, logout } = useAuth()
 
+  const activeView = useAtomValue(activeViewAtom)
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 p-6">
       {/* Header */}
@@ -36,7 +40,7 @@ export default function HomePage() {
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
                   <span className="text-md font-bold text-white">{user?.currency}</span>
-              </div>
+                </div>
                 <div>
                   <h1 className="text-3xl font-bold text-foreground">MoneyMate</h1>
                   <p className="text-muted-foreground mt-1">

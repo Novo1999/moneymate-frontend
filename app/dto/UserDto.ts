@@ -7,4 +7,5 @@ export interface UserDto {
   currency: Currency
   firstDayOfWeek: number
   firstDayOfMonth: number
+  viewMode: string
 }

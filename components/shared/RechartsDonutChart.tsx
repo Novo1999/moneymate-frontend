@@ -1,9 +1,11 @@
 'use client'
 
 import { useAuth } from '@/app/contexts/AuthContext'
-import { Banknote, Car, Coffee, CreditCard, Fuel, Gamepad2, Gift, GraduationCap, Heart, Home, LucideIcon, Phone, PiggyBank, Plane, Shirt, ShoppingBag, Stethoscope, Utensils } from 'lucide-react'
-import React, { useEffect, useState } from 'react'
-import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts'
+import { categoryKeyAtom } from '@/lib/atoms'
+import { useAtom } from 'jotai'
+import { Car, CreditCard, Fuel, Gamepad2, Home, LucideIcon, Phone, PiggyBank, ShoppingBag, Utensils } from 'lucide-react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Cell, Pie, PieChart, ResponsiveContainer } from 'recharts'
 import { ImplicitLabelListType } from 'recharts/types/component/LabelList'
 
 interface ExpenseData {
@@ -19,40 +21,33 @@ interface RechartsDonutChartProps {
   height?: number
 }
 
-const categoryIconMap: Record<string, LucideIcon> = {
-  food: Utensils,
-  transport: Car,
-  shopping: ShoppingBag,
-  entertainment: Gamepad2,
-  bills: Home,
-  health: Stethoscope,
-  travel: Plane,
-  coffee: Coffee,
-  fuel: Fuel,
-  education: GraduationCap,
-  gifts: Gift,
-  credit: CreditCard,
-  clothing: Shirt,
-  phone: Phone,
-  cash: Banknote,
-  charity: Heart,
-  savings: PiggyBank,
-}
-interface ChartDataItem extends ExpenseData {
-  percentage: string
+import { MoreHorizontal, TrendingUp } from 'lucide-react'
+enum ExpenseCategory {
+  FOOD_DRINKS = 'food_drinks',
+  SHOPPING = 'shopping',
+  HOUSING = 'housing',
+  TRANSPORTATION = 'transportation',
+  VEHICLE = 'vehicle',
+  LIFE_ENTERTAINMENT = 'life_entertainment',
+  COMMUNICATION_PC = 'communication_pc',
+  FINANCIAL_EXPENSES = 'financial_expenses',
+  INVESTMENTS = 'investments',
+  OTHERS_EXPENSE = 'others_expense',
+  TRANSFER = 'transfer_income',
 }
 
-interface TooltipPayloadItem {
-  color: string
-  dataKey: string
-  fill: string
-  name: string
-  payload: ChartDataItem
-  stroke: string
-  strokeWidth: number
-  type: string
-  unit: string
-  value: number
+export const categoryIconMap: Record<ExpenseCategory, LucideIcon> = {
+  [ExpenseCategory.FOOD_DRINKS]: Utensils,
+  [ExpenseCategory.SHOPPING]: ShoppingBag,
+  [ExpenseCategory.HOUSING]: Home,
+  [ExpenseCategory.TRANSPORTATION]: Car,
+  [ExpenseCategory.VEHICLE]: Fuel,
+  [ExpenseCategory.LIFE_ENTERTAINMENT]: Gamepad2,
+  [ExpenseCategory.COMMUNICATION_PC]: Phone,
+  [ExpenseCategory.FINANCIAL_EXPENSES]: CreditCard,
+  [ExpenseCategory.INVESTMENTS]: TrendingUp,
+  [ExpenseCategory.OTHERS_EXPENSE]: MoreHorizontal,
+  [ExpenseCategory.TRANSFER]: PiggyBank,
 }
 
 const CustomLabel = ({
@@ -103,10 +98,10 @@ const CustomLabel = ({
   const iconSize = isMobile ? 18 : isTablet ? 20 : 22
   const iconRadius_size = isMobile ? 22 : isTablet ? 25 : 28
   const iconGlowRadius = isMobile ? 26 : isTablet ? 29 : 32
+  const [, setCategoryKey] = useAtom(categoryKeyAtom)
 
   return (
     <g>
-      {/* Extended connecting line with adaptive thickness */}
       <polyline
         points={`${lineStartX},${lineStartY} ${lineMidX},${lineMidY} ${iconX},${iconY}`}
         stroke={color}
@@ -123,6 +118,7 @@ const CustomLabel = ({
 
       {/* Responsive icon background circle */}
       <circle
+        onMouseEnter={() => setCategoryKey(categoryKey)}
         cx={iconX}
         cy={iconY}
         r={iconRadius_size}
@@ -172,6 +168,8 @@ const CustomLabel = ({
 export default function RechartsDonutChart({ data, width, height }: RechartsDonutChartProps) {
   const { user } = useAuth()
   const [screenSize, setScreenSize] = useState({ width: 1024, height: 768 })
+  const [categoryKey] = useAtom(categoryKeyAtom)
+  console.log("🚀 ~ RechartsDonutChart ~ categoryKey:", categoryKey)
 
   // Track screen size for responsive behavior
   useEffect(() => {
@@ -187,7 +185,7 @@ export default function RechartsDonutChart({ data, width, height }: RechartsDonu
   }, [])
 
   // Responsive sizing based on screen dimensions
-  const getResponsiveDimensions = () => {
+  const getResponsiveDimensions = useCallback(() => {
     const screenWidth = screenSize.width
     const screenHeight = screenSize.height
 
@@ -216,11 +214,22 @@ export default function RechartsDonutChart({ data, width, height }: RechartsDonu
         innerRadius: 85,
       }
     }
-  }
+  }, [height, width, screenSize.height, screenSize.width])
 
-  const responsive = getResponsiveDimensions()
-  const isMobile = screenSize.width < 640
+  const responsive = useCallback(() => getResponsiveDimensions(), [getResponsiveDimensions])
+  // Calculate total and add percentage to data - memoized to prevent re-renders
+  const chartData = useMemo(() => {
+    const total = data.reduce((sum, item) => sum + item.amount, 0)
+    return data.map((item) => ({
+      ...item,
+      percentage: ((item.amount / total) * 100).toFixed(1),
+    }))
+  }, [data])
 
+  const total = useMemo(() => data.reduce((sum, item) => sum + item.amount, 0), [data])
+
+  const responsiveConfig = useMemo(() => responsive(), [responsive])
+  const memoizedPie = useMemo(() => <PieChartComponent chartData={chartData} responsive={responsiveConfig} />, [chartData, responsiveConfig])
   if (!data || data.length === 0) {
     return (
       <div className="flex items-center justify-center h-64 sm:h-80 md:h-96 text-gray-500 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border mx-4">
@@ -232,49 +241,10 @@ export default function RechartsDonutChart({ data, width, height }: RechartsDonu
     )
   }
 
-  // Calculate total and add percentage to data
-  const total = data.reduce((sum, item) => sum + item.amount, 0)
-  const chartData = data.map((item) => ({
-    ...item,
-    percentage: ((item.amount / total) * 100).toFixed(1),
-  }))
-
   return (
     <div className="w-full flex flex-col items-center">
       <div className="relative w-full max-w-4xl">
-        <ResponsiveContainer width="100%" height={responsive.height}>
-          <PieChart>
-            <Pie
-              data={chartData}
-              cx="50%"
-              cy="50%"
-              labelLine={false}
-              label={CustomLabel as ImplicitLabelListType}
-              outerRadius={responsive.outerRadius}
-              innerRadius={responsive.innerRadius}
-              paddingAngle={3}
-              fill="#8884d8"
-              dataKey="amount"
-              animationBegin={0}
-              animationDuration={1200}
-              animationEasing="ease-out"
-            >
-              {chartData.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={entry.color}
-                  stroke="white"
-                  strokeWidth={3}
-                  style={{
-                    filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.1))',
-                    cursor: 'pointer',
-                  }}
-                />
-              ))}
-            </Pie>
-          </PieChart>
-        </ResponsiveContainer>
-
+        {memoizedPie}
         {/* Enhanced Center content - Mobile Responsive */}
         <div className="absolute inset-0 z-0 flex flex-col items-center justify-center pointer-events-none">
           <div className="text-center rounded-2xl bg-transparent px-2 sm:px-4">
@@ -284,54 +254,6 @@ export default function RechartsDonutChart({ data, width, height }: RechartsDonu
             </div>
             <div className="text-sm sm:text-base lg:text-lg font-semibold text-gray-500">{user?.currency || 'USD'}</div>
           </div>
-        </div>
-      </div>
-
-      {/* Enhanced Legend - Mobile Responsive */}
-      <div className="mt-6 sm:mt-8 lg:mt-10 w-full max-w-6xl">
-        <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-4 sm:mb-6 text-center px-4">Expense Categories</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
-          {chartData.map((item, index) => {
-            const IconComponent = categoryIconMap[item.category.toLowerCase()] || ShoppingBag
-            return (
-              <div
-                key={index}
-                className="bg-white rounded-lg sm:rounded-xl p-3 sm:p-4 shadow-md border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group active:scale-95"
-              >
-                <div className="flex items-center gap-2 sm:gap-3">
-                  <div
-                    className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl flex items-center justify-center text-white group-hover:scale-110 transition-all duration-300 shadow-lg flex-shrink-0"
-                    style={{
-                      backgroundColor: item.color,
-                      boxShadow: `0 4px 12px ${item.color}40`,
-                    }}
-                  >
-                    <IconComponent size={isMobile ? 18 : 20} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm sm:text-base font-semibold text-gray-800 capitalize truncate group-hover:text-gray-900">{item.category}</div>
-                    <div className="text-xs sm:text-sm text-gray-600 font-medium">
-                      {item.amount.toLocaleString()} {user?.currency || 'USD'}
-                    </div>
-                    <div className="text-xs text-emerald-600 font-bold">{item.percentage}% of total</div>
-                  </div>
-                </div>
-
-                {/* Mobile: Add progress bar */}
-                <div className="mt-2 sm:mt-3 h-1 bg-gray-200 rounded-full overflow-hidden sm:hidden">
-                  <div
-                    className="h-full rounded-full transition-all duration-500 ease-out"
-                    style={{
-                      backgroundColor: item.color,
-                      width: `${item.percentage}%`,
-                      transform: 'translateX(-100%)',
-                      animation: `slideIn 0.8s ease-out ${index * 0.1}s forwards`,
-                    }}
-                  />
-                </div>
-              </div>
-            )
-          })}
         </div>
       </div>
 
@@ -346,5 +268,59 @@ export default function RechartsDonutChart({ data, width, height }: RechartsDonu
         }
       `}</style>
     </div>
+  )
+}
+
+const PieChartComponent = ({
+  responsive,
+  chartData,
+}: {
+  chartData: {
+    percentage: string
+    category: string
+    amount: number
+    color: string
+    icon?: string
+  }[]
+  responsive: {
+    width: number
+    height: number
+    outerRadius: number
+    innerRadius: number
+  }
+}) => {
+  return (
+    <ResponsiveContainer width="100%" height={responsive.height}>
+      <PieChart>
+        <Pie
+          data={chartData}
+          cx="50%"
+          cy="50%"
+          labelLine={false}
+          label={CustomLabel as ImplicitLabelListType}
+          outerRadius={responsive.outerRadius}
+          innerRadius={responsive.innerRadius}
+          paddingAngle={3}
+          fill="#8884d8"
+          dataKey="amount"
+          animationBegin={0}
+          animationDuration={1200}
+          animationEasing="ease-out"
+        >
+          {chartData.map((entry, index) => (
+            <Cell
+              key={`cell-${index}`}
+              fill={entry.color}
+              stroke="white"
+              strokeWidth={3}
+              style={{
+                filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.1))',
+                cursor: 'pointer',
+              }}
+            />
+          ))}
+        </Pie>
+      </PieChart>
+    </ResponsiveContainer>
   )
 }

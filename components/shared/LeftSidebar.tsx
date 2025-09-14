@@ -10,9 +10,10 @@ import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGrou
 import { Skeleton } from '@/components/ui/skeleton'
 import { useQuery } from '@tanstack/react-query'
 import { format } from 'date-fns'
+import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { BarChart3, Calendar, CalendarIcon, Clock, Eye } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 
 interface AccountType {
   id: number
@@ -31,11 +32,15 @@ const viewModes = [
   { value: 'interval', label: 'Custom Interval', icon: Calendar },
 ]
 
+export const activeViewAtom = atom('day')
+export const accountTypeAtom = atom<string>('')
+export const dateAtom = atom<Date | undefined>(undefined)
+
 export default function LeftSidebar() {
-  const [accountType, setAccountType] = useState<string>('')
-  const [activeView, setActiveView] = useState('month')
-  const [date, setDate] = useState<Date>()
+  const [accountType, setAccountType] = useAtom(accountTypeAtom)
+  const [date, setDate] = useAtom(dateAtom)
   const { user } = useAuth()
+  const [activeView, setActiveView] = useAtom(activeViewAtom)
 
   // Fetch account types using TanStack Query
   const {
@@ -49,6 +54,10 @@ export default function LeftSidebar() {
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
   })
+
+  activeViewAtom.onMount = (setAtom) => {
+    setAtom(user?.viewMode || '')
+  }
 
   // Set default account type when data loads
   useEffect(() => {
@@ -98,7 +107,6 @@ export default function LeftSidebar() {
       </div>
     )
   }
-
   return (
     <Sidebar>
       <SidebarHeader>
