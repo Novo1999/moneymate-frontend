@@ -91,7 +91,7 @@ const CustomLabel = ({
   const iconX = cx + iconRadius * Math.cos(-midAngle * RADIAN)
   const iconY = cy + iconRadius * Math.sin(-midAngle * RADIAN)
 
-  const categoryKey = category.toLowerCase()
+  const categoryKey = category.toLowerCase() as ExpenseCategory
   const IconComponent = categoryIconMap[categoryKey] || ShoppingBag
 
   // Responsive icon and text sizes
@@ -169,7 +169,6 @@ export default function RechartsDonutChart({ data, width, height }: RechartsDonu
   const { user } = useAuth()
   const [screenSize, setScreenSize] = useState({ width: 1024, height: 768 })
   const [categoryKey] = useAtom(categoryKeyAtom)
-  console.log("🚀 ~ RechartsDonutChart ~ categoryKey:", categoryKey)
 
   // Track screen size for responsive behavior
   useEffect(() => {

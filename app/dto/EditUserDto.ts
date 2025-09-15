@@ -7,4 +7,5 @@ export interface EditUserDto {
   currency?: Currency
   firstDayOfWeek?: number
   firstDayOfMonth?: number
+  viewMode?: string
 }

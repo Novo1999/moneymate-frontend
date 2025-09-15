@@ -41,6 +41,11 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --gradient-custom-green: linear-gradient(to right, #16a34a, #059669);
+}
+
+@utility bg-custom-green {
+  background-image: var(--gradient-custom-green);
 }
 
 :root {

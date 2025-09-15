@@ -1,6 +1,7 @@
 'use client'
 
 import AccountTypeApiService from '@/app/ApiService/AccountTypeApiService'
+import UserApiService from '@/app/ApiService/UserApiService'
 import { useAuth } from '@/app/contexts/AuthContext'
 import { Button } from '@/components/ui/button'
 import { Calendar as CalendarComponent } from '@/components/ui/calendar'
@@ -10,7 +11,7 @@ import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGrou
 import { Skeleton } from '@/components/ui/skeleton'
 import { useQuery } from '@tanstack/react-query'
 import { format } from 'date-fns'
-import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai'
+import { atom, useAtom } from 'jotai'
 import { BarChart3, Calendar, CalendarIcon, Clock, Eye } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect } from 'react'
@@ -65,6 +66,11 @@ export default function LeftSidebar() {
       setAccountType(accountTypes[0].id.toString())
     }
   }, [accountTypes, accountType])
+
+  const handleChangeActiveView = async (mode: string) => {
+    if (!user?.id) return
+    UserApiService.editUser(user?.id, { viewMode: mode })
+  }
 
   const renderAccountTypeSelect = () => {
     if (isLoadingAccountTypes) {
@@ -129,7 +135,13 @@ export default function LeftSidebar() {
                 const Icon = mode.icon
                 return (
                   <SidebarMenuItem key={mode.value}>
-                    <SidebarMenuButton isActive={activeView === mode.value} onClick={() => setActiveView(mode.value)}>
+                    <SidebarMenuButton
+                      isActive={activeView === mode.value}
+                      onClick={() => {
+                        setActiveView(mode.value)
+                        handleChangeActiveView(mode.value)
+                      }}
+                    >
                       <Icon className="h-4 w-4" />
                       <span>{mode.label}</span>
                     </SidebarMenuButton>
