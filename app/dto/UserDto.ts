@@ -1,3 +1,4 @@
+import { ActiveViewModes } from '@/types/activeViewMode'
 import { Currency } from '@/types/currency'
 
 export interface UserDto {
@@ -7,5 +8,5 @@ export interface UserDto {
   currency: Currency
   firstDayOfWeek: number
   firstDayOfMonth: number
-  viewMode: string
+  viewMode: ActiveViewModes
 }

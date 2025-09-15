@@ -1,5 +1,6 @@
 'use client'
 
+import ExpenseOverview from '@/app/(main)/components/ExpenseOverview'
 import { useAuth } from '@/app/contexts/AuthContext'
 import { activeViewAtom } from '@/components/shared/LeftSidebar'
 import RechartsDonutChart from '@/components/shared/RechartsDonutChart'
@@ -56,58 +57,7 @@ export default function HomePage() {
         </Card>
       </div>
 
-      <div className="max-w-7xl grid grid-cols-1 xl:grid-cols-3 gap-6">
-        {/* Chart Section */}
-        <div className="lg:col-span-2">
-          <Card className="shadow-lg">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-2xl">Expense Overview</CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0 px-0">
-              <div className="flex flex-col lg:flex-row justify-between items-center gap-8">
-                <RechartsDonutChart data={expenseData} />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Summary Cards */}
-        <div className="space-y-6">
-          {/* Balance Card */}
-          <Card className="shadow-lg bg-gradient-to-br from-green-500 to-emerald-600 text-white border-0">
-            <CardContent className="text-center p-8">
-              <h3 className="text-lg font-semibold mb-3">Current Balance</h3>
-              <p className="text-4xl font-bold mb-2">4,280.45 {user?.currency}</p>
-              <p className="text-green-100 text-sm">+2.5% from last month</p>
-            </CardContent>
-          </Card>
-
-          {/* Monthly Spending */}
-          <Card className="shadow-lg">
-            <CardContent className="text-center p-8">
-              <h3 className="text-lg font-semibold text-foreground mb-3">This Month Spending</h3>
-              <p className="text-4xl font-bold text-destructive mb-2">2,720 {user?.currency}</p>
-              <p className="text-muted-foreground text-sm">Total expenses</p>
-            </CardContent>
-          </Card>
-
-          {/* Quick Actions */}
-          <Card className="shadow-lg">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-xl">Quick Actions</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4 pt-0">
-              <Button size="lg">Add Income</Button>
-              <Button className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white" size="lg">
-                Add Expense
-              </Button>
-              <Button className="w-full" variant="outline" size="lg">
-                View Reports
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+      <ExpenseOverview />
 
       {/* Recent Transactions */}
       <div className="max-w-7xl mt-8">

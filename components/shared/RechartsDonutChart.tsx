@@ -8,19 +8,22 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Cell, Pie, PieChart, ResponsiveContainer } from 'recharts'
 import { ImplicitLabelListType } from 'recharts/types/component/LabelList'
 
-interface ExpenseData {
+interface TransactionData {
+  id: number
   category: string
-  amount: number
+  money: string
   color: string
   icon?: string
+  type: string
 }
 
 interface RechartsDonutChartProps {
-  data: ExpenseData[]
+  data: TransactionData[]
   width?: number
   height?: number
 }
 
+import { cn } from '@/lib/utils'
 import { MoreHorizontal, TrendingUp } from 'lucide-react'
 enum ExpenseCategory {
   FOOD_DRINKS = 'food_drinks',
@@ -101,7 +104,7 @@ const CustomLabel = ({
   const [, setCategoryKey] = useAtom(categoryKeyAtom)
 
   return (
-    <g>
+    <g onMouseEnter={() => setCategoryKey(categoryKey)} onMouseLeave={() => setCategoryKey('')}>
       <polyline
         points={`${lineStartX},${lineStartY} ${lineMidX},${lineMidY} ${iconX},${iconY}`}
         stroke={color}
@@ -118,7 +121,6 @@ const CustomLabel = ({
 
       {/* Responsive icon background circle */}
       <circle
-        onMouseEnter={() => setCategoryKey(categoryKey)}
         cx={iconX}
         cy={iconY}
         r={iconRadius_size}
@@ -135,14 +137,14 @@ const CustomLabel = ({
       <circle cx={iconX} cy={iconY} r={iconGlowRadius} fill="none" stroke={color} strokeWidth={2} opacity={0.3} />
 
       {/* Foreign object for React icon */}
-      <foreignObject x={iconX - iconSize / 2} y={iconY - iconSize / 2} width={iconSize} height={iconSize}>
+      <foreignObject className="cursor-pointer" x={iconX - iconSize / 2} y={iconY - iconSize / 2} width={iconSize} height={iconSize}>
         <div className="flex items-center justify-center w-full h-full text-white">
           <IconComponent size={iconSize} />
         </div>
       </foreignObject>
 
       {/* Responsive category label */}
-      <text
+      {/* <text
         x={iconX}
         y={iconY + (isMobile ? 40 : 50)}
         fill="#374151"
@@ -155,10 +157,17 @@ const CustomLabel = ({
         }}
       >
         {isMobile ? category.substring(0, 8) : category}
-      </text>
+      </text> */}
 
       {/* Responsive percentage label */}
-      <text x={iconX} y={iconY + (isMobile ? 55 : 68)} fill="#059669" textAnchor="middle" dominantBaseline="central" className={isMobile ? 'text-xs font-bold' : 'text-sm font-bold'}>
+      <text
+        x={isMobile ? iconX : iconX + 60}
+        y={isMobile ? iconY + 40 : iconY + 20}
+        fill="#059669"
+        textAnchor="middle"
+        dominantBaseline="central"
+        className={cn(isMobile ? 'text-xs font-bold' : 'text-sm font-bold')}
+      >
         {`${(percent * 100).toFixed(1)}%`}
       </text>
     </g>
@@ -216,18 +225,42 @@ export default function RechartsDonutChart({ data, width, height }: RechartsDonu
   }, [height, width, screenSize.height, screenSize.width])
 
   const responsive = useCallback(() => getResponsiveDimensions(), [getResponsiveDimensions])
-  // Calculate total and add percentage to data - memoized to prevent re-renders
+
+  const responsiveConfig = useMemo(() => responsive(), [responsive])
+
   const chartData = useMemo(() => {
-    const total = data.reduce((sum, item) => sum + item.amount, 0)
-    return data.map((item) => ({
-      ...item,
-      percentage: ((item.amount / total) * 100).toFixed(1),
+    const expenseData = data.filter((item) => item.type === 'expense')
+    const categoryTotals = expenseData.reduce((acc, item) => {
+      const category = item.category
+      const money = parseFloat(item.money)
+
+      if (acc[category]) {
+        acc[category] += money
+      } else {
+        acc[category] = money
+      }
+
+      return acc
+    }, {} as Record<string, number>)
+
+    const colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#FF6384', '#C9CBCF', '#4BC0C0', '#FF6384', '#36A2EB']
+
+    const expenseTotal = Object.values(categoryTotals).reduce((sum, amount) => sum + amount, 0)
+
+    if (expenseTotal === 0) return []
+
+    return Object.entries(categoryTotals).map(([category, amount], index) => ({
+      id: index,
+      category,
+      money: amount,
+      color: colors[index % colors.length],
+      type: 'expense',
+      percentage: ((amount / expenseTotal) * 100).toFixed(1),
     }))
   }, [data])
 
-  const total = useMemo(() => data.reduce((sum, item) => sum + item.amount, 0), [data])
+  const total = useMemo(() => data.filter((item) => item.type === 'expense').reduce((sum, item) => sum + parseFloat(item.money), 0), [data])
 
-  const responsiveConfig = useMemo(() => responsive(), [responsive])
   const memoizedPie = useMemo(() => <PieChartComponent chartData={chartData} responsive={responsiveConfig} />, [chartData, responsiveConfig])
   if (!data || data.length === 0) {
     return (
@@ -240,6 +273,8 @@ export default function RechartsDonutChart({ data, width, height }: RechartsDonu
     )
   }
 
+  console.log(chartData)
+
   return (
     <div className="w-full flex flex-col items-center">
       <div className="relative w-full max-w-4xl">
@@ -248,24 +283,14 @@ export default function RechartsDonutChart({ data, width, height }: RechartsDonu
         <div className="absolute inset-0 z-0 flex flex-col items-center justify-center pointer-events-none">
           <div className="text-center rounded-2xl bg-transparent px-2 sm:px-4">
             <div className="text-xs sm:text-sm font-semibold text-gray-600 uppercase tracking-wide mb-1 sm:mb-2">Total Expenses</div>
-            <div className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-emerald-600 to-green-500 bg-clip-text text-transparent mb-1 sm:mb-2 break-all">
-              {total.toLocaleString()}
+            <div className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-red-600 to-red-500 bg-clip-text text-transparent mb-1 sm:mb-2 break-all">
+              {/* {total.toLocaleString()} */}
+              {chartData?.find((cd) => cd.category === categoryKey)?.money.toLocaleString() || total.toLocaleString()}
             </div>
             <div className="text-sm sm:text-base lg:text-lg font-semibold text-gray-500">{user?.currency || 'USD'}</div>
           </div>
         </div>
       </div>
-
-      <style jsx>{`
-        @keyframes slideIn {
-          from {
-            transform: translateX(-100%);
-          }
-          to {
-            transform: translateX(0);
-          }
-        }
-      `}</style>
     </div>
   )
 }
@@ -277,7 +302,7 @@ const PieChartComponent = ({
   chartData: {
     percentage: string
     category: string
-    amount: number
+    money: number
     color: string
     icon?: string
   }[]
@@ -288,6 +313,7 @@ const PieChartComponent = ({
     innerRadius: number
   }
 }) => {
+  console.log(chartData)
   return (
     <ResponsiveContainer width="100%" height={responsive.height}>
       <PieChart>
@@ -301,7 +327,7 @@ const PieChartComponent = ({
           innerRadius={responsive.innerRadius}
           paddingAngle={3}
           fill="#8884d8"
-          dataKey="amount"
+          dataKey="money"
           animationBegin={0}
           animationDuration={1200}
           animationEasing="ease-out"

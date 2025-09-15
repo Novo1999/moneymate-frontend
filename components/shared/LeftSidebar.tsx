@@ -9,10 +9,11 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar'
 import { Skeleton } from '@/components/ui/skeleton'
+import { ActiveViewModes } from '@/types/activeViewMode'
 import { useQuery } from '@tanstack/react-query'
 import { format } from 'date-fns'
 import { atom, useAtom } from 'jotai'
-import { BarChart3, Calendar, CalendarIcon, Clock, Eye } from 'lucide-react'
+import { BarChart3, Calendar, CalendarIcon, Clock, Eye, LucideIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect } from 'react'
 
@@ -24,7 +25,7 @@ interface AccountType {
   description?: string
 }
 
-const viewModes = [
+const viewModes: Array<{ value: ActiveViewModes; label: string; icon: LucideIcon }> = [
   { value: 'day', label: 'Day', icon: Clock },
   { value: 'week', label: 'Week', icon: Calendar },
   { value: 'month', label: 'Month', icon: BarChart3 },
@@ -33,7 +34,7 @@ const viewModes = [
   { value: 'interval', label: 'Custom Interval', icon: Calendar },
 ]
 
-export const activeViewAtom = atom('day')
+export const activeViewAtom = atom<ActiveViewModes>('day')
 export const accountTypeAtom = atom<string>('')
 export const dateAtom = atom<Date | undefined>(undefined)
 
@@ -90,9 +91,9 @@ export default function LeftSidebar() {
     }
 
     return (
-      <div className="px-2">
+      <div>
         <Select value={accountType} onValueChange={setAccountType}>
-          <SelectTrigger>
+          <SelectTrigger className="border-green-500 w-full">
             <SelectValue placeholder="Select account type" />
           </SelectTrigger>
           <SelectContent>
@@ -116,7 +117,7 @@ export default function LeftSidebar() {
   return (
     <Sidebar>
       <SidebarHeader>
-        <Link href={'/'} className="text-lg font-semibold px-2 py-2">
+        <Link href={'/'} className="text-lg font-semibold py-2">
           Moneymate
         </Link>
       </SidebarHeader>
