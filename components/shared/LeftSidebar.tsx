@@ -1,5 +1,6 @@
 'use client'
 
+import { transactionInfoIntervalAtom } from '@/app/(main)/components/ExpenseOverview'
 import AccountTypeApiService from '@/app/ApiService/AccountTypeApiService'
 import UserApiService from '@/app/ApiService/UserApiService'
 import { useAuth } from '@/app/contexts/AuthContext'
@@ -13,7 +14,7 @@ import { ActiveViewModes } from '@/types/activeViewMode'
 import { useQuery } from '@tanstack/react-query'
 import { format } from 'date-fns'
 import { atom, useAtom } from 'jotai'
-import { BarChart3, Calendar, CalendarIcon, Clock, Eye, LucideIcon } from 'lucide-react'
+import { BarChart3, Calendar, CalendarIcon, Clock, Eye, Loader, LucideIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect } from 'react'
 
@@ -35,14 +36,15 @@ const viewModes: Array<{ value: ActiveViewModes; label: string; icon: LucideIcon
 ]
 
 export const activeViewAtom = atom<ActiveViewModes>('day')
-export const accountTypeAtom = atom<string>('')
+export const accountTypeAtom = atom<number>(0)
 export const dateAtom = atom<Date | undefined>(undefined)
 
 export default function LeftSidebar() {
   const [accountType, setAccountType] = useAtom(accountTypeAtom)
   const [date, setDate] = useAtom(dateAtom)
-  const { user } = useAuth()
+  const { user, isLoading } = useAuth()
   const [activeView, setActiveView] = useAtom(activeViewAtom)
+  const [transactionInfoInterval, setTransactionInfoInterval] = useAtom(transactionInfoIntervalAtom)
 
   // Fetch account types using TanStack Query
   const {
@@ -63,14 +65,20 @@ export default function LeftSidebar() {
 
   // Set default account type when data loads
   useEffect(() => {
-    if (accountTypes && accountTypes.length > 0 && !accountType) {
-      setAccountType(accountTypes[0].id.toString())
+    if (user) {
+      setAccountType(user?.activeAccountTypeId ?? 0)
     }
-  }, [accountTypes, accountType])
+  }, [user])
 
   const handleChangeActiveView = async (mode: string) => {
     if (!user?.id) return
     UserApiService.editUser(user?.id, { viewMode: mode })
+  }
+
+  const handleChangeAccountType = async (val: number) => {
+    console.log('🚀 ~ handleChangeAccountType ~ val:', val)
+    setAccountType(val)
+    if (user?.id) await UserApiService.editUser(user?.id, { activeAccountTypeId: Number(val) })
   }
 
   const renderAccountTypeSelect = () => {
@@ -90,9 +98,11 @@ export default function LeftSidebar() {
       )
     }
 
-    return (
+    return isLoading ? (
+      <Loader className="animate-spin" />
+    ) : (
       <div>
-        <Select value={accountType} onValueChange={setAccountType}>
+        <Select value={accountType.toString()} onValueChange={(val) => handleChangeAccountType(Number(val))}>
           <SelectTrigger className="border-green-500 w-full">
             <SelectValue placeholder="Select account type" />
           </SelectTrigger>
@@ -141,6 +151,10 @@ export default function LeftSidebar() {
                       onClick={() => {
                         setActiveView(mode.value)
                         handleChangeActiveView(mode.value)
+                        if (mode.value === 'day') {
+                          setTransactionInfoInterval(new Date().toISOString())
+                        } else if (mode.value === 'week') {
+                        }
                       }}
                     >
                       <Icon className="h-4 w-4" />

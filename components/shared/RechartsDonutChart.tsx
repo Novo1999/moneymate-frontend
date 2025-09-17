@@ -2,8 +2,8 @@
 
 import { useAuth } from '@/app/contexts/AuthContext'
 import { categoryKeyAtom } from '@/lib/atoms'
-import { useAtom } from 'jotai'
-import { Car, CreditCard, Fuel, Gamepad2, Home, LucideIcon, Phone, PiggyBank, ShoppingBag, Utensils } from 'lucide-react'
+import { useAtom, useAtomValue } from 'jotai'
+import { Car, CreditCard, Fuel, Gamepad2, Home, Loader, LucideIcon, Phone, PiggyBank, ShoppingBag, Utensils } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Cell, Pie, PieChart, ResponsiveContainer } from 'recharts'
 import { ImplicitLabelListType } from 'recharts/types/component/LabelList'
@@ -15,6 +15,7 @@ interface TransactionData {
   color: string
   icon?: string
   type: string
+  createdAt: string
 }
 
 interface RechartsDonutChartProps {
@@ -23,7 +24,9 @@ interface RechartsDonutChartProps {
   height?: number
 }
 
+import { transactionInfoIntervalAtom } from '@/app/(main)/components/ExpenseOverview'
 import { cn } from '@/lib/utils'
+import { isSameDay } from 'date-fns'
 import { MoreHorizontal, TrendingUp } from 'lucide-react'
 enum ExpenseCategory {
   FOOD_DRINKS = 'food_drinks',
@@ -101,7 +104,7 @@ const CustomLabel = ({
   const iconSize = isMobile ? 18 : isTablet ? 20 : 22
   const iconRadius_size = isMobile ? 22 : isTablet ? 25 : 28
   const iconGlowRadius = isMobile ? 26 : isTablet ? 29 : 32
-  const [, setCategoryKey] = useAtom(categoryKeyAtom)
+  const [currentCategoryKey, setCategoryKey] = useAtom(categoryKeyAtom)
 
   return (
     <g onMouseEnter={() => setCategoryKey(categoryKey)} onMouseLeave={() => setCategoryKey('')}>
@@ -134,7 +137,7 @@ const CustomLabel = ({
       />
 
       {/* Outer glow circle */}
-      <circle cx={iconX} cy={iconY} r={iconGlowRadius} fill="none" stroke={color} strokeWidth={2} opacity={0.3} />
+      <circle cx={iconX} cy={iconY} r={iconGlowRadius} fill="none" stroke={color} strokeWidth={2} opacity={currentCategoryKey === categoryKey ? 1 : 0.3} />
 
       {/* Foreign object for React icon */}
       <foreignObject className="cursor-pointer" x={iconX - iconSize / 2} y={iconY - iconSize / 2} width={iconSize} height={iconSize}>
@@ -176,6 +179,7 @@ const CustomLabel = ({
 
 export default function RechartsDonutChart({ data, width, height }: RechartsDonutChartProps) {
   const { user } = useAuth()
+  const transactionInfoInterval = useAtomValue(transactionInfoIntervalAtom)
   const [screenSize, setScreenSize] = useState({ width: 1024, height: 768 })
   const [categoryKey] = useAtom(categoryKeyAtom)
 
@@ -228,8 +232,10 @@ export default function RechartsDonutChart({ data, width, height }: RechartsDonu
 
   const responsiveConfig = useMemo(() => responsive(), [responsive])
 
+  console.log(data)
+
   const chartData = useMemo(() => {
-    const expenseData = data.filter((item) => item.type === 'expense')
+    const expenseData = data.filter((item) => item.type === 'expense' && isSameDay(new Date(item.createdAt), transactionInfoInterval))
     const categoryTotals = expenseData.reduce((acc, item) => {
       const category = item.category
       const money = parseFloat(item.money)
@@ -257,9 +263,12 @@ export default function RechartsDonutChart({ data, width, height }: RechartsDonu
       type: 'expense',
       percentage: ((amount / expenseTotal) * 100).toFixed(1),
     }))
-  }, [data])
+  }, [data, transactionInfoInterval])
 
-  const total = useMemo(() => data.filter((item) => item.type === 'expense').reduce((sum, item) => sum + parseFloat(item.money), 0), [data])
+  const total = useMemo(
+    () => data.filter((item) => item.type === 'expense' && isSameDay(new Date(item.createdAt), transactionInfoInterval)).reduce((sum, item) => sum + parseFloat(item.money), 0),
+    [data, transactionInfoInterval]
+  )
 
   const memoizedPie = useMemo(() => <PieChartComponent chartData={chartData} responsive={responsiveConfig} />, [chartData, responsiveConfig])
   if (!data || data.length === 0) {
@@ -273,10 +282,8 @@ export default function RechartsDonutChart({ data, width, height }: RechartsDonu
     )
   }
 
-  console.log(chartData)
-
   return (
-    <div className="w-full flex flex-col items-center">
+    <div className="w-full flex flex-col items-center justify-center min-h-[50vh]">
       <div className="relative w-full max-w-4xl">
         {memoizedPie}
         {/* Enhanced Center content - Mobile Responsive */}

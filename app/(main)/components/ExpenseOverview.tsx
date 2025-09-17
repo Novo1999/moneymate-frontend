@@ -6,8 +6,9 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ActiveViewModes } from '@/types/activeViewMode'
 import { useQuery } from '@tanstack/react-query'
-import { addDays, subDays } from 'date-fns'
-import { useAtomValue } from 'jotai'
+import { addDays, format, subDays } from 'date-fns'
+import { atom, useAtom, useAtomValue } from 'jotai'
+import { ChevronLeft, ChevronRight, Loader } from 'lucide-react'
 import { useMemo } from 'react'
 
 const getDateIntervalBasedOnActiveViewMode = (activeView: ActiveViewModes): { from: string; to: string } => {
@@ -25,25 +26,37 @@ const getDateIntervalBasedOnActiveViewMode = (activeView: ActiveViewModes): { fr
     default:
       return {
         from: new Date().toISOString(),
-        to: new Date().toISOString(),
+        to: addDays(new Date(), 1).toISOString(),
       }
   }
 }
 
+export const transactionInfoIntervalAtom = atom(new Date().toISOString())
 const ExpenseOverview = () => {
   const { user } = useAuth()
   const accountTypeId = useAtomValue(accountTypeAtom)
   const activeView = useAtomValue(activeViewAtom)
+  const [transactionInfoInterval, setTransactionInfoInterval] = useAtom(transactionInfoIntervalAtom)
+  const transactionInfoIntervalDate = new Date(transactionInfoInterval)
 
   const { from, to } = useMemo(() => getDateIntervalBasedOnActiveViewMode(activeView), [activeView])
 
-  const { data: transactionInfo } = useQuery({
+  const { data: transactionInfo, isLoading: transactionInfoLoading } = useQuery({
     queryKey: ['userTransactionsInfo', accountTypeId, from, to],
     queryFn: () => TransactionApiService.getUserTransactionsInfo(Number(accountTypeId), from, to),
     enabled: !!accountTypeId && !!from && !!to,
   })
 
   console.log(transactionInfo)
+  const handlePrevDate = () => {
+    const prevDate = subDays(transactionInfoIntervalDate, 1)
+    setTransactionInfoInterval(prevDate.toISOString())
+  }
+
+  const handleNextDate = () => {
+    const nextDate = addDays(transactionInfoIntervalDate, 1)
+    setTransactionInfoInterval(nextDate.toISOString())
+  }
 
   return (
     <div className="max-w-7xl grid grid-cols-1 xl:grid-cols-3 gap-6">
@@ -54,7 +67,18 @@ const ExpenseOverview = () => {
             <CardTitle className="text-2xl">Expense Overview</CardTitle>
           </CardHeader>
           <CardContent className="pt-0 px-0">
-            <div className="flex flex-col lg:flex-row justify-between items-center gap-8">{transactionInfo && <RechartsDonutChart data={transactionInfo?.transactions} />}</div>
+            <div className="flex justify-center gap-4 items-center">
+              <Button onClick={handlePrevDate}>
+                <ChevronLeft />
+              </Button>
+              <p className="text-center font-bold text-green-500">{format(transactionInfoIntervalDate, 'd MMMM')}</p>
+              <Button onClick={handleNextDate}>
+                <ChevronRight />
+              </Button>
+            </div>
+            <div className="flex flex-col lg:flex-row min-h-[70vh] justify-center items-center gap-8">
+              {transactionInfoLoading ? <Loader className="text-green-500 animate-spin" /> : transactionInfo && <RechartsDonutChart data={transactionInfo?.transactions} />}
+            </div>
           </CardContent>
         </Card>
       </div>

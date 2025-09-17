@@ -9,4 +9,5 @@ export interface UserDto {
   firstDayOfWeek: number
   firstDayOfMonth: number
   viewMode: ActiveViewModes
+  activeAccountTypeId: number
 }

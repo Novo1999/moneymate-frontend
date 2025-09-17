@@ -8,4 +8,5 @@ export interface EditUserDto {
   firstDayOfWeek?: number
   firstDayOfMonth?: number
   viewMode?: string
+  activeAccountTypeId?: number
 }
