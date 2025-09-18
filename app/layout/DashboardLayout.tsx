@@ -1,11 +1,12 @@
 'use client'
 
+import { useIs2xl } from '@/app/hooks/use-mobile'
 import LeftSidebar from '@/components/shared/LeftSidebar'
 import RightSidebar from '@/components/shared/RightSidebar'
 import { Button } from '@/components/ui/button'
 import { SidebarInset, SidebarProvider, useSidebar } from '@/components/ui/sidebar'
 import { PanelLeft } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 interface DashboardLayoutProps {
   children: React.ReactNode
@@ -13,7 +14,15 @@ interface DashboardLayoutProps {
 
 function DashboardContent({ children }: DashboardLayoutProps) {
   const [rightSidebarOpen, setRightSidebarOpen] = useState(false)
+  console.log(rightSidebarOpen)
   const { open, setOpen } = useSidebar()
+
+  const is2xl = useIs2xl()
+
+  useEffect(() => {
+    if (is2xl) setRightSidebarOpen(true)
+    else setRightSidebarOpen(false)
+  }, [is2xl])
 
   return (
     <>

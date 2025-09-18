@@ -14,4 +14,3 @@ const isInRange = isWithinInterval(compareDate, {
   start: rangeStart,
   end: rangeEnd,
 })
-console.log('In range:', isInRange)

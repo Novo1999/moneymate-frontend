@@ -1,3 +1,4 @@
+import DateController from '@/app/(main)/components/DateController'
 import TransactionApiService from '@/app/ApiService/TransactionApiService'
 import { useAuth } from '@/app/contexts/AuthContext'
 import { accountTypeAtom, activeViewAtom } from '@/components/shared/LeftSidebar'
@@ -6,22 +7,22 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ActiveViewModes } from '@/types/activeViewMode'
 import { useQuery } from '@tanstack/react-query'
-import { addDays, format, subDays } from 'date-fns'
+import { addDays, subDays } from 'date-fns'
 import { atom, useAtom, useAtomValue } from 'jotai'
-import { ChevronLeft, ChevronRight, Loader } from 'lucide-react'
+import { Loader } from 'lucide-react'
 import { useMemo } from 'react'
 
-const getDateIntervalBasedOnActiveViewMode = (activeView: ActiveViewModes): { from: string; to: string } => {
+export const getDateIntervalBasedOnActiveViewMode = (activeView: ActiveViewModes, intervalDate: Date): { from: string; to: string } => {
   switch (activeView) {
     case 'day':
       return {
-        from: subDays(new Date(), 2).toISOString(), // 2 days ago
-        to: new Date().toISOString(), // today
+        from: subDays(intervalDate, 1).toISOString(), // 2 days ago
+        to: intervalDate.toISOString(), // today
       }
     case 'week':
       return {
-        from: subDays(new Date(), 8).toISOString(),
-        to: addDays(new Date(), 5).toISOString(),
+        from: subDays(intervalDate, 7).toISOString(),
+        to: intervalDate.toISOString(),
       }
     default:
       return {
@@ -37,26 +38,16 @@ const ExpenseOverview = () => {
   const accountTypeId = useAtomValue(accountTypeAtom)
   const activeView = useAtomValue(activeViewAtom)
   const [transactionInfoInterval, setTransactionInfoInterval] = useAtom(transactionInfoIntervalAtom)
-  const transactionInfoIntervalDate = new Date(transactionInfoInterval)
 
-  const { from, to } = useMemo(() => getDateIntervalBasedOnActiveViewMode(activeView), [activeView])
+  const transactionInfoIntervalDate = useMemo(() => new Date(transactionInfoInterval), [transactionInfoInterval])
+
+  const { from, to } = useMemo(() => getDateIntervalBasedOnActiveViewMode(activeView, transactionInfoIntervalDate), [activeView, transactionInfoIntervalDate])
 
   const { data: transactionInfo, isLoading: transactionInfoLoading } = useQuery({
     queryKey: ['userTransactionsInfo', accountTypeId, from, to],
     queryFn: () => TransactionApiService.getUserTransactionsInfo(Number(accountTypeId), from, to),
     enabled: !!accountTypeId && !!from && !!to,
   })
-
-  console.log(transactionInfo)
-  const handlePrevDate = () => {
-    const prevDate = subDays(transactionInfoIntervalDate, 1)
-    setTransactionInfoInterval(prevDate.toISOString())
-  }
-
-  const handleNextDate = () => {
-    const nextDate = addDays(transactionInfoIntervalDate, 1)
-    setTransactionInfoInterval(nextDate.toISOString())
-  }
 
   return (
     <div className="max-w-7xl grid grid-cols-1 xl:grid-cols-3 gap-6">
@@ -67,15 +58,7 @@ const ExpenseOverview = () => {
             <CardTitle className="text-2xl">Expense Overview</CardTitle>
           </CardHeader>
           <CardContent className="pt-0 px-0">
-            <div className="flex justify-center gap-4 items-center">
-              <Button onClick={handlePrevDate}>
-                <ChevronLeft />
-              </Button>
-              <p className="text-center font-bold text-green-500">{format(transactionInfoIntervalDate, 'd MMMM')}</p>
-              <Button onClick={handleNextDate}>
-                <ChevronRight />
-              </Button>
-            </div>
+            <DateController />
             <div className="flex flex-col lg:flex-row min-h-[70vh] justify-center items-center gap-8">
               {transactionInfoLoading ? <Loader className="text-green-500 animate-spin" /> : transactionInfo && <RechartsDonutChart data={transactionInfo?.transactions} />}
             </div>

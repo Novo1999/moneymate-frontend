@@ -151,10 +151,10 @@ export default function LeftSidebar() {
                       onClick={() => {
                         setActiveView(mode.value)
                         handleChangeActiveView(mode.value)
-                        if (mode.value === 'day') {
-                          setTransactionInfoInterval(new Date().toISOString())
-                        } else if (mode.value === 'week') {
-                        }
+                        // if (mode.value === 'day') {
+                        //   setTransactionInfoInterval(new Date().toISOString())
+                        // } else if (mode.value === 'week') {
+                        // }
                       }}
                     >
                       <Icon className="h-4 w-4" />

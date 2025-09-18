@@ -3,7 +3,7 @@
 import { useAuth } from '@/app/contexts/AuthContext'
 import { categoryKeyAtom } from '@/lib/atoms'
 import { useAtom, useAtomValue } from 'jotai'
-import { Car, CreditCard, Fuel, Gamepad2, Home, Loader, LucideIcon, Phone, PiggyBank, ShoppingBag, Utensils } from 'lucide-react'
+import { Car, CreditCard, Fuel, Gamepad2, Home, LucideIcon, Phone, PiggyBank, ShoppingBag, Utensils } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Cell, Pie, PieChart, ResponsiveContainer } from 'recharts'
 import { ImplicitLabelListType } from 'recharts/types/component/LabelList'
@@ -26,7 +26,6 @@ interface RechartsDonutChartProps {
 
 import { transactionInfoIntervalAtom } from '@/app/(main)/components/ExpenseOverview'
 import { cn } from '@/lib/utils'
-import { isSameDay } from 'date-fns'
 import { MoreHorizontal, TrendingUp } from 'lucide-react'
 enum ExpenseCategory {
   FOOD_DRINKS = 'food_drinks',
@@ -231,11 +230,11 @@ export default function RechartsDonutChart({ data, width, height }: RechartsDonu
   const responsive = useCallback(() => getResponsiveDimensions(), [getResponsiveDimensions])
 
   const responsiveConfig = useMemo(() => responsive(), [responsive])
-
-  console.log(data)
+  const transactionInfoIntervalDate = useMemo(() => new Date(transactionInfoInterval), [transactionInfoInterval])
 
   const chartData = useMemo(() => {
-    const expenseData = data.filter((item) => item.type === 'expense' && isSameDay(new Date(item.createdAt), transactionInfoInterval))
+    const expenseData = data.filter((item) => item.type === 'expense')
+    console.log('🚀 ~ RechartsDonutChart ~ expenseData:', expenseData)
     const categoryTotals = expenseData.reduce((acc, item) => {
       const category = item.category
       const money = parseFloat(item.money)
@@ -265,10 +264,7 @@ export default function RechartsDonutChart({ data, width, height }: RechartsDonu
     }))
   }, [data, transactionInfoInterval])
 
-  const total = useMemo(
-    () => data.filter((item) => item.type === 'expense' && isSameDay(new Date(item.createdAt), transactionInfoInterval)).reduce((sum, item) => sum + parseFloat(item.money), 0),
-    [data, transactionInfoInterval]
-  )
+  const total = useMemo(() => data.filter((item) => item.type === 'expense').reduce((sum, item) => sum + parseFloat(item.money), 0), [data])
 
   const memoizedPie = useMemo(() => <PieChartComponent chartData={chartData} responsive={responsiveConfig} />, [chartData, responsiveConfig])
   if (!data || data.length === 0) {
@@ -282,6 +278,8 @@ export default function RechartsDonutChart({ data, width, height }: RechartsDonu
     )
   }
 
+  const hoveredCategory = chartData?.find((cd) => cd.category === categoryKey)
+
   return (
     <div className="w-full flex flex-col items-center justify-center min-h-[50vh]">
       <div className="relative w-full max-w-4xl">
@@ -289,10 +287,10 @@ export default function RechartsDonutChart({ data, width, height }: RechartsDonu
         {/* Enhanced Center content - Mobile Responsive */}
         <div className="absolute inset-0 z-0 flex flex-col items-center justify-center pointer-events-none">
           <div className="text-center rounded-2xl bg-transparent px-2 sm:px-4">
-            <div className="text-xs sm:text-sm font-semibold text-gray-600 uppercase tracking-wide mb-1 sm:mb-2">Total Expenses</div>
+            <div className="text-xs sm:text-sm font-semibold text-gray-600 uppercase tracking-wide mb-1 sm:mb-2">{hoveredCategory?.category?.replace('_', ' ') || 'Total Expenses'}</div>
             <div className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-red-600 to-red-500 bg-clip-text text-transparent mb-1 sm:mb-2 break-all">
               {/* {total.toLocaleString()} */}
-              {chartData?.find((cd) => cd.category === categoryKey)?.money.toLocaleString() || total.toLocaleString()}
+              {hoveredCategory?.money.toLocaleString() || total.toLocaleString()}
             </div>
             <div className="text-sm sm:text-base lg:text-lg font-semibold text-gray-500">{user?.currency || 'USD'}</div>
           </div>
@@ -320,7 +318,6 @@ const PieChartComponent = ({
     innerRadius: number
   }
 }) => {
-  console.log(chartData)
   return (
     <ResponsiveContainer width="100%" height={responsive.height}>
       <PieChart>
