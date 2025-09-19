@@ -14,7 +14,6 @@ interface DashboardLayoutProps {
 
 function DashboardContent({ children }: DashboardLayoutProps) {
   const [rightSidebarOpen, setRightSidebarOpen] = useState(false)
-  console.log(rightSidebarOpen)
   const { open, setOpen } = useSidebar()
 
   const is2xl = useIs2xl()

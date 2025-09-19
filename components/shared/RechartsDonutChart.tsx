@@ -234,7 +234,6 @@ export default function RechartsDonutChart({ data, width, height }: RechartsDonu
 
   const chartData = useMemo(() => {
     const expenseData = data.filter((item) => item.type === 'expense')
-    console.log('🚀 ~ RechartsDonutChart ~ expenseData:', expenseData)
     const categoryTotals = expenseData.reduce((acc, item) => {
       const category = item.category
       const money = parseFloat(item.money)
@@ -288,7 +287,10 @@ export default function RechartsDonutChart({ data, width, height }: RechartsDonu
         <div className="absolute inset-0 z-0 flex flex-col items-center justify-center pointer-events-none">
           <div className="text-center rounded-2xl bg-transparent px-2 sm:px-4">
             <div className="text-xs sm:text-sm font-semibold text-gray-600 uppercase tracking-wide mb-1 sm:mb-2">{hoveredCategory?.category?.replace('_', ' ') || 'Total Expenses'}</div>
-            <div className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-red-600 to-red-500 bg-clip-text text-transparent mb-1 sm:mb-2 break-all">
+            <div
+              className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-red-600 to-red-500 bg-clip-text text-transparent mb-1 sm:mb-2 break-all"
+              style={{ color: hoveredCategory?.color }}
+            >
               {/* {total.toLocaleString()} */}
               {hoveredCategory?.money.toLocaleString() || total.toLocaleString()}
             </div>

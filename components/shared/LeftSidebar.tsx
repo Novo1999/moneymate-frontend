@@ -76,7 +76,6 @@ export default function LeftSidebar() {
   }
 
   const handleChangeAccountType = async (val: number) => {
-    console.log('🚀 ~ handleChangeAccountType ~ val:', val)
     setAccountType(val)
     if (user?.id) await UserApiService.editUser(user?.id, { activeAccountTypeId: Number(val) })
   }

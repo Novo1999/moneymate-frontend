@@ -1,3 +1,4 @@
+import AddTransactionModal from '@/app/(main)/components/AddTransaction'
 import DateController from '@/app/(main)/components/DateController'
 import TransactionApiService from '@/app/ApiService/TransactionApiService'
 import { useAuth } from '@/app/contexts/AuthContext'
@@ -92,7 +93,7 @@ const ExpenseOverview = () => {
             <CardTitle className="text-xl">Quick Actions</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 pt-0">
-            <Button size="lg">Add Income</Button>
+            <AddTransactionModal />
             <Button className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white" size="lg">
               Add Expense
             </Button>

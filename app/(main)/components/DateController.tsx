@@ -10,7 +10,6 @@ const DateController = () => {
   const [transactionInfoInterval, setTransactionInfoInterval] = useAtom(transactionInfoIntervalAtom)
   const activeView = useAtomValue(activeViewAtom)
   const transactionInfoIntervalDate = useMemo(() => new Date(transactionInfoInterval), [transactionInfoInterval])
-  console.log('🚀 ~ DateController ~ transactionInfoIntervalDate:', transactionInfoIntervalDate)
 
   const handlePrevDate = () => {
     let prevDate: Date
