@@ -3,7 +3,7 @@
 import { transactionInfoIntervalAtom } from '@/app/(main)/components/ExpenseOverview'
 import AccountTypeApiService from '@/app/ApiService/AccountTypeApiService'
 import UserApiService from '@/app/ApiService/UserApiService'
-import { useAuth } from '@/app/contexts/AuthContext'
+import { useAuth, userAtom } from '@/app/contexts/AuthContext'
 import { Button } from '@/components/ui/button'
 import { Calendar as CalendarComponent } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
@@ -42,16 +42,15 @@ export const dateAtom = atom<Date | undefined>(undefined)
 export default function LeftSidebar() {
   const [accountType, setAccountType] = useAtom(accountTypeAtom)
   const [date, setDate] = useAtom(dateAtom)
-  const { user, isLoading } = useAuth()
+  const { isLoading } = useAuth()
   const [activeView, setActiveView] = useAtom(activeViewAtom)
-  const [transactionInfoInterval, setTransactionInfoInterval] = useAtom(transactionInfoIntervalAtom)
+  const [user, setUser] = useAtom(userAtom)
 
   // Fetch account types using TanStack Query
   const {
     data: accountTypes,
     isLoading: isLoadingAccountTypes,
     isError: isErrorAccountTypes,
-    error: accountTypesError,
   } = useQuery({
     queryKey: ['accountTypes'],
     queryFn: AccountTypeApiService.getUserAccountTypes,
@@ -65,10 +64,9 @@ export default function LeftSidebar() {
 
   // Set default account type when data loads
   useEffect(() => {
-    if (user) {
-      setAccountType(user?.activeAccountTypeId ?? 0)
-    }
-  }, [user])
+    if (!user) return
+    setAccountType(user?.activeAccountTypeId ?? 0)
+  }, [user, setAccountType])
 
   const handleChangeActiveView = async (mode: string) => {
     if (!user?.id) return
@@ -78,6 +76,7 @@ export default function LeftSidebar() {
   const handleChangeAccountType = async (val: number) => {
     setAccountType(val)
     if (user?.id) await UserApiService.editUser(user?.id, { activeAccountTypeId: Number(val) })
+    setUser((prev) => prev && { ...prev, activeAccountTypeId: val || 0 })
   }
 
   const renderAccountTypeSelect = () => {

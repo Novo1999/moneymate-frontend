@@ -3,24 +3,28 @@
 import AuthApiService from '@/app/ApiService/AuthApiService'
 import UserApiService from '@/app/ApiService/UserApiService'
 import { UserDto } from '@/app/dto/UserDto'
+import { SetAtom } from '@/types/atomType'
+import { atom, useAtom } from 'jotai'
 import Cookies from 'js-cookie'
 import { Loader } from 'lucide-react'
 import { usePathname, useRouter } from 'next/navigation'
-import React, { createContext, Dispatch, SetStateAction, useContext, useEffect, useState } from 'react'
+import React, { createContext, SetStateAction, useContext, useEffect, useState } from 'react'
 
 interface AuthContextType {
-  user: UserDto | null
+  user: UserDto | null | undefined
   token: string | null
   login: (email: string, password: string) => Promise<void>
   logout: () => void
   isLoading: boolean
-  setUser: Dispatch<SetStateAction<UserDto | null>>
+  setUser: SetAtom<[SetStateAction<UserDto | null | undefined>], void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
+export const userAtom = atom<UserDto | null>()
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<UserDto | null>(null)
+  const [user, setUser] = useAtom(userAtom)
   const [token, setToken] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
@@ -117,7 +121,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     <AuthContext.Provider value={value}>
       {isLoading ? (
         <div className="min-h-[90vh] flex justify-center items-center">
-          <Loader className="animate-spin size-24" />
+          <Loader className="animate-spin size-24 text-green-500" />
         </div>
       ) : (
         // Only render children when user is logged in OR on public routes

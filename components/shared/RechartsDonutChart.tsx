@@ -2,7 +2,7 @@
 
 import { useAuth } from '@/app/contexts/AuthContext'
 import { categoryKeyAtom } from '@/lib/atoms'
-import { useAtom, useAtomValue } from 'jotai'
+import { atom, useAtom, useAtomValue } from 'jotai'
 import { Car, CreditCard, Fuel, Gamepad2, Home, LucideIcon, Phone, PiggyBank, ShoppingBag, Utensils } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Cell, Pie, PieChart, ResponsiveContainer } from 'recharts'
@@ -55,6 +55,8 @@ export const categoryIconMap: Record<ExpenseCategory, LucideIcon> = {
   [ExpenseCategory.TRANSFER]: PiggyBank,
 }
 
+export const addTransactionCategoryAtom = atom<string | null>()
+
 const CustomLabel = ({
   cx,
   cy,
@@ -72,6 +74,9 @@ const CustomLabel = ({
   category: string
   color: string
 }) => {
+  const [_, setAddTransactionAtomCategory] = useAtom(addTransactionCategoryAtom)
+  const [currentCategoryKey, setCategoryKey] = useAtom(categoryKeyAtom)
+
   const RADIAN = Math.PI / 180
 
   // Responsive positioning based on screen size
@@ -103,10 +108,9 @@ const CustomLabel = ({
   const iconSize = isMobile ? 18 : isTablet ? 20 : 22
   const iconRadius_size = isMobile ? 22 : isTablet ? 25 : 28
   const iconGlowRadius = isMobile ? 26 : isTablet ? 29 : 32
-  const [currentCategoryKey, setCategoryKey] = useAtom(categoryKeyAtom)
 
   return (
-    <g onMouseEnter={() => setCategoryKey(categoryKey)} onMouseLeave={() => setCategoryKey('')}>
+    <g onClick={() => setAddTransactionAtomCategory(categoryKey)} onMouseEnter={() => setCategoryKey(categoryKey)} onMouseLeave={() => setCategoryKey('')}>
       <polyline
         points={`${lineStartX},${lineStartY} ${lineMidX},${lineMidY} ${iconX},${iconY}`}
         stroke={color}
@@ -263,6 +267,8 @@ export default function RechartsDonutChart({ data, width, height }: RechartsDonu
     }))
   }, [data, transactionInfoInterval])
 
+  console.log(chartData)
+
   const total = useMemo(() => data.filter((item) => item.type === 'expense').reduce((sum, item) => sum + parseFloat(item.money), 0), [data])
 
   const memoizedPie = useMemo(() => <PieChartComponent chartData={chartData} responsive={responsiveConfig} />, [chartData, responsiveConfig])
@@ -322,7 +328,7 @@ const PieChartComponent = ({
 }) => {
   return (
     <ResponsiveContainer width="100%" height={responsive.height}>
-      <PieChart>
+      <PieChart style={{ outline: 'none' }}>
         <Pie
           data={chartData}
           cx="50%"
@@ -347,6 +353,7 @@ const PieChartComponent = ({
               style={{
                 filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.1))',
                 cursor: 'pointer',
+                outline: 'none',
               }}
             />
           ))}

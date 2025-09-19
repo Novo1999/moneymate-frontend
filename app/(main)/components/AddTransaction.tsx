@@ -2,6 +2,7 @@ import { getDateIntervalBasedOnActiveViewMode, transactionInfoIntervalAtom } fro
 import TransactionApiService from '@/app/ApiService/TransactionApiService'
 import { useAuth } from '@/app/contexts/AuthContext'
 import { accountTypeAtom, activeViewAtom } from '@/components/shared/LeftSidebar'
+import { addTransactionCategoryAtom } from '@/components/shared/RechartsDonutChart'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
@@ -17,7 +18,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { format } from 'date-fns'
 import { useAtom, useAtomValue } from 'jotai'
 import { Calendar as CalendarIcon, Plus } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 
@@ -73,6 +74,7 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>
 
 const AddTransactionModal = () => {
+  const [addTransactionCategory, setAddTransactionCategory] = useAtom(addTransactionCategoryAtom)
   const { user } = useAuth()
   const [open, setOpen] = useState(false)
   const queryClient = useQueryClient()
@@ -93,6 +95,13 @@ const AddTransactionModal = () => {
     },
   })
 
+  useEffect(() => {
+    if (!addTransactionCategory) return
+    form.setValue('type', 'expense')
+    form.setValue('category', addTransactionCategory)
+    setOpen(true)
+  }, [addTransactionCategory, form])
+
   const watchedType = form.watch('type')
 
   const addTransactionMutation = useMutation({
@@ -101,6 +110,7 @@ const AddTransactionModal = () => {
       setOpen(false)
       form.reset()
       queryClient.invalidateQueries({ queryKey: ['userTransactionsInfo', accountTypeId, from, to] })
+      queryClient.invalidateQueries({ queryKey: ['accountTypes'] })
     },
   })
 
@@ -146,7 +156,13 @@ const AddTransactionModal = () => {
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={(open) => {
+        setOpen(open)
+        if (!open) setAddTransactionCategory(null)
+      }}
+    >
       <DialogTrigger asChild>
         <Button size="lg" className="w-full bg-green-500 hover:bg-green-600 text-white">
           <Plus className="w-5 h-5 mr-2" />
@@ -191,6 +207,7 @@ const AddTransactionModal = () => {
                       }}
                       value={field.value}
                       className="flex flex-row space-x-4"
+                      defaultValue={addTransactionCategory ? 'expense' : ''}
                     >
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem className="peer" value="income" id="income" />
