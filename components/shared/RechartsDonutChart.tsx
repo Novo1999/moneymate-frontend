@@ -272,6 +272,7 @@ export default function RechartsDonutChart({ data, width, height }: RechartsDonu
   const total = useMemo(() => data.filter((item) => item.type === 'expense').reduce((sum, item) => sum + parseFloat(item.money), 0), [data])
 
   const memoizedPie = useMemo(() => <PieChartComponent chartData={chartData} responsive={responsiveConfig} />, [chartData, responsiveConfig])
+
   if (!data || data.length === 0) {
     return (
       <div className="flex items-center justify-center h-64 sm:h-80 md:h-96 text-gray-500 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border mx-4">
