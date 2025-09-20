@@ -5,15 +5,18 @@ import LeftSidebar from '@/components/shared/LeftSidebar'
 import RightSidebar from '@/components/shared/RightSidebar'
 import { Button } from '@/components/ui/button'
 import { SidebarInset, SidebarProvider, useSidebar } from '@/components/ui/sidebar'
+import { atom, useAtom } from 'jotai'
 import { PanelLeft } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 
 interface DashboardLayoutProps {
   children: React.ReactNode
 }
 
+export const rightSidebarOpenAtom = atom<boolean>(false)
+
 function DashboardContent({ children }: DashboardLayoutProps) {
-  const [rightSidebarOpen, setRightSidebarOpen] = useState(false)
+  const [rightSidebarOpen, setRightSidebarOpen] = useAtom(rightSidebarOpenAtom)
   const { open, setOpen } = useSidebar()
 
   const is2xl = useIs2xl()

@@ -1,6 +1,8 @@
 'use client'
 
+import { rightSidebarOpenAtom } from '@/app/layout/DashboardLayout'
 import { cn } from '@/lib/utils'
+import { useAtom } from 'jotai'
 import { CreditCard, DollarSign, FolderTree, Settings } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -33,6 +35,8 @@ interface RightSidebarProps {
 }
 
 export default function RightSidebar({ className }: RightSidebarProps) {
+  const [_, setRightSidebarOpen] = useAtom(rightSidebarOpenAtom)
+
   const pathname = usePathname()
 
   return (
@@ -47,6 +51,7 @@ export default function RightSidebar({ className }: RightSidebarProps) {
 
               return (
                 <Link
+                  onClick={() => setRightSidebarOpen(false)}
                   key={item.title}
                   href={item.href}
                   className={cn(

@@ -22,7 +22,6 @@ import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 
-// Enums
 const TransactionType = {
   INCOME: 'income',
   EXPENSE: 'expense',
@@ -56,6 +55,8 @@ const IncomeCategory = {
   OTHERS_INCOME: 'others_income',
   TRANSFER: 'transfer',
 } as const
+
+export { ExpenseCategory, IncomeCategory, TransactionType }
 
 // Form schema
 const formSchema = z.object({

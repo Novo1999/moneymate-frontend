@@ -8,7 +8,6 @@ import { cn } from '@/lib/utils'
 import { Currency, getCurrencyDisplayName } from '@/types/currency'
 import { useMutation } from '@tanstack/react-query'
 import { useAtom } from 'jotai'
-import { PlusCircle } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -44,10 +43,10 @@ const CurrenciesPage = () => {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex gap-4">
+      <div className="flex gap-4 flex-col">
         <Label className="text-2xl font-bold">Currencies</Label>
+        <Label className="text-gray-400">Select your preferred currency for the app</Label>
       </div>
-      <Label className="underline underline-offset-4">Select Your Preferred Currency For the App</Label>
       <Input value={search} onChange={(e) => setSearch(e.target.value)} type="search" className="w-fit" placeholder="Search Currency" />
       <div className="flex gap-4 flex-wrap max-w-7xl">
         {currencyOptions?.map((opt) => (

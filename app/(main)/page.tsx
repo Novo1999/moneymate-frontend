@@ -2,21 +2,9 @@
 
 import ExpenseOverview from '@/app/(main)/components/ExpenseOverview'
 import { useAuth } from '@/app/contexts/AuthContext'
-import { activeViewAtom } from '@/components/shared/LeftSidebar'
-import RechartsDonutChart from '@/components/shared/RechartsDonutChart'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { useAtom, useAtomValue } from 'jotai'
-
-const expenseData = [
-  { category: 'Food', amount: 850, color: '#059669' },
-  { category: 'Transport', amount: 320, color: '#0d9488' },
-  { category: 'Entertainment', amount: 240, color: '#10b981' },
-  { category: 'Shopping', amount: 450, color: '#34d399' },
-  { category: 'Bills', amount: 680, color: '#6ee7b7' },
-  { category: 'Healthcare', amount: 180, color: '#a7f3d0' },
-]
 
 const recentTransactions = [
   { id: 1, description: 'Grocery Store', amount: -85.5, category: 'Food', date: '2024-01-15' },
@@ -28,8 +16,6 @@ const recentTransactions = [
 
 export default function HomePage() {
   const { user, logout } = useAuth()
-
-  const activeView = useAtomValue(activeViewAtom)
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 p-6">
