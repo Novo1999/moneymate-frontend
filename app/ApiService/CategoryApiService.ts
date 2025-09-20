@@ -8,7 +8,7 @@ export default class CategoryApiService {
     try {
       const response = await axiosInstance.get<DataResponse<CategoryDto[]>>('/categories')
 
-      return response.data.data
+      return response.data.data.sort((a, b) => (a?.id || 0) - (b?.id || 0))
     } catch (error: any) {
       const errorMessage = error?.response?.data?.message || 'Failed to fetch all categories'
       toast.error(errorMessage)
@@ -55,9 +55,9 @@ export default class CategoryApiService {
     }
   }
 
-  static async editCategory(id: number, categoryData: CategoryDto) {
+  static async editCategory(id: number, categoryData: Partial<CategoryDto>) {
     try {
-      const response = await axiosInstance.patch(`/categories/${id}`, categoryData)
+      const response = await axiosInstance.patch(`/categories/edit/${id}`, categoryData)
 
       toast.success('Category updated successfully!')
       return response.data
@@ -70,7 +70,7 @@ export default class CategoryApiService {
 
   static async deleteCategory(id: number) {
     try {
-      const response = await axiosInstance.delete(`/categories/${id}`)
+      const response = await axiosInstance.delete(`/categories/delete/${id}`)
 
       toast.success('Category deleted successfully!')
       return response.data

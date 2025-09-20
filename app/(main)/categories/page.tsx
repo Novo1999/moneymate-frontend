@@ -1,4 +1,5 @@
 'use client'
+import CategoryItem from '@/app/(main)/categories/components/CategoryItem'
 import CategoryApiService from '@/app/ApiService/CategoryApiService'
 import { useAuth } from '@/app/contexts/AuthContext'
 import { CategoryDto } from '@/app/dto/CategoryDto'
@@ -77,6 +78,7 @@ const iconOptions = [
 ]
 
 const CategoryPage = () => {
+  const [isEditing, setIsEditing] = useState(0)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [modalType, setModalType] = useState<'income' | 'expense'>('income')
   const [categoryName, setCategoryName] = useState('')
@@ -129,6 +131,9 @@ const CategoryPage = () => {
 
   const SelectedIconComponent = iconOptions.find((opt) => opt.name === selectedIcon)?.icon || DollarSign
 
+  const incomeCategories = categories?.filter((cat) => cat.type === 'income')
+  const expenseCategories = categories?.filter((cat) => cat.type === 'expense')
+
   return (
     <div className="min-h-[90vh]">
       <div className="max-w-7xl">
@@ -138,7 +143,7 @@ const CategoryPage = () => {
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4">
           {/* Income Column */}
-          <Card className="shadow-lg h-fit">
+          <Card className="shadow-lg h-fit relative pb-8">
             <CardHeader className="bg-green-50 border-b py-6">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-xl font-semibold text-green-800 flex items-center gap-2">Income Categories</CardTitle>
@@ -159,26 +164,22 @@ const CategoryPage = () => {
                   </div>
                 ))}
               </div>
-              <fieldset className="border p-2 mt-4">
-                <legend className="text-xs font-bold">Custom Income Categories</legend>
-                <div className="flex flex-col gap-4">
-                  {categories
-                    ?.filter((cat) => cat.type === 'income')
-                    ?.map((cat) => (
-                      <div key={cat.id} className="flex items-center justify-between p-3 bg-white border rounded-lg hover:shadow-md transition-shadow cursor-pointer">
-                        <span className="font-medium text-gray-700">{cat.name}</span>
-                        <Badge variant="secondary" className="bg-green-100 text-green-800">
-                          Income
-                        </Badge>
-                      </div>
+              {(incomeCategories?.length || 0) > 0 && (
+                <fieldset className="border p-2 mt-4">
+                  <legend className="text-xs font-bold">Custom Income Categories</legend>
+                  <div className="flex flex-col gap-4">
+                    {incomeCategories?.map((cat) => (
+                      <CategoryItem isEditing={isEditing} setIsEditing={setIsEditing} type={cat.type} category={cat} key={cat.id} />
                     ))}
-                </div>
-              </fieldset>
+                  </div>
+                  <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-green-500/10 to-transparent backdrop-blur-sm rounded-b-sm"></div>
+                </fieldset>
+              )}
             </CardContent>
           </Card>
 
           {/* Expense Column */}
-          <Card className="shadow-lg h-fit">
+          <Card className="shadow-lg h-fit relative pb-8">
             <CardHeader className="bg-red-50 border-b py-6">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-xl font-semibold text-red-800 flex items-center gap-2">Expense Categories</CardTitle>
@@ -198,21 +199,19 @@ const CategoryPage = () => {
                     </Badge>
                   </div>
                 ))}
-                <fieldset className="border p-2 mt-4">
-                  <legend className="text-xs font-bold">Custom Expense Categories</legend>
-                  {categories
-                    ?.filter((cat) => cat.type === 'expense')
-                    ?.map((cat) => (
-                      <div key={cat.id} className="flex items-center justify-between p-3 bg-white border rounded-lg hover:shadow-md transition-shadow cursor-pointer">
-                        <span className="font-medium text-gray-700">{cat.name}</span>
-                        <Badge variant="secondary" className="bg-red-100 text-red-800">
-                          Expense
-                        </Badge>
-                      </div>
-                    ))}
-                </fieldset>
+                {(expenseCategories?.length || 0) > 0 && (
+                  <fieldset className="border p-2 mt-4">
+                    <legend className="text-xs font-bold">Custom Expense Categories</legend>
+                    <div className="flex flex-col gap-4">
+                      {expenseCategories?.map((cat) => (
+                        <CategoryItem isEditing={isEditing} setIsEditing={setIsEditing} type={cat.type} category={cat} key={cat.id} />
+                      ))}
+                    </div>
+                  </fieldset>
+                )}
               </div>
             </CardContent>
+            <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-red-500/10 to-transparent backdrop-blur-sm rounded-b-sm"></div>
           </Card>
         </div>
       </div>

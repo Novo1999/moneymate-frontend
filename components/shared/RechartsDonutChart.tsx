@@ -255,8 +255,6 @@ export default function RechartsDonutChart({ data, width, height }: RechartsDonu
     }))
   }, [data, transactionInfoInterval])
 
-  console.log(chartData)
-
   const total = useMemo(() => data.filter((item) => item.type === 'expense').reduce((sum, item) => sum + parseFloat(item.money), 0), [data])
 
   const memoizedPie = useMemo(() => <PieChartComponent chartData={chartData} responsive={responsiveConfig} />, [chartData, responsiveConfig])
