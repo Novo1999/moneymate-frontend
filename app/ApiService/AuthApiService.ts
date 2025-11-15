@@ -20,7 +20,7 @@ export default class AuthApiService {
 
   static async register(name: string, email: string, password: string) {
     try {
-      const response = await axiosInstance.post('/auth/register', {
+      const response = await axiosInstance.post('/auth/signUp', {
         name,
         email,
         password,
