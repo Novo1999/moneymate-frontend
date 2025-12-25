@@ -29,8 +29,8 @@ function DashboardContent({ children }: DashboardLayoutProps) {
   return (
     <>
       <LeftSidebar />
-      <SidebarInset>
-        <header className="flex h-16 items-center gap-2 border-b px-4 justify-between">
+      <SidebarInset className="flex flex-col h-screen">
+        <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4 justify-between">
           <Button variant="ghost" size="icon" onClick={() => setOpen(!open)} className="h-8 w-8">
             <PanelLeft className="h-4 w-4" />
           </Button>
@@ -39,9 +39,17 @@ function DashboardContent({ children }: DashboardLayoutProps) {
             <PanelLeft className="h-4 w-4" />
           </Button>
         </header>
-        <div className="flex flex-1">
-          <main className="flex-1 overflow-auto p-4">{children}</main>
-          {rightSidebarOpen && <RightSidebar />}
+        <div className="flex flex-1 min-h-0 relative">
+          <main className="flex-1 overflow-y-auto p-4">{children}</main>
+          <aside
+            className={`border-l overflow-y-auto transition-all duration-300 ease-in-out ${
+              rightSidebarOpen ? 'w-64 opacity-100' : 'w-0 opacity-0'
+            }`}
+          >
+            <div className={`${rightSidebarOpen ? 'block' : 'hidden'}`}>
+              <RightSidebar />
+            </div>
+          </aside>
         </div>
       </SidebarInset>
     </>

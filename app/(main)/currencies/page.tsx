@@ -48,12 +48,12 @@ const CurrenciesPage = () => {
         <Label className="text-gray-400">Select your preferred currency for the app</Label>
       </div>
       <Input value={search} onChange={(e) => setSearch(e.target.value)} type="search" className="w-fit" placeholder="Search Currency" />
-      <div className="flex gap-4 flex-wrap max-w-7xl">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 max-w-7xl">
         {currencyOptions?.map((opt) => (
           <Button
             onClick={() => changeCurrencyMutate(opt.value)}
             className={cn(
-              'transform transition duration-300',
+              'transform transition duration-300 w-full',
               user?.currency !== opt.value ? 'bg-green-200 text-black' : 'bg-custom-green',
               search && (opt.label.toLowerCase().includes(search.toLowerCase()) || opt.value.toLowerCase().includes(search.toLowerCase())) ? 'scale-105 border-2 border-green-500' : 'scale-100'
             )}

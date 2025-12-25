@@ -4,10 +4,11 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { SetStateAction } from 'jotai'
-import { ArrowLeft, ArrowLeftRight, ArrowRight, Pen, Trash, X } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Pen, Trash, X } from 'lucide-react'
 import { Dispatch, useState } from 'react'
 
 type CategoryItemProp = {
@@ -46,7 +47,7 @@ const CategoryItem = ({ category, type, setIsEditing, isEditing }: CategoryItemP
   const handleDeleteCategory = () => !operationsDisabled && deleteCategoryMutation.mutateAsync()
 
   return (
-    <div key={category.id} className="flex items-center justify-between p-3 group *:transition-all *:duration-300 bg-white border rounded-lg hover:shadow-md transition-shadow cursor-pointer">
+    <div key={category.id} className="flex items-center flex-wrap gap-2 justify-between p-3 group *:transition-all *:duration-300 bg-white border rounded-lg hover:shadow-md transition-shadow cursor-pointer">
       {isEditing === category.id ? (
         <Input
           onKeyDown={(e) => {
@@ -60,17 +61,16 @@ const CategoryItem = ({ category, type, setIsEditing, isEditing }: CategoryItemP
       ) : (
         <span className="font-medium text-gray-700">{category.name}</span>
       )}
-
       <div className="flex gap-2">
         {isEditing !== category.id && (
-          <Badge variant="secondary" className={cn('group-hover:hidden capitalize', type === 'income' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800')}>
+          <Badge variant="secondary" className={cn('capitalize lg:group-hover:hidden', type === 'income' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800')}>
             {type}
           </Badge>
         )}
         <Badge
           onClick={() => !operationsDisabled && setIsEditing((prev) => (prev === category.id ? 0 : category.id || 0))}
           variant={operationsDisabled ? 'disabled' : 'secondary'}
-          className={cn('bg-green-100 hover:bg-green-200 text-green-800 gap-2', isEditing === category.id ? 'flex' : 'group-hover:flex hidden')}
+          className={cn('bg-green-100 hover:bg-green-200 text-green-800 gap-2', isEditing === category.id ? 'flex' : 'flex lg:hidden lg:group-hover:flex')}
         >
           {isEditing === category.id ? <X /> : <Pen />}
           {isEditing === category.id ? 'Close' : 'Edit'}
@@ -78,19 +78,25 @@ const CategoryItem = ({ category, type, setIsEditing, isEditing }: CategoryItemP
         <Badge
           onClick={() => setShowDeleteModal(true)}
           variant={operationsDisabled ? 'disabled' : 'destructive'}
-          className={cn('group-hover:flex hover:bg-red-700 hidden gap-2', isEditing === category.id ? 'flex' : 'group-hover:flex hidden')}
+          className={cn('hover:bg-red-700 gap-2', isEditing === category.id ? 'flex' : 'flex lg:hidden lg:group-hover:flex')}
         >
           <Trash />
           Delete
         </Badge>
-        <Badge
-          variant={operationsDisabled ? 'disabled' : 'outline'}
-          title={`Move to ${type}`}
-          onClick={() => handleEditCategory(category.id, type === 'income' ? 'expense' : 'income')}
-          className={cn('group-hover:flex hover:bg-white hidden text-black gap-2', isEditing === category.id ? 'flex' : 'group-hover:flex hidden')}
-        >
-          {type === 'expense' ? <ArrowLeft /> : <ArrowRight />}
-        </Badge>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Badge
+              variant={operationsDisabled ? 'disabled' : 'outline'}
+              onClick={() => handleEditCategory(category.id, type === 'income' ? 'expense' : 'income')}
+              className={cn('hover:bg-white text-black gap-2', isEditing === category.id ? 'flex' : 'flex lg:hidden lg:group-hover:flex')}
+            >
+              {type === 'expense' ? <ArrowLeft className='rotate-90 lg:rotate-0' /> : <ArrowRight className='rotate-90 lg:rotate-0' />}
+            </Badge>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Move to {type === 'income' ? 'expense' : 'income'}</p>
+          </TooltipContent>
+        </Tooltip>
       </div>
 
       <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>

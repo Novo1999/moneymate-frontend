@@ -115,6 +115,8 @@ const AddTransactionModal = () => {
     },
   })
 
+
+  console.log({user})
   const onSubmit = (data: FormData) => {
     if (!user?.id || !user?.activeAccountTypeId) return
 

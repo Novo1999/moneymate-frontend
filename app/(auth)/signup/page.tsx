@@ -1,5 +1,6 @@
 'use client'
 
+import AccountTypeApiService from '@/app/ApiService/AccountTypeApiService'
 import AuthApiService from '@/app/ApiService/AuthApiService'
 import { useAuth } from '@/app/contexts/AuthContext'
 import { Button } from '@/components/ui/button'
@@ -51,9 +52,10 @@ export default function SignupPage() {
     try {
       // Create account
       await AuthApiService.register(data.name, data.email, data.password)
-
+      
       // Auto-login after successful signup
       await login(data.email, data.password)
+      await AccountTypeApiService.addUserAccountType({ name: data.name, type: 'Cash', balance: 0, description: '' })
       router.push('/')
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } }
