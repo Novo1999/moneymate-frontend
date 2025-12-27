@@ -1,6 +1,5 @@
 'use client'
 
-import { useAuth } from '@/app/contexts/AuthContext'
 import { categoryKeyAtom } from '@/lib/atoms'
 import { atom, useAtom, useAtomValue } from 'jotai'
 import { Car, CreditCard, Fuel, Gamepad2, Home, LucideIcon, Phone, PiggyBank, ShoppingBag, Utensils } from 'lucide-react'
@@ -25,6 +24,7 @@ interface RechartsDonutChartProps {
 }
 
 import { transactionInfoIntervalAtom } from '@/app/(main)/components/ExpenseOverview'
+import { useAuth } from '@/app/hooks/use-auth'
 import { cn } from '@/lib/utils'
 import { ExpenseCategory } from '@/types/categories'
 import { MoreHorizontal, TrendingUp } from 'lucide-react'

@@ -1,8 +1,8 @@
 'use client'
 import { editFormAtom, editOpenAtom } from '@/app/(main)/accounts/components/store'
 import AccountTypeApiService from '@/app/ApiService/AccountTypeApiService'
-import { userAtom } from '@/app/contexts/AuthContext'
 import { accountTypeAtom } from '@/app/stores/accountType'
+import { userAtom } from '@/app/stores/auth'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -93,8 +93,7 @@ const CurrentAccount = () => {
         </CardHeader>
         <CardContent>
           <div className="text-4xl font-bold">
-            {user?.currency}
-            {" "}
+            {user?.currency}{' '}
             {parseFloat(data?.balance || '0').toLocaleString('en-US', {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,

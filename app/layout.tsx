@@ -1,4 +1,4 @@
-import { AuthProvider } from '@/app/contexts/AuthContext'
+import { AuthProvider } from '@/app/provider/AuthProvider'
 import { QueryProvider } from '@/app/provider/QueryProvider'
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'

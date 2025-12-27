@@ -2,7 +2,7 @@ import AddTransactionModal from '@/app/(main)/components/AddTransaction'
 import DateController from '@/app/(main)/components/DateController'
 import AccountTypeApiService from '@/app/ApiService/AccountTypeApiService'
 import TransactionApiService from '@/app/ApiService/TransactionApiService'
-import { useAuth } from '@/app/contexts/AuthContext'
+import { useAuth } from '@/app/hooks/use-auth'
 import { accountTypeAtom } from '@/app/stores/accountType'
 import { activeViewAtom } from '@/components/shared/LeftSidebar'
 import RechartsDonutChart from '@/components/shared/RechartsDonutChart'
@@ -39,7 +39,6 @@ export const transactionInfoIntervalAtom = atom(new Date().toISOString())
 const ExpenseOverview = () => {
   const { user } = useAuth()
   const accountTypeId = useAtomValue(accountTypeAtom)
-  console.log('🚀 ~ ExpenseOverview ~ accountTypeId:', accountTypeId)
   const activeView = useAtomValue(activeViewAtom)
   const [transactionInfoInterval, setTransactionInfoInterval] = useAtom(transactionInfoIntervalAtom)
 
@@ -57,7 +56,6 @@ const ExpenseOverview = () => {
     queryFn: () => AccountTypeApiService.getUserAccountType(Number(accountTypeId)),
     enabled: !!accountTypeId && accountTypeId > 0,
   })
-  console.log('🚀 ~ ExpenseOverview ~ accountType:', accountType)
 
   return (
     <div className="max-w-7xl grid grid-cols-1 xl:grid-cols-3 gap-6">

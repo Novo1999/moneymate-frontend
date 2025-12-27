@@ -2,7 +2,7 @@
 
 import AccountTypeApiService from '@/app/ApiService/AccountTypeApiService'
 import AuthApiService from '@/app/ApiService/AuthApiService'
-import { useAuth } from '@/app/contexts/AuthContext'
+import { useAuth } from '@/app/hooks/use-auth'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
@@ -56,7 +56,10 @@ export default function SignupPage() {
       await AuthApiService.register(data.name, data.email, data.password)
 
       // Auto-login after successful signup
-      await login(data.email, data.password)
+      await login({
+        email: data.email,
+        password: data.password,
+      })
       await AccountTypeApiService.addUserAccountType({ name: 'Cash', balance: 0 })
       queryClient.invalidateQueries({ queryKey: ['accountTypes'] })
       router.push('/')

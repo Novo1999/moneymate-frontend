@@ -1,8 +1,8 @@
 'use client'
 import CategoryItem from '@/app/(main)/categories/components/CategoryItem'
 import CategoryApiService from '@/app/ApiService/CategoryApiService'
-import { useAuth } from '@/app/contexts/AuthContext'
 import { CategoryDto } from '@/app/dto/CategoryDto'
+import { useAuth } from '@/app/hooks/use-auth'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -40,7 +40,7 @@ import {
   Wallet,
   Zap,
 } from 'lucide-react'
-import React, { useState } from 'react'
+import { useState } from 'react'
 
 const formatCategoryName = (category: string) => {
   return category
@@ -119,8 +119,6 @@ const CategoryPage = () => {
       type: modalType,
       icon: selectedIcon,
     }
-
-    console.log('Submitting category:', payload)
 
     await addCategoryMutation.mutateAsync(payload)
 

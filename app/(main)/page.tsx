@@ -1,7 +1,7 @@
 'use client'
 
 import ExpenseOverview from '@/app/(main)/components/ExpenseOverview'
-import { useAuth } from '@/app/contexts/AuthContext'
+import { useAuth } from '@/app/hooks/use-auth'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'

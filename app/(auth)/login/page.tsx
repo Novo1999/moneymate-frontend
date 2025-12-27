@@ -1,30 +1,30 @@
-'use client';
+'use client'
 
-import { useAuth } from '@/app/contexts/AuthContext';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { zodResolver } from '@hookform/resolvers/zod';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+import { useAuth } from '@/app/hooks/use-auth'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { zodResolver } from '@hookform/resolvers/zod'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
-});
+})
 
-type LoginFormData = z.infer<typeof loginSchema>;
+type LoginFormData = z.infer<typeof loginSchema>
 
 export default function LoginPage() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState('')
 
-  const { login } = useAuth();
-  const router = useRouter();
+  const { login } = useAuth()
+  const router = useRouter()
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -32,22 +32,25 @@ export default function LoginPage() {
       email: '',
       password: '',
     },
-  });
+  })
 
   const onSubmit = async (data: LoginFormData) => {
-    setError('');
-    setIsLoading(true);
+    setError('')
+    setIsLoading(true)
 
     try {
-      await login(data.email, data.password);
-      router.push('/');
+      await login({
+        email: data.email,
+        password: data.password,
+      })
+      router.push('/')
     } catch (err: unknown) {
-      const error = err as { response?: { data?: { msg?: string } } };
-      setError(error?.response?.data?.msg || 'Login failed');
+      const error = err as { response?: { data?: { msg?: string } } }
+      setError(error?.response?.data?.msg || 'Login failed')
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-emerald-100 px-4">
@@ -70,12 +73,7 @@ export default function LoginPage() {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input
-                        type="email"
-                        placeholder="Enter your email"
-                        className="h-12"
-                        {...field}
-                      />
+                      <Input type="email" placeholder="Enter your email" className="h-12" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -89,30 +87,17 @@ export default function LoginPage() {
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input
-                        type="password"
-                        placeholder="Enter your password"
-                        className="h-12"
-                        {...field}
-                      />
+                      <Input type="password" placeholder="Enter your password" className="h-12" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              {error && (
-                <div className="text-destructive text-sm text-center bg-destructive/10 p-3 rounded-lg border border-destructive/20">
-                  {error}
-                </div>
-              )}
+              {error && <div className="text-destructive text-sm text-center bg-destructive/10 p-3 rounded-lg border border-destructive/20">{error}</div>}
 
-              <Button
-                type="submit"
-                className="w-full h-12 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
-                disabled={isLoading}
-              >
-                {isLoading ? "Signing In..." : "Sign In"}
+              <Button type="submit" className="w-full h-12 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700" disabled={isLoading}>
+                {isLoading ? 'Signing In...' : 'Sign In'}
               </Button>
             </form>
           </Form>
@@ -124,7 +109,7 @@ export default function LoginPage() {
             </div>
             <div className="mt-6">
               <p className="text-sm text-muted-foreground">
-                Don&apos;t have an account?{" "}
+                Don&apos;t have an account?{' '}
                 <Link href="/signup" className="text-green-600 hover:text-green-700 font-medium">
                   Sign up
                 </Link>
@@ -134,5 +119,5 @@ export default function LoginPage() {
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }

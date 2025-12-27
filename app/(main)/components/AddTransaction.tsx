@@ -1,6 +1,6 @@
 import { getDateIntervalBasedOnActiveViewMode, transactionInfoIntervalAtom } from '@/app/(main)/components/ExpenseOverview'
 import TransactionApiService from '@/app/ApiService/TransactionApiService'
-import { useAuth } from '@/app/contexts/AuthContext'
+import { useAuth } from '@/app/hooks/use-auth'
 import { accountTypeAtom } from '@/app/stores/accountType'
 import { activeViewAtom } from '@/components/shared/LeftSidebar'
 import { addTransactionCategoryAtom } from '@/components/shared/RechartsDonutChart'
@@ -116,7 +116,6 @@ const AddTransactionModal = () => {
     },
   })
 
-  console.log({ user })
   const onSubmit = (data: FormData) => {
     if (!user?.id || !user?.activeAccountTypeId) return
 

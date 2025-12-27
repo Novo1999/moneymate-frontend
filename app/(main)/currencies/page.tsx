@@ -1,6 +1,6 @@
 'use client'
 import UserApiService from '@/app/ApiService/UserApiService'
-import { userAtom } from '@/app/contexts/AuthContext'
+import { userAtom } from '@/app/stores/auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
