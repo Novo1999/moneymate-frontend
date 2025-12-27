@@ -10,7 +10,7 @@ export default class CategoryApiService {
 
       return response.data.data.sort((a, b) => (a?.id || 0) - (b?.id || 0))
     } catch (error: any) {
-      const errorMessage = error?.response?.data?.message || 'Failed to fetch all categories'
+      const errorMessage = error?.response?.data?.msg || 'Failed to fetch all categories'
       toast.error(errorMessage)
       throw error
     }
@@ -22,7 +22,7 @@ export default class CategoryApiService {
 
       return response.data.data
     } catch (error: any) {
-      const errorMessage = error?.response?.data?.message || 'Failed to fetch category'
+      const errorMessage = error?.response?.data?.msg || 'Failed to fetch category'
       toast.error(errorMessage)
       throw error
     }
@@ -36,7 +36,7 @@ export default class CategoryApiService {
 
       return response.data.data
     } catch (error: any) {
-      const errorMessage = error?.response?.data?.message || 'Failed to fetch user categories'
+      const errorMessage = error?.response?.data?.msg || 'Failed to fetch user categories'
       toast.error(errorMessage)
       throw error
     }
@@ -49,7 +49,7 @@ export default class CategoryApiService {
       toast.success('Category added successfully!')
       return response.data
     } catch (error: any) {
-      const errorMessage = error?.response?.data?.message || 'Failed to add category'
+      const errorMessage = error?.response?.data?.msg || 'Failed to add category'
       toast.error(errorMessage)
       throw error
     }
@@ -62,7 +62,7 @@ export default class CategoryApiService {
       toast.success('Category updated successfully!')
       return response.data
     } catch (error: any) {
-      const errorMessage = error?.response?.data?.message || 'Failed to update category'
+      const errorMessage = error?.response?.data?.msg || 'Failed to update category'
       toast.error(errorMessage)
       throw error
     }
@@ -75,7 +75,7 @@ export default class CategoryApiService {
       toast.success('Category deleted successfully!')
       return response.data
     } catch (error: any) {
-      const errorMessage = error?.response?.data?.message || 'Failed to delete category'
+      const errorMessage = error?.response?.data?.msg || 'Failed to delete category'
       toast.error(errorMessage)
       throw error
     }

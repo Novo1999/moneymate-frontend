@@ -11,7 +11,7 @@ export default class UserApiService {
 
       return response.data
     } catch (error: any) {
-      const errorMessage = error?.response?.data?.message || 'Failed to fetch user'
+      const errorMessage = error?.response?.data?.msg || 'Failed to fetch user'
       toast.error(errorMessage)
       throw error
     }
@@ -23,7 +23,7 @@ export default class UserApiService {
 
       return response.data
     } catch (error: any) {
-      const errorMessage = error?.response?.data?.message || 'Failed to edit user'
+      const errorMessage = error?.response?.data?.msg || 'Failed to edit user'
       toast.error(errorMessage)
       throw error
     }

@@ -43,7 +43,7 @@ export default function LoginPage() {
       router.push('/');
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
-      setError(error?.response?.data?.message || 'Login failed');
+      setError(error?.response?.data?.msg || 'Login failed');
     } finally {
       setIsLoading(false);
     }

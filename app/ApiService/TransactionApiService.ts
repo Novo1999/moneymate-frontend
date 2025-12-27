@@ -8,7 +8,7 @@ export default class TransactionApiService {
 
       return response.data.data
     } catch (error: any) {
-      const errorMessage = error?.response?.data?.message || 'Failed to fetch all transactions'
+      const errorMessage = error?.response?.data?.msg || 'Failed to fetch all transactions'
       toast.error(errorMessage)
       throw error
     }
@@ -22,7 +22,7 @@ export default class TransactionApiService {
 
       return response.data.data
     } catch (error: any) {
-      const errorMessage = error?.response?.data?.message || 'Failed to fetch user transactions'
+      const errorMessage = error?.response?.data?.msg || 'Failed to fetch user transactions'
       toast.error(errorMessage)
       throw error
     }
@@ -36,7 +36,7 @@ export default class TransactionApiService {
 
       return response.data.data
     } catch (error: any) {
-      const errorMessage = error?.response?.data?.message || 'Failed to fetch transaction info'
+      const errorMessage = error?.response?.data?.msg || 'Failed to fetch transaction info'
       toast.error(errorMessage)
       throw error
     }
@@ -49,7 +49,7 @@ export default class TransactionApiService {
       toast.success('Transaction added successfully!')
       return response.data
     } catch (error: any) {
-      const errorMessage = error?.response?.data?.message || 'Failed to add transaction'
+      const errorMessage = error?.response?.data?.msg || 'Failed to add transaction'
       toast.error(errorMessage)
       throw error
     }
@@ -70,7 +70,7 @@ export default class TransactionApiService {
       toast.success('Transaction updated successfully!')
       return response.data
     } catch (error: any) {
-      const errorMessage = error?.response?.data?.message || 'Failed to update transaction'
+      const errorMessage = error?.response?.data?.msg || 'Failed to update transaction'
       toast.error(errorMessage)
       throw error
     }
@@ -83,7 +83,7 @@ export default class TransactionApiService {
       toast.success('Transaction deleted successfully!')
       return response.data
     } catch (error: any) {
-      const errorMessage = error?.response?.data?.message || 'Failed to delete transaction'
+      const errorMessage = error?.response?.data?.msg || 'Failed to delete transaction'
       toast.error(errorMessage)
       throw error
     }

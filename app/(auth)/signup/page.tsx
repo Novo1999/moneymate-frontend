@@ -59,7 +59,7 @@ export default function SignupPage() {
       router.push('/')
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } }
-      setError(error?.response?.data?.message || 'Signup failed')
+      setError(error?.response?.data?.msg || 'Signup failed')
     } finally {
       setIsLoading(false)
     }

@@ -1,5 +1,6 @@
 import AddTransactionModal from '@/app/(main)/components/AddTransaction'
 import DateController from '@/app/(main)/components/DateController'
+import AccountTypeApiService from '@/app/ApiService/AccountTypeApiService'
 import TransactionApiService from '@/app/ApiService/TransactionApiService'
 import { useAuth } from '@/app/contexts/AuthContext'
 import { accountTypeAtom, activeViewAtom } from '@/components/shared/LeftSidebar'
@@ -37,6 +38,7 @@ export const transactionInfoIntervalAtom = atom(new Date().toISOString())
 const ExpenseOverview = () => {
   const { user } = useAuth()
   const accountTypeId = useAtomValue(accountTypeAtom)
+  console.log("🚀 ~ ExpenseOverview ~ accountTypeId:", accountTypeId)
   const activeView = useAtomValue(activeViewAtom)
   const [transactionInfoInterval, setTransactionInfoInterval] = useAtom(transactionInfoIntervalAtom)
 
@@ -49,6 +51,12 @@ const ExpenseOverview = () => {
     queryFn: () => TransactionApiService.getUserTransactionsInfo(Number(accountTypeId), from, to),
     enabled: !!accountTypeId && !!from && !!to,
   })
+  const { data: accountType, isLoading: accountTypeLoading } = useQuery({
+    queryKey: ['userAccountType', accountTypeId],
+    queryFn: () => AccountTypeApiService.getUserAccountType(Number(accountTypeId)),
+    enabled: !!accountTypeId
+  })
+  console.log("🚀 ~ ExpenseOverview ~ accountType:", accountType)
 
   return (
     <div className="max-w-7xl grid grid-cols-1 xl:grid-cols-3 gap-6">
@@ -73,7 +81,7 @@ const ExpenseOverview = () => {
         <Card className="shadow-lg bg-gradient-to-br from-green-500 to-emerald-600 text-white border-0">
           <CardContent className="text-center p-8">
             <h3 className="text-lg font-semibold mb-3">Current Balance</h3>
-            <p className="text-4xl font-bold mb-2">4,280.45 {user?.currency}</p>
+            <p className="text-4xl font-bold mb-2">{accountType?.balance} {user?.currency}</p>
             <p className="text-green-100 text-sm">+2.5% from last month</p>
           </CardContent>
         </Card>
