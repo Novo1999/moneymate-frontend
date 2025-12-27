@@ -8,6 +8,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -31,6 +32,7 @@ type SignupFormData = z.infer<typeof signupSchema>
 export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
+  const queryClient = useQueryClient()
 
   const { login } = useAuth()
   const router = useRouter()
@@ -52,13 +54,14 @@ export default function SignupPage() {
     try {
       // Create account
       await AuthApiService.register(data.name, data.email, data.password)
-      
+
       // Auto-login after successful signup
       await login(data.email, data.password)
       await AccountTypeApiService.addUserAccountType({ name: data.name, type: 'Cash', balance: 0, description: '' })
+      queryClient.invalidateQueries({ queryKey: ['accountTypes'] })
       router.push('/')
     } catch (err: unknown) {
-      const error = err as { response?: { data?: { message?: string } } }
+      const error = err as { response?: { data?: { msg?: string } } }
       setError(error?.response?.data?.msg || 'Signup failed')
     } finally {
       setIsLoading(false)

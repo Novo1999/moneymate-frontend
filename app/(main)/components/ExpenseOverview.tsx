@@ -38,7 +38,7 @@ export const transactionInfoIntervalAtom = atom(new Date().toISOString())
 const ExpenseOverview = () => {
   const { user } = useAuth()
   const accountTypeId = useAtomValue(accountTypeAtom)
-  console.log("🚀 ~ ExpenseOverview ~ accountTypeId:", accountTypeId)
+  console.log('🚀 ~ ExpenseOverview ~ accountTypeId:', accountTypeId)
   const activeView = useAtomValue(activeViewAtom)
   const [transactionInfoInterval, setTransactionInfoInterval] = useAtom(transactionInfoIntervalAtom)
 
@@ -47,16 +47,16 @@ const ExpenseOverview = () => {
   const { from, to } = useMemo(() => getDateIntervalBasedOnActiveViewMode(activeView, transactionInfoIntervalDate), [activeView, transactionInfoIntervalDate])
 
   const { data: transactionInfo, isLoading: transactionInfoLoading } = useQuery({
-    queryKey: ['userTransactionsInfo', accountTypeId, from, to],
+    queryKey: ['userTransactionsInfo', accountTypeId, from, to, user?.email],
     queryFn: () => TransactionApiService.getUserTransactionsInfo(Number(accountTypeId), from, to),
-    enabled: !!accountTypeId && !!from && !!to,
+    enabled: !!accountTypeId && accountTypeId > 0 && !!from && !!to && !!user?.email,
   })
   const { data: accountType, isLoading: accountTypeLoading } = useQuery({
     queryKey: ['userAccountType', accountTypeId],
     queryFn: () => AccountTypeApiService.getUserAccountType(Number(accountTypeId)),
-    enabled: !!accountTypeId
+    enabled: !!accountTypeId && accountTypeId > 0,
   })
-  console.log("🚀 ~ ExpenseOverview ~ accountType:", accountType)
+  console.log('🚀 ~ ExpenseOverview ~ accountType:', accountType)
 
   return (
     <div className="max-w-7xl grid grid-cols-1 xl:grid-cols-3 gap-6">
@@ -80,9 +80,17 @@ const ExpenseOverview = () => {
         {/* Balance Card */}
         <Card className="shadow-lg bg-gradient-to-br from-green-500 to-emerald-600 text-white border-0">
           <CardContent className="text-center p-8">
-            <h3 className="text-lg font-semibold mb-3">Current Balance</h3>
-            <p className="text-4xl font-bold mb-2">{accountType?.balance} {user?.currency}</p>
-            <p className="text-green-100 text-sm">+2.5% from last month</p>
+            {!accountType ? (
+              <p className="text-white">No Details to Show</p>
+            ) : (
+              <div>
+                <h3 className="text-lg font-semibold mb-3">Current Balance</h3>
+                <p className="text-4xl font-bold mb-2">
+                  {accountType?.balance} {user?.currency}
+                </p>
+                <p className="text-green-100 text-sm">+2.5% from last month</p>
+              </div>
+            )}
           </CardContent>
         </Card>
 

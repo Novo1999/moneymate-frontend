@@ -42,7 +42,7 @@ export default function LoginPage() {
       await login(data.email, data.password);
       router.push('/');
     } catch (err: unknown) {
-      const error = err as { response?: { data?: { message?: string } } };
+      const error = err as { response?: { data?: { msg?: string } } };
       setError(error?.response?.data?.msg || 'Login failed');
     } finally {
       setIsLoading(false);

@@ -1,6 +1,5 @@
 'use client'
 
-import { transactionInfoIntervalAtom } from '@/app/(main)/components/ExpenseOverview'
 import AccountTypeApiService from '@/app/ApiService/AccountTypeApiService'
 import UserApiService from '@/app/ApiService/UserApiService'
 import { useAuth, userAtom } from '@/app/contexts/AuthContext'
@@ -61,6 +60,11 @@ export default function LeftSidebar() {
   activeViewAtom.onMount = (setAtom) => {
     setAtom(user?.viewMode || '')
   }
+
+  useEffect(() => {
+    if (!accountTypes) return
+    setAccountType(accountTypes?.[0]?.id)
+  }, [accountTypes, setAccountType])
 
   // Set default account type when data loads
   useEffect(() => {

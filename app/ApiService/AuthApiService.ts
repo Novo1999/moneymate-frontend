@@ -12,8 +12,6 @@ export default class AuthApiService {
       toast.success('Login successful!')
       return response.data.data.token
     } catch (error: any) {
-      const errorMessage = error?.response?.data?.msg || 'Login failed'
-      toast.error(errorMessage)
       throw error
     }
   }
@@ -29,8 +27,6 @@ export default class AuthApiService {
       toast.success('Account created successfully!')
       return response.data
     } catch (error: any) {
-      const errorMessage = error?.response?.data?.msg || 'Registration failed'
-      toast.error(errorMessage)
       throw error
     }
   }
