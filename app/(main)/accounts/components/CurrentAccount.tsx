@@ -1,6 +1,7 @@
 'use client'
 import { editFormAtom, editOpenAtom } from '@/app/(main)/accounts/components/store'
 import AccountTypeApiService from '@/app/ApiService/AccountTypeApiService'
+import { userAtom } from '@/app/contexts/AuthContext'
 import { accountTypeAtom } from '@/app/stores/accountType'
 import {
   AlertDialog,
@@ -21,9 +22,10 @@ import { Pencil, Trash2, Wallet } from 'lucide-react'
 
 const CurrentAccount = () => {
   const accountTypeId = useAtomValue(accountTypeAtom)
-  const [_, setIsEditOpen] = useAtom(editOpenAtom)
-  const [__, setEditForm] = useAtom(editFormAtom)
+  const [, setIsEditOpen] = useAtom(editOpenAtom)
+  const [, setEditForm] = useAtom(editFormAtom)
   const queryClient = useQueryClient()
+  const user = useAtomValue(userAtom)
 
   const { data } = useQuery({
     queryKey: ['accountType', accountTypeId],
@@ -34,9 +36,6 @@ const CurrentAccount = () => {
   const handleEdit = () => {
     setEditForm({
       name: data?.name || '',
-      type: data?.type || '',
-      balance: parseFloat(data?.balance || '0'),
-      description: data?.description || '',
     })
     setIsEditOpen(true)
   }
@@ -54,7 +53,6 @@ const CurrentAccount = () => {
 
   return (
     <div>
-      {/* Header Section */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">{data?.name}</h1>
@@ -86,7 +84,6 @@ const CurrentAccount = () => {
         </div>
       </div>
 
-      {/* Balance Card */}
       <Card className="bg-gradient-to-br from-primary/10 to-primary/5">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -96,7 +93,8 @@ const CurrentAccount = () => {
         </CardHeader>
         <CardContent>
           <div className="text-4xl font-bold">
-            $
+            {user?.currency}
+            {" "}
             {parseFloat(data?.balance || '0').toLocaleString('en-US', {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,

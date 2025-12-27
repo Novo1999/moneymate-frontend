@@ -1,3 +1,4 @@
+import { EditAccountDetailsDto } from '@/app/dto/EditAccountDetailsDto'
 import axiosInstance from '@/lib/axios'
 import { toast } from 'sonner'
 
@@ -25,7 +26,7 @@ export default class AccountTypeApiService {
     }
   }
 
-  static async addUserAccountType(accountTypeData: { name: string; type: string; balance?: number; description?: string }) {
+  static async addUserAccountType(accountTypeData: { name: string; balance?: number }) {
     try {
       const response = await axiosInstance.post('/accountType/add', accountTypeData)
 
@@ -38,15 +39,7 @@ export default class AccountTypeApiService {
     }
   }
 
-  static async editUserAccountType(
-    id: number,
-    accountTypeData: {
-      name?: string
-      type?: string
-      balance?: number
-      description?: string
-    }
-  ) {
+  static async editUserAccountType(id: number, accountTypeData: EditAccountDetailsDto) {
     try {
       const response = await axiosInstance.patch(`/accountType/edit/${id}`, accountTypeData)
 

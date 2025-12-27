@@ -1,11 +1,11 @@
 import { editFormAtom, editOpenAtom } from '@/app/(main)/accounts/components/store'
 import AccountTypeApiService from '@/app/ApiService/AccountTypeApiService'
+import { EditAccountDetailsDto } from '@/app/dto/EditAccountDetailsDto'
 import { accountTypeAtom } from '@/app/stores/accountType'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAtom, useAtomValue } from 'jotai'
 
@@ -16,9 +16,10 @@ const EditAccountDetails = () => {
   const queryClient = useQueryClient()
 
   const editMutation = useMutation({
-    mutationFn: (editData: any) => AccountTypeApiService.editUserAccountType(accountTypeId || 0, editData),
+    mutationFn: (editData: EditAccountDetailsDto) => AccountTypeApiService.editUserAccountType(accountTypeId || 0, editData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['accountType', accountTypeId] })
+      queryClient.invalidateQueries({ queryKey: ['accountTypes'] })
       setIsEditOpen(false)
     },
   })
@@ -38,38 +39,6 @@ const EditAccountDetails = () => {
           <div>
             <Label htmlFor="name">Account Name</Label>
             <Input id="name" value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} />
-          </div>
-          <div>
-            <Label htmlFor="type">Type</Label>
-            <Input id="type" value={editForm.type} onChange={(e) => setEditForm({ ...editForm, type: e.target.value })} />
-          </div>
-          <div>
-            <Label htmlFor="balance">Balance</Label>
-            <Input
-              id="balance"
-              type="number"
-              step="0.01"
-              value={editForm.balance}
-              onChange={(e) =>
-                setEditForm({
-                  ...editForm,
-                  balance: parseFloat(e.target.value),
-                })
-              }
-            />
-          </div>
-          <div>
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              value={editForm.description}
-              onChange={(e) =>
-                setEditForm({
-                  ...editForm,
-                  description: e.target.value,
-                })
-              }
-            />
           </div>
         </div>
         <DialogFooter>

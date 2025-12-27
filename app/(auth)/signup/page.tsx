@@ -57,7 +57,7 @@ export default function SignupPage() {
 
       // Auto-login after successful signup
       await login(data.email, data.password)
-      await AccountTypeApiService.addUserAccountType({ name: data.name, type: 'Cash', balance: 0, description: '' })
+      await AccountTypeApiService.addUserAccountType({ name: 'Cash', balance: 0 })
       queryClient.invalidateQueries({ queryKey: ['accountTypes'] })
       router.push('/')
     } catch (err: unknown) {

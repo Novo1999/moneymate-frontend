@@ -8,6 +8,7 @@ import { accountTypeAtom } from '@/app/stores/accountType'
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useQuery } from '@tanstack/react-query'
 import { atom, useAtomValue } from 'jotai'
+import { Loader } from 'lucide-react'
 
 export const transferOpenAtom = atom<boolean>(false)
 
@@ -42,7 +43,7 @@ const AccountsPage = () => {
   if (isLoading) {
     return (
       <div className="min-h-[90vh] flex items-center justify-center">
-        <div className="animate-pulse">Loading...</div>
+        <Loader className="animate-spin size-24 text-green-500" />
       </div>
     )
   }
