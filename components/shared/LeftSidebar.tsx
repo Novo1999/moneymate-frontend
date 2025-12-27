@@ -3,6 +3,7 @@
 import AccountTypeApiService from '@/app/ApiService/AccountTypeApiService'
 import UserApiService from '@/app/ApiService/UserApiService'
 import { useAuth, userAtom } from '@/app/contexts/AuthContext'
+import { accountTypeAtom } from '@/app/stores/accountType'
 import { Button } from '@/components/ui/button'
 import { Calendar as CalendarComponent } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
@@ -35,7 +36,6 @@ const viewModes: Array<{ value: ActiveViewModes; label: string; icon: LucideIcon
 ]
 
 export const activeViewAtom = atom<ActiveViewModes>('day')
-export const accountTypeAtom = atom<number>(0)
 export const dateAtom = atom<Date | undefined>(undefined)
 
 export default function LeftSidebar() {
