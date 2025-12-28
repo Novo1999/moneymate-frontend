@@ -36,18 +36,20 @@ export const initAuthAtom = atom(null, async (_get, set) => {
 })
 
 export const loginAtom = atom(null, async (_get, set, { email, password }: { email: string; password: string }) => {
-  const token = await AuthApiService.login(email, password)
+  const data = (await AuthApiService.login(email, password)) ?? {}
+  if (!data) return
 
-  Cookies.set('accessToken', token, {
+  Cookies.set('accessToken', data.token, {
     expires: 1,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
   })
 
-  set(tokenAtom, token)
+  set(tokenAtom, data.token)
 
-  const payload = JSON.parse(atob(token.split('.')[1]))
+  const payload = JSON.parse(atob(data.token.split('.')[1]))
   set(userAtom, payload)
+  return data
 })
 
 export const logoutAtom = atom(null, (_get, set) => {

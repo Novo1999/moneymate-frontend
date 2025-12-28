@@ -1,118 +1,253 @@
 export enum Currency {
   // Major Global Currencies
-  USD = 'USD', // United States Dollar
-  EUR = 'EUR', // Euro
-  JPY = 'JPY', // Japanese Yen
-  GBP = 'GBP', // British Pound Sterling
-  AUD = 'AUD', // Australian Dollar
-  CAD = 'CAD', // Canadian Dollar
-  CHF = 'CHF', // Swiss Franc
-  CNY = 'CNY', // Chinese Yuan
-  SEK = 'SEK', // Swedish Krona
-  NZD = 'NZD', // New Zealand Dollar
+  USD = 'USD',
+  EUR = 'EUR',
+  JPY = 'JPY',
+  GBP = 'GBP',
+  AUD = 'AUD',
+  CAD = 'CAD',
+  CHF = 'CHF',
+  CNY = 'CNY',
+  SEK = 'SEK',
+  NZD = 'NZD',
 
   // Other Major Currencies
-  NOK = 'NOK', // Norwegian Krone
-  DKK = 'DKK', // Danish Krone
-  SGD = 'SGD', // Singapore Dollar
-  HKD = 'HKD', // Hong Kong Dollar
-  KRW = 'KRW', // South Korean Won
-  INR = 'INR', // Indian Rupee
-  BRL = 'BRL', // Brazilian Real
-  RUB = 'RUB', // Russian Ruble
-  MXN = 'MXN', // Mexican Peso
-  ZAR = 'ZAR', // South African Rand
+  NOK = 'NOK',
+  DKK = 'DKK',
+  SGD = 'SGD',
+  HKD = 'HKD',
+  KRW = 'KRW',
+  INR = 'INR',
+  BRL = 'BRL',
+  RUB = 'RUB',
+  MXN = 'MXN',
+  ZAR = 'ZAR',
 
   // Middle East & Africa
-  SAR = 'SAR', // Saudi Riyal
-  AED = 'AED', // UAE Dirham
-  ILS = 'ILS', // Israeli Shekel
-  TRY = 'TRY', // Turkish Lira
-  EGP = 'EGP', // Egyptian Pound
-  NGN = 'NGN', // Nigerian Naira
-  KES = 'KES', // Kenyan Shilling
-  MAD = 'MAD', // Moroccan Dirham
-  GHS = 'GHS', // Ghanaian Cedi
-  TND = 'TND', // Tunisian Dinar
+  SAR = 'SAR',
+  AED = 'AED',
+  ILS = 'ILS',
+  TRY = 'TRY',
+  EGP = 'EGP',
+  NGN = 'NGN',
+  KES = 'KES',
+  MAD = 'MAD',
+  GHS = 'GHS',
+  TND = 'TND',
 
   // Asia Pacific
-  THB = 'THB', // Thai Baht
-  MYR = 'MYR', // Malaysian Ringgit
-  PHP = 'PHP', // Philippine Peso
-  IDR = 'IDR', // Indonesian Rupiah
-  VND = 'VND', // Vietnamese Dong
-  TWD = 'TWD', // Taiwan Dollar
-  PKR = 'PKR', // Pakistani Rupee
-  BDT = 'BDT', // Bangladeshi Taka
-  LKR = 'LKR', // Sri Lankan Rupee
-  NPR = 'NPR', // Nepalese Rupee
+  THB = 'THB',
+  MYR = 'MYR',
+  PHP = 'PHP',
+  IDR = 'IDR',
+  VND = 'VND',
+  TWD = 'TWD',
+  PKR = 'PKR',
+  BDT = 'BDT',
+  LKR = 'LKR',
+  NPR = 'NPR',
 
   // Latin America
-  CLP = 'CLP', // Chilean Peso
-  COP = 'COP', // Colombian Peso
-  PEN = 'PEN', // Peruvian Sol
-  ARS = 'ARS', // Argentine Peso
-  UYU = 'UYU', // Uruguayan Peso
-  BOB = 'BOB', // Bolivian Boliviano
-  PYG = 'PYG', // Paraguayan Guarani
-  VES = 'VES', // Venezuelan Bolívar
-  CRC = 'CRC', // Costa Rican Colón
-  GTQ = 'GTQ', // Guatemalan Quetzal
+  CLP = 'CLP',
+  COP = 'COP',
+  PEN = 'PEN',
+  ARS = 'ARS',
+  UYU = 'UYU',
+  BOB = 'BOB',
+  PYG = 'PYG',
+  VES = 'VES',
+  CRC = 'CRC',
+  GTQ = 'GTQ',
 
   // Eastern Europe
-  PLN = 'PLN', // Polish Zloty
-  CZK = 'CZK', // Czech Koruna
-  HUF = 'HUF', // Hungarian Forint
-  RON = 'RON', // Romanian Leu
-  BGN = 'BGN', // Bulgarian Lev
-  HRK = 'HRK', // Croatian Kuna
-  RSD = 'RSD', // Serbian Dinar
-  UAH = 'UAH', // Ukrainian Hryvnia
+  PLN = 'PLN',
+  CZK = 'CZK',
+  HUF = 'HUF',
+  RON = 'RON',
+  BGN = 'BGN',
+  HRK = 'HRK',
+  RSD = 'RSD',
+  UAH = 'UAH',
 
   // Other European
-  ISK = 'ISK', // Icelandic Krona
+  ISK = 'ISK',
 
   // Central Asia & Others
-  KZT = 'KZT', // Kazakhstani Tenge
-  UZS = 'UZS', // Uzbekistani Som
+  KZT = 'KZT',
+  UZS = 'UZS',
 
   // Caribbean & Small Nations
-  BBD = 'BBD', // Barbadian Dollar
-  BMD = 'BMD', // Bermudian Dollar
-  BSD = 'BSD', // Bahamian Dollar
-  JMD = 'JMD', // Jamaican Dollar
-  TTD = 'TTD', // Trinidad and Tobago Dollar
+  BBD = 'BBD',
+  BMD = 'BMD',
+  BSD = 'BSD',
+  JMD = 'JMD',
+  TTD = 'TTD',
 
   // Pacific
-  FJD = 'FJD', // Fijian Dollar
-  PGK = 'PGK', // Papua New Guinea Kina
+  FJD = 'FJD',
+  PGK = 'PGK',
 
   // Africa continued
-  BWP = 'BWP', // Botswana Pula
-  MUR = 'MUR', // Mauritian Rupee
-  SCR = 'SCR', // Seychellois Rupee
-  SZL = 'SZL', // Swazi Lilangeni
-  LSL = 'LSL', // Lesotho Loti
-  NAD = 'NAD', // Namibian Dollar
-  ZMW = 'ZMW', // Zambian Kwacha
-  MWK = 'MWK', // Malawian Kwacha
-  UGX = 'UGX', // Ugandan Shilling
-  TZS = 'TZS', // Tanzanian Shilling
-  RWF = 'RWF', // Rwandan Franc
-  ETB = 'ETB', // Ethiopian Birr
+  BWP = 'BWP',
+  MUR = 'MUR',
+  SCR = 'SCR',
+  SZL = 'SZL',
+  LSL = 'LSL',
+  NAD = 'NAD',
+  ZMW = 'ZMW',
+  MWK = 'MWK',
+  UGX = 'UGX',
+  TZS = 'TZS',
+  RWF = 'RWF',
+  ETB = 'ETB',
 
   // Middle East continued
-  JOD = 'JOD', // Jordanian Dinar
-  KWD = 'KWD', // Kuwaiti Dinar
-  BHD = 'BHD', // Bahraini Dinar
-  QAR = 'QAR', // Qatari Riyal
-  OMR = 'OMR', // Omani Rial
+  JOD = 'JOD',
+  KWD = 'KWD',
+  BHD = 'BHD',
+  QAR = 'QAR',
+  OMR = 'OMR',
 
   // Additional currencies
-  AMD = 'ARM', // Armenian Dram
-  GEL = 'GEL', // Georgian Lari
-  AZN = 'AZN', // Azerbaijani Manat
-  MDL = 'MDL', // Moldovan Leu
+  AMD = 'AMD',
+  GEL = 'GEL',
+  AZN = 'AZN',
+  MDL = 'MDL',
+}
+
+const countryToCurrencyMap: Record<string, Currency> = {
+  US: Currency.USD,
+  JP: Currency.JPY,
+  GB: Currency.GBP,
+  AU: Currency.AUD,
+  CA: Currency.CAD,
+  CH: Currency.CHF,
+  CN: Currency.CNY,
+  SE: Currency.SEK,
+  NZ: Currency.NZD,
+  NO: Currency.NOK,
+  DK: Currency.DKK,
+  SG: Currency.SGD,
+  HK: Currency.HKD,
+  KR: Currency.KRW,
+  IN: Currency.INR,
+  BR: Currency.BRL,
+  RU: Currency.RUB,
+  MX: Currency.MXN,
+  ZA: Currency.ZAR,
+  AT: Currency.EUR,
+  BE: Currency.EUR,
+  CY: Currency.EUR,
+  EE: Currency.EUR,
+  FI: Currency.EUR,
+  FR: Currency.EUR,
+  DE: Currency.EUR,
+  GR: Currency.EUR,
+  IE: Currency.EUR,
+  IT: Currency.EUR,
+  LV: Currency.EUR,
+  LT: Currency.EUR,
+  LU: Currency.EUR,
+  MT: Currency.EUR,
+  NL: Currency.EUR,
+  PT: Currency.EUR,
+  SK: Currency.EUR,
+  SI: Currency.EUR,
+  ES: Currency.EUR,
+  HR: Currency.EUR,
+  SA: Currency.SAR,
+  AE: Currency.AED,
+  IL: Currency.ILS,
+  TR: Currency.TRY,
+  EG: Currency.EGP,
+  NG: Currency.NGN,
+  KE: Currency.KES,
+  MA: Currency.MAD,
+  GH: Currency.GHS,
+  TN: Currency.TND,
+  TH: Currency.THB,
+  MY: Currency.MYR,
+  PH: Currency.PHP,
+  ID: Currency.IDR,
+  VN: Currency.VND,
+  TW: Currency.TWD,
+  PK: Currency.PKR,
+  BD: Currency.BDT,
+  LK: Currency.LKR,
+  NP: Currency.NPR,
+  CL: Currency.CLP,
+  CO: Currency.COP,
+  PE: Currency.PEN,
+  AR: Currency.ARS,
+  UY: Currency.UYU,
+  BO: Currency.BOB,
+  PY: Currency.PYG,
+  VE: Currency.VES,
+  CR: Currency.CRC,
+  GT: Currency.GTQ,
+  PL: Currency.PLN,
+  CZ: Currency.CZK,
+  HU: Currency.HUF,
+  RO: Currency.RON,
+  BG: Currency.BGN,
+  RS: Currency.RSD,
+  UA: Currency.UAH,
+  IS: Currency.ISK,
+  KZ: Currency.KZT,
+  UZ: Currency.UZS,
+  BB: Currency.BBD,
+  BM: Currency.BMD,
+  BS: Currency.BSD,
+  JM: Currency.JMD,
+  TT: Currency.TTD,
+  FJ: Currency.FJD,
+  PG: Currency.PGK,
+  BW: Currency.BWP,
+  MU: Currency.MUR,
+  SC: Currency.SCR,
+  SZ: Currency.SZL,
+  LS: Currency.LSL,
+  NA: Currency.NAD,
+  ZM: Currency.ZMW,
+  MW: Currency.MWK,
+  UG: Currency.UGX,
+  TZ: Currency.TZS,
+  RW: Currency.RWF,
+  ET: Currency.ETB,
+  JO: Currency.JOD,
+  KW: Currency.KWD,
+  BH: Currency.BHD,
+  QA: Currency.QAR,
+  OM: Currency.OMR,
+  AM: Currency.AMD,
+  GE: Currency.GEL,
+  AZ: Currency.AZN,
+  MD: Currency.MDL,
+}
+
+export const getCurrencyFromCountryCode = (countryCode: string): Currency | undefined => {
+  return countryToCurrencyMap[countryCode?.toUpperCase()]
+}
+
+export const getCurrencyFromIpData = (ipData: { country_code: string }): Currency | undefined => {
+  return getCurrencyFromCountryCode(ipData.country_code)
+}
+
+export const detectCurrencyFromIp = async (apiKey: string, userIp?: string): Promise<Currency> => {
+  try {
+    const url = userIp 
+      ? `http://api.ipapi.com/${userIp}?access_key=${apiKey}&format=1`
+      : `http://api.ipapi.com/check?access_key=${apiKey}&format=1`
+    
+    const res = await fetch(url)
+    const data = await res.json()
+    
+    const currency = getCurrencyFromCountryCode(data?.country_code)
+    return currency || Currency.USD
+  } catch (error) {
+    console.error('Failed to detect currency from IP:', error)
+    return Currency.USD
+  }
 }
 
 export const getCurrencyDisplayName = (currency: Currency): string => {

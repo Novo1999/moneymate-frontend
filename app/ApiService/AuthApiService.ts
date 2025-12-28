@@ -10,18 +10,19 @@ export default class AuthApiService {
       })
 
       toast.success('Login successful!')
-      return response.data.data.token
+      return response.data.data
     } catch (error: any) {
       throw error
     }
   }
 
-  static async register(name: string, email: string, password: string) {
+  static async register(name: string, email: string, password: string, currency: string) {
     try {
       const response = await axiosInstance.post('/auth/signUp', {
         name,
         email,
         password,
+        currency,
       })
 
       toast.success('Account created successfully!')
