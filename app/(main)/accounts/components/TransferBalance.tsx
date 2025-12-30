@@ -1,46 +1,50 @@
 'use client'
 
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAtom, useAtomValue } from 'jotai'
 import { ArrowLeftRight } from 'lucide-react'
 
-import { transferFormAtom, transferOpenAtom } from '@/app/(main)/accounts/page'
+import { transferFormAtom, transferOpenAtom } from '@/app/(main)/accounts/components/store'
 import AccountTypeApiService from '@/app/ApiService/AccountTypeApiService'
 import { accountTypeAtom } from '@/app/stores/accountType'
+
+import { TransferDto } from '@/app/dto/TransferDto'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 const TransferBalance = () => {
-  const accountTypeId = useAtomValue(accountTypeAtom)
+  const fromAccountId = useAtomValue(accountTypeAtom)
   const [isTransferOpen, setIsTransferOpen] = useAtom(transferOpenAtom)
   const [transferForm, setTransferForm] = useAtom(transferFormAtom)
+  const queryClient = useQueryClient()
+  const { data: accountTypes } = useQuery({
+    queryKey: ['accountTypes'],
+    queryFn: () => AccountTypeApiService.getUserAccountTypes(),
+  })
   const { data: allAccounts } = useQuery({
     queryKey: ['accountTypes'],
-    queryFn: async () => await AccountTypeApiService.getUserAccountTypes(),
+    queryFn: () => AccountTypeApiService.getUserAccountTypes(),
   })
-  const queryClient = useQueryClient()
 
   const transferMutation = useMutation({
-    mutationFn: (transferData: any) =>
-      AccountTypeApiService.transferBalance({
-        fromAccountId: accountTypeId || 0,
-        ...transferData,
-      }),
+    mutationFn: (data: TransferDto) => AccountTypeApiService.transferBalance(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['accountType', accountTypeId] })
       queryClient.invalidateQueries({ queryKey: ['accountTypes'] })
+      queryClient.invalidateQueries({ queryKey: ['accountType', fromAccountId] })
       setIsTransferOpen(false)
       setTransferForm({ toAccountId: 0, amount: 0, description: '' })
     },
   })
 
   const handleTransferSubmit = () => {
-    transferMutation.mutate(transferForm)
+    transferMutation.mutate(transferForm as TransferDto)
   }
+
   return (
     <Card>
       <CardHeader>
@@ -51,7 +55,7 @@ const TransferBalance = () => {
       <CardContent>
         <Dialog open={isTransferOpen} onOpenChange={setIsTransferOpen}>
           <DialogTrigger asChild>
-            <Button className="w-full">
+            <Button disabled={accountTypes?.length === 0} className="w-full">
               <ArrowLeftRight className="w-4 h-4 mr-2" />
               Transfer Funds
             </Button>
@@ -64,34 +68,37 @@ const TransferBalance = () => {
             </DialogHeader>
 
             <div className="space-y-4">
-              <div>
-                <Label htmlFor="toAccount">To Account</Label>
-                <select
-                  id="toAccountId"
-                  className="w-full mt-1.5 px-3 py-2 border rounded-md"
-                  value={transferForm.toAccountId}
-                  onChange={(e) =>
+              {/* TO ACCOUNT */}
+              <div className="space-y-1.5">
+                <Label>To Account</Label>
+                <Select
+                  value={transferForm.toAccountId ? String(transferForm.toAccountId) : ''}
+                  onValueChange={(value) =>
                     setTransferForm({
                       ...transferForm,
-                      toAccountId: Number(e.target.value),
+                      toAccountId: Number(value),
                     })
                   }
                 >
-                  <option value={0}>Select account...</option>
-                  {allAccounts
-                    ?.filter((acc) => acc.id !== accountTypeId)
-                    .map((acc) => (
-                      <option key={acc.id} value={acc.id}>
-                        {acc.name} (${acc.balance})
-                      </option>
-                    ))}
-                </select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select account..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {allAccounts
+                      ?.filter((acc) => acc.id !== fromAccountId)
+                      .map((acc) => (
+                        <SelectItem key={acc.id} value={String(acc.id)}>
+                          {acc.name} (${acc.balance})
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
               </div>
 
-              <div>
-                <Label htmlFor="amount">Amount</Label>
+              {/* AMOUNT */}
+              <div className="space-y-1.5">
+                <Label>Amount</Label>
                 <Input
-                  id="amount"
                   type="number"
                   step="0.01"
                   placeholder="0.00"
@@ -105,10 +112,10 @@ const TransferBalance = () => {
                 />
               </div>
 
-              <div>
-                <Label htmlFor="transferDesc">Description (Optional)</Label>
+              {/* DESCRIPTION */}
+              <div className="space-y-1.5">
+                <Label>Description (optional)</Label>
                 <Textarea
-                  id="transferDesc"
                   placeholder="Add a note..."
                   value={transferForm.description}
                   onChange={(e) =>
@@ -126,8 +133,8 @@ const TransferBalance = () => {
                 Cancel
               </Button>
 
-              <Button onClick={handleTransferSubmit} disabled={!transferForm.toAccountId || transferForm.amount <= 0}>
-                Transfer
+              <Button onClick={handleTransferSubmit} disabled={!transferForm.toAccountId || transferForm.amount <= 0 || transferMutation.isPending}>
+                {transferMutation.isPending ? 'Transferring...' : 'Transfer'}
               </Button>
             </DialogFooter>
           </DialogContent>

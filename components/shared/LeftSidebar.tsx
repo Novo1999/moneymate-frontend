@@ -19,14 +19,6 @@ import { BarChart3, Calendar, CalendarIcon, Clock, Eye, Loader, LucideIcon } fro
 import Link from 'next/link'
 import { useEffect } from 'react'
 
-interface AccountType {
-  id: number
-  name: string
-  type: string
-  balance?: number
-  description?: string
-}
-
 const viewModes: Array<{ value: ActiveViewModes; label: string; icon: LucideIcon }> = [
   { value: 'day', label: 'Day', icon: Clock },
   { value: 'week', label: 'Week', icon: Calendar },
@@ -105,12 +97,12 @@ export default function LeftSidebar() {
       <Loader className="animate-spin" />
     ) : (
       <div>
-        <Select value={accountType.toString()} onValueChange={(val) => handleChangeAccountType(Number(val))}>
+        <Select value={accountType?.toString()} onValueChange={(val) => handleChangeAccountType(Number(val))}>
           <SelectTrigger className="border-green-500 w-full">
             <SelectValue placeholder="Select account type" />
           </SelectTrigger>
           <SelectContent>
-            {accountTypes?.map((type: AccountType) => (
+            {accountTypes?.map((type) => (
               <SelectItem key={type.id} value={type.id.toString()}>
                 <div className="flex items-center gap-4">
                   <span>{type.name}</span>

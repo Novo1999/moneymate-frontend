@@ -1,11 +1,13 @@
 import { EditAccountDetailsDto } from '@/app/dto/EditAccountDetailsDto'
+import { TransferDto } from '@/app/dto/TransferDto'
 import axiosInstance from '@/lib/axios'
+import { AccountType } from '@/types/account'
 import { toast } from 'sonner'
 
 export default class AccountTypeApiService {
   static async getUserAccountTypes() {
     try {
-      const response = await axiosInstance.get('/accountType')
+      const response = await axiosInstance.get<{ data: AccountType[] }>('/accountType')
 
       return response.data.data
     } catch (error: any) {
@@ -52,7 +54,7 @@ export default class AccountTypeApiService {
     }
   }
 
-  static async transferBalance(transferData: { fromAccountId: number; toAccountId: number; amount: number; description?: string }) {
+  static async transferBalance(transferData: TransferDto) {
     try {
       const response = await axiosInstance.patch('/accountType/transfer', transferData)
 
