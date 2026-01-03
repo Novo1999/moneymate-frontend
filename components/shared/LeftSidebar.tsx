@@ -102,7 +102,7 @@ export default function LeftSidebar() {
             <SelectValue placeholder="Select account type" />
           </SelectTrigger>
           <SelectContent>
-            {accountTypes?.map((type) => (
+              {accountTypes?.map((type) => (
               <SelectItem key={type.id} value={type.id.toString()}>
                 <div className="flex items-center gap-4">
                   <span>{type.name}</span>

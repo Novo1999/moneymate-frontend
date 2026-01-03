@@ -1,6 +1,6 @@
 'use client'
 
-import { rightSidebarOpenAtom } from '@/app/layout/DashboardLayout'
+import { rightSidebarOpenAtom } from '@/app/layout/store'
 import { cn } from '@/lib/utils'
 import { useAtom } from 'jotai'
 import { CreditCard, DollarSign, FolderTree, Settings } from 'lucide-react'

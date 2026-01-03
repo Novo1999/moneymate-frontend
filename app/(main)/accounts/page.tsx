@@ -67,13 +67,13 @@ const AccountsPage = () => {
 
   return (
     <div className="min-h-[90vh] p-6 space-y-6">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-6 flex-wrap gap-2">
         <p className="text-muted-foreground">Manage your account details and balance</p>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           {markedAccounts.length > 0 && (
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap">
                   <Button onClick={handleMarkAll} size="sm" variant="destructive">
                     <Check className="w-4 h-4 mr-2" />
                     {allMarked ? 'Unmark' : 'Mark'} All

@@ -64,7 +64,7 @@ const Account = ({ accountType }: { accountType: AccountType }) => {
 
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={() => mutate()} disabled={isPending}>
+              <AlertDialogAction className='w-full sm:w-fit' onClick={() => mutate()} disabled={isPending}>
                 {isPending ? 'Deleting...' : 'Delete'}
               </AlertDialogAction>
             </AlertDialogFooter>
