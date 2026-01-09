@@ -1,38 +1,23 @@
 'use client'
 
+import CurrencyPicker from '@/app/(auth)/signup/components/CurrencyPicker'
 import AccountTypeApiService from '@/app/ApiService/AccountTypeApiService'
 import AuthApiService from '@/app/ApiService/AuthApiService'
 import { useAuth } from '@/app/hooks/use-auth'
 import { updateUserAtom } from '@/app/provider/actions/authActions'
+import { DynamicPageForm } from '@/app/zod/auth.schema'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Currency, getCurrencyDisplayName, getCurrencyFromCountryCode } from '@/types/currency'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
 import { useSetAtom } from 'jotai'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
-
-const signupSchema = z
-  .object({
-    name: z.string().min(2, 'Name must be at least 2 characters'),
-    email: z.string().email('Please enter a valid email address'),
-    password: z.string().min(6, 'Password must be at least 6 characters'),
-    confirmPassword: z.string().min(6, 'Confirm password must be at least 6 characters'),
-    currency: z.nativeEnum(Currency),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ['confirmPassword'],
-  })
-
-type SignupFormData = z.infer<typeof signupSchema>
+import { useFormContext } from 'react-hook-form'
 
 export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false)
@@ -43,16 +28,7 @@ export default function SignupPage() {
   const { login } = useAuth()
   const router = useRouter()
 
-  const form = useForm<SignupFormData>({
-    resolver: zodResolver(signupSchema),
-    defaultValues: {
-      name: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
-      currency: Currency.USD,
-    },
-  })
+  const form = useFormContext<DynamicPageForm>()
 
   useEffect(() => {
     const detectCurrency = async () => {
@@ -62,11 +38,9 @@ export default function SignupPage() {
       try {
         const res = await fetch(`http://api.ipapi.com/check?access_key=${apiKey}&format=1`)
         const data = await res.json()
-        console.log('🚀 ~ detectCurrency ~ data:', data)
 
         // Use getCurrencyFromCountryCode instead of getCurrencyDisplayName
         const currency = getCurrencyFromCountryCode(data?.country_code)
-        console.log('🚀 ~ detectCurrency ~ currency:', currency)
 
         if (currency) {
           form.setValue('currency', currency)
@@ -79,10 +53,10 @@ export default function SignupPage() {
     detectCurrency()
   }, [form])
 
-  const onSubmit = async (data: SignupFormData) => {
+  const onSubmit = async (data: DynamicPageForm) => {
     setError('')
     setIsLoading(true)
-
+    if (data.pageType !== 'signup') return
     try {
       // Create account
       await AuthApiService.register(data.name, data.email, data.password, data.currency)
@@ -92,8 +66,8 @@ export default function SignupPage() {
         email: data.email,
         password: data.password,
       })
-      await AccountTypeApiService.addUserAccountType({ name: 'Cash', balance: 0 })
-      updateUser({ currency: response.currency })
+      const addUserAccountResponse = await AccountTypeApiService.addUserAccountType({ name: 'Cash', balance: 0 })
+      updateUser({ currency: response.currency, activeAccountTypeId: addUserAccountResponse?.data?.id })
 
       queryClient.invalidateQueries({ queryKey: ['accountTypes'] })
       router.push('/')
@@ -176,30 +150,7 @@ export default function SignupPage() {
               />
 
               {error && <div className="text-destructive text-sm text-center bg-destructive/10 p-3 rounded-lg border border-destructive/20">{error}</div>}
-              <FormField
-                control={form.control}
-                name="currency"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Currency</FormLabel>
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <FormControl>
-                        <SelectTrigger className="h-12">
-                          <SelectValue placeholder="Select currency" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent className="max-h-72">
-                        {Object.values(Currency).map((currency) => (
-                          <SelectItem key={currency} value={currency}>
-                            {getCurrencyDisplayName(currency)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <CurrencyPicker />
 
               <Button type="submit" className="w-full h-12 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700" disabled={isLoading}>
                 {isLoading ? 'Creating Account...' : 'Create Account'}

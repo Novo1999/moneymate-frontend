@@ -32,11 +32,12 @@ export const activeViewAtom = atom<ActiveViewModes>('day')
 export const dateAtom = atom<Date | undefined>(undefined)
 
 export default function LeftSidebar() {
-  const [accountType, setAccountType] = useAtom(accountTypeAtom)
+  const [accountTypeId, setAccountTypeId] = useAtom(accountTypeAtom)
   const [date, setDate] = useAtom(dateAtom)
   const { isLoading } = useAuth()
   const [activeView, setActiveView] = useAtom(activeViewAtom)
   const [user, setUser] = useAtom(userAtom)
+  console.log("🚀 ~ LeftSidebar ~ user:", user)
 
   // Fetch account types using TanStack Query
   const {
@@ -54,16 +55,11 @@ export default function LeftSidebar() {
     setAtom(user?.viewMode || '')
   }
 
-  useEffect(() => {
-    if (!accountTypes) return
-    setAccountType(accountTypes?.[0]?.id)
-  }, [accountTypes, setAccountType])
-
   // Set default account type when data loads
   useEffect(() => {
     if (!user) return
-    setAccountType(user?.activeAccountTypeId ?? 0)
-  }, [user, setAccountType])
+    setAccountTypeId(user?.activeAccountTypeId ?? 0)
+  }, [user, setAccountTypeId])
 
   const handleChangeActiveView = async (mode: string) => {
     if (!user?.id) return
@@ -71,7 +67,7 @@ export default function LeftSidebar() {
   }
 
   const handleChangeAccountType = async (val: number) => {
-    setAccountType(val)
+    setAccountTypeId(val)
     if (user?.id) await UserApiService.editUser(user?.id, { activeAccountTypeId: Number(val) })
     setUser((prev) => prev && { ...prev, activeAccountTypeId: val || 0 })
   }
@@ -97,12 +93,12 @@ export default function LeftSidebar() {
       <Loader className="animate-spin" />
     ) : (
       <div>
-        <Select value={accountType?.toString()} onValueChange={(val) => handleChangeAccountType(Number(val))}>
+        <Select value={accountTypeId?.toString()} onValueChange={(val) => handleChangeAccountType(Number(val))}>
           <SelectTrigger className="border-green-500 w-full">
             <SelectValue placeholder="Select account type" />
           </SelectTrigger>
           <SelectContent>
-              {accountTypes?.map((type) => (
+            {accountTypes?.map((type) => (
               <SelectItem key={type.id} value={type.id.toString()}>
                 <div className="flex items-center gap-4">
                   <span>{type.name}</span>

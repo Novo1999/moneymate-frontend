@@ -1,23 +1,15 @@
 'use client'
 
 import { useAuth } from '@/app/hooks/use-auth'
+import { DynamicPageForm } from '@/app/zod/auth.schema'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
-
-const loginSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-})
-
-type LoginFormData = z.infer<typeof loginSchema>
+import { useFormContext } from 'react-hook-form'
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
@@ -26,15 +18,10 @@ export default function LoginPage() {
   const { login } = useAuth()
   const router = useRouter()
 
-  const form = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: '',
-      password: '',
-    },
-  })
+  const form = useFormContext<DynamicPageForm>()
 
-  const onSubmit = async (data: LoginFormData) => {
+  const onSubmit = async (data: DynamicPageForm) => {
+    if (data.pageType !== 'login') return
     setError('')
     setIsLoading(true)
 
@@ -110,7 +97,7 @@ export default function LoginPage() {
             <div className="mt-6">
               <p className="text-sm text-muted-foreground">
                 Don&apos;t have an account?{' '}
-                <Link href="/signup" className="text-green-600 hover:text-green-700 font-medium">
+                <Link onClick={() => form.clearErrors()} href="/signup" className="text-green-600 hover:text-green-700 font-medium">
                   Sign up
                 </Link>
               </p>

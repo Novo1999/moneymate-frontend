@@ -49,7 +49,7 @@ const ExpenseOverview = () => {
   const { data: transactionInfo, isLoading: transactionInfoLoading } = useQuery({
     queryKey: ['userTransactionsInfo', accountTypeId, from, to, user?.email],
     queryFn: () => TransactionApiService.getUserTransactionsInfo(Number(accountTypeId), from, to),
-    enabled: !!accountTypeId && accountTypeId > 0 && !!from && !!to && !!user?.email,
+    enabled: !!accountTypeId && accountTypeId > 0 && !!from && !!to && !!user?.email && !!user?.activeAccountTypeId,
   })
   const { data: accountType, isLoading: accountTypeLoading } = useQuery({
     queryKey: ['userAccountType', accountTypeId],

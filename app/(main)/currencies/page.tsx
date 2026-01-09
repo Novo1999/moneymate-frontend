@@ -55,7 +55,7 @@ const CurrenciesPage = () => {
             className={cn(
               'transform transition duration-300 w-full',
               user?.currency !== opt.value ? 'bg-green-200 text-black' : 'bg-custom-green',
-              search && (opt.label.toLowerCase().includes(search.toLowerCase()) || opt.value.toLowerCase().includes(search.toLowerCase())) ? 'scale-105 border-2 border-green-500' : 'scale-100'
+              search && (opt.label.toLowerCase().includes(search.toLowerCase()) || opt.value.toLowerCase().includes(search.toLowerCase())) ? 'scale-102 border-2 border-green-500' : 'scale-100'
             )}
             key={opt.value}
           >

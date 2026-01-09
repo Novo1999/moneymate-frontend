@@ -1,7 +1,9 @@
-export default function AuthLayout({
+import { AuthFormProvider } from '@/app/provider/form/AuthFormProvider'
+
+export default async function AuthLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  return <div>{children}</div>
+  return <AuthFormProvider>{children}</AuthFormProvider>
 }
