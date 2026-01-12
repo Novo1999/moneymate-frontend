@@ -27,7 +27,7 @@ const getDefaultValues = (pathname: string): DynamicPageForm => {
   }
 }
 
-export const AuthFormProvider = ({ children }: { children: React.ReactNode }) => {
+export const AuthFormProvider = ({ currencyData, children }: { currencyData: Currency | undefined; children: React.ReactNode }) => {
   const pathname = usePathname()
 
   const form = useForm<DynamicPageForm>({
@@ -39,6 +39,11 @@ export const AuthFormProvider = ({ children }: { children: React.ReactNode }) =>
   useEffect(() => {
     form.reset(getDefaultValues(pathname))
   }, [pathname, form])
+
+  useEffect(() => {
+    if (!currencyData) return
+    form.setValue('currency', currencyData)
+  }, [currencyData, form])
 
   return <FormProvider {...form}>{children}</FormProvider>
 }
