@@ -2,7 +2,9 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 export function middleware(request: NextRequest) {
+  console.log("MIDDLEWARE")
   const token = request.cookies.get('accessToken')?.value;
+  console.log("🚀 ~ middleware ~ token:", token)
   const { pathname } = request.nextUrl;
 
   // Public routes that don't require authentication

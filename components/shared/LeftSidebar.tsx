@@ -37,7 +37,6 @@ export default function LeftSidebar() {
   const { isLoading } = useAuth()
   const [activeView, setActiveView] = useAtom(activeViewAtom)
   const [user, setUser] = useAtom(userAtom)
-  console.log("🚀 ~ LeftSidebar ~ user:", user)
 
   // Fetch account types using TanStack Query
   const {

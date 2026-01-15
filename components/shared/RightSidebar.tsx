@@ -2,7 +2,7 @@
 
 import { rightSidebarOpenAtom } from '@/app/layout/store'
 import { cn } from '@/lib/utils'
-import { useAtom } from 'jotai'
+import { useAtom, useSetAtom } from 'jotai'
 import { CreditCard, DollarSign, FolderTree, Settings } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -35,7 +35,7 @@ interface RightSidebarProps {
 }
 
 export default function RightSidebar({ className }: RightSidebarProps) {
-  const [_, setRightSidebarOpen] = useAtom(rightSidebarOpenAtom)
+  const setRightSidebarOpen = useSetAtom(rightSidebarOpenAtom)
 
   const pathname = usePathname()
 
