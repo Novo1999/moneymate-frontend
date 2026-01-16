@@ -34,10 +34,8 @@ export default function LeftSidebar() {
   const [accountTypeId, setAccountTypeId] = useAtom(accountTypeAtom)
   const [date, setDate] = useAtom(dateAtom)
   const [activeView, setActiveView] = useAtom(activeViewAtom)
-  console.log('🚀 ~ LeftSidebar ~ activeView:', activeView)
 
   const { user, isLoading, updateUser } = useAuth()
-  console.log('🚀 ~ LeftSidebar ~ user:', user)
 
   const {
     data: accountTypes,

@@ -62,7 +62,6 @@ export default function SignupPage() {
         email: data.email,
         password: data.password,
       })
-      console.log('🚀 ~ onSubmit ~ loginResponse:', loginResponse)
 
       const addUserAccountResponse = await AccountTypeApiService.addUserAccountType({
         name: 'Cash',
@@ -167,7 +166,7 @@ export default function SignupPage() {
 
           <div className="mt-6 text-center flex justify-center items-center">
             <p className="text-sm text-muted-foreground">Already have an account? </p>
-            <Button variant="link" className='p-1'>
+            <Button variant="link" className="p-1">
               <Link href="/login">Sign In</Link>
             </Button>
           </div>

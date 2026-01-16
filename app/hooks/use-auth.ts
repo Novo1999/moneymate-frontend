@@ -20,7 +20,7 @@ export function useAuth() {
     queryFn: async () => {
       return (await UserApiService.getCurrentUser()) || null
     },
-    retry: false,
+    retry: 3,
     staleTime: 5 * 60 * 1000,
     enabled: !ignoredPaths.includes(pathname),
   })
