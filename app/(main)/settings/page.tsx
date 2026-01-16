@@ -2,7 +2,6 @@
 
 import UserApiService from '@/app/ApiService/UserApiService'
 import { useAuth } from '@/app/hooks/use-auth'
-import { updateUserAtom } from '@/app/provider/actions/authActions'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Combobox } from '@/components/ui/combobox'
@@ -10,7 +9,6 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Currency, getCurrencyDisplayName } from '@/types/currency'
 import { useMutation } from '@tanstack/react-query'
-import { useSetAtom } from 'jotai'
 import { Loader, Settings } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -20,8 +18,8 @@ export default function SettingsPage() {
   const [name, setName] = useState<string>('')
   const [firstDayOfWeek, setFirstDayOfWeek] = useState<number>(0)
   const [firstDayOfMonth, setFirstDayOfMonth] = useState<number>(1)
-  const { user } = useAuth()
-  const updateUser = useSetAtom(updateUserAtom)
+  const { user, updateUser } = useAuth()
+
   const currencyOptions = Object.values(Currency).map((currency) => ({
     value: currency,
     label: getCurrencyDisplayName(currency),

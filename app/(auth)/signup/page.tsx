@@ -8,11 +8,10 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { getCurrencyFromCountryCode } from '@/types/currency'
 import { useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 
 export default function SignupPage() {
@@ -23,28 +22,6 @@ export default function SignupPage() {
   const { registerAsync, loginAsync, updateUser, isRegistering, isLoggingIn } = useAuth()
 
   const form = useFormContext<DynamicPageForm>()
-
-  useEffect(() => {
-    const detectCurrency = async () => {
-      const apiKey = process.env.NEXT_PUBLIC_IP_API_KEY
-      if (!apiKey) return
-
-      try {
-        const res = await fetch(`http://api.ipapi.com/check?access_key=${apiKey}&format=1`)
-        const data = await res.json()
-
-        const currency = getCurrencyFromCountryCode(data?.country_code)
-
-        if (currency) {
-          form.setValue('currency', currency)
-        }
-      } catch (error) {
-        console.error('Failed to detect currency:', error)
-      }
-    }
-
-    detectCurrency()
-  }, [form])
 
   const onSubmit = async (data: DynamicPageForm) => {
     if (data.pageType !== 'signup') return

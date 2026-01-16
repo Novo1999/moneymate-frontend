@@ -3,6 +3,7 @@ import CategoryItem from '@/app/(main)/categories/components/CategoryItem'
 import CategoryApiService from '@/app/ApiService/CategoryApiService'
 import { CategoryDto } from '@/app/dto/CategoryDto'
 import { useAuth } from '@/app/hooks/use-auth'
+import { iconOptions } from '@/app/utils/constants'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -12,35 +13,10 @@ import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
 import { ExpenseCategory, IncomeCategory } from '@/types/categories'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import {
-  Award,
-  Briefcase,
-  Building,
-  Car,
-  Coffee,
-  CreditCard,
-  Crown,
-  Diamond,
-  DollarSign,
-  Gamepad2,
-  Gift,
-  Heart,
-  Home,
-  Loader,
-  Music,
-  Phone,
-  PiggyBank,
-  Plus,
-  ShoppingCart,
-  Star,
-  Target,
-  TrendingUp,
-  Users,
-  Utensils,
-  Wallet,
-  Zap,
-} from 'lucide-react'
-import { useState } from 'react'
+import { DollarSign, Loader, LucideArrowDownNarrowWide, Plus } from 'lucide-react'
+
+import { useRef, useState } from 'react'
+import { toast } from 'sonner'
 
 const formatCategoryName = (category: string) => {
   return category
@@ -48,34 +24,6 @@ const formatCategoryName = (category: string) => {
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ')
 }
-
-// Predefined icons to choose from
-const iconOptions = [
-  { name: 'DollarSign', icon: DollarSign },
-  { name: 'Home', icon: Home },
-  { name: 'Car', icon: Car },
-  { name: 'ShoppingCart', icon: ShoppingCart },
-  { name: 'Utensils', icon: Utensils },
-  { name: 'Gamepad2', icon: Gamepad2 },
-  { name: 'Phone', icon: Phone },
-  { name: 'CreditCard', icon: CreditCard },
-  { name: 'TrendingUp', icon: TrendingUp },
-  { name: 'Gift', icon: Gift },
-  { name: 'Award', icon: Award },
-  { name: 'Briefcase', icon: Briefcase },
-  { name: 'Building', icon: Building },
-  { name: 'Coffee', icon: Coffee },
-  { name: 'Music', icon: Music },
-  { name: 'Heart', icon: Heart },
-  { name: 'Zap', icon: Zap },
-  { name: 'Wallet', icon: Wallet },
-  { name: 'PiggyBank', icon: PiggyBank },
-  { name: 'Target', icon: Target },
-  { name: 'Users', icon: Users },
-  { name: 'Star', icon: Star },
-  { name: 'Crown', icon: Crown },
-  { name: 'Diamond', icon: Diamond },
-]
 
 const CategoryPage = () => {
   const [isEditing, setIsEditing] = useState(0)
@@ -85,6 +33,11 @@ const CategoryPage = () => {
   const [selectedIcon, setSelectedIcon] = useState('DollarSign')
   const { user } = useAuth()
   const queryClient = useQueryClient()
+
+  const scrollRefs = {
+    income: useRef<HTMLDivElement | null>(null),
+    expense: useRef<HTMLDivElement | null>(null),
+  }
 
   const { data: categories, isLoading: isCategoriesLoading } = useQuery({
     queryKey: ['categories'],
@@ -105,6 +58,16 @@ const CategoryPage = () => {
     setSelectedIcon('DollarSign')
   }
 
+  const handleScrollToCustomOptions = (type: 'income' | 'expense') => {
+    const el = scrollRefs[type].current
+    if (!el) return
+
+    el.scrollTo({
+      top: el.scrollHeight,
+      behavior: 'smooth',
+    })
+  }
+
   const addCategoryMutation = useMutation({
     mutationFn: (payload: CategoryDto) => CategoryApiService.addCategory(payload),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['categories'] }),
@@ -120,17 +83,21 @@ const CategoryPage = () => {
       icon: selectedIcon,
     }
 
-    await addCategoryMutation.mutateAsync(payload)
-
-    setIsModalOpen(false)
-    setCategoryName('')
-    setSelectedIcon('DollarSign')
+    await addCategoryMutation.mutateAsync(payload, {
+      onSuccess: () => {
+        toast.success(`Added ${modalType} category - ${categoryName}`)
+        setIsModalOpen(false)
+        setCategoryName('')
+        setSelectedIcon('DollarSign')
+        setTimeout(() => handleScrollToCustomOptions(modalType), 0)
+      },
+    })
   }
 
   const SelectedIconComponent = iconOptions.find((opt) => opt.name === selectedIcon)?.icon || DollarSign
 
-  const incomeCategories = categories?.filter((cat) => cat.type === 'income')
-  const expenseCategories = categories?.filter((cat) => cat.type === 'expense')
+  const incomeCategories = categories?.filter((cat) => cat.type === 'income') || []
+  const expenseCategories = categories?.filter((cat) => cat.type === 'expense') || []
 
   return (
     <div className="min-h-[90vh]">
@@ -145,13 +112,21 @@ const CategoryPage = () => {
             <CardHeader className="bg-green-50 border-b py-6">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-xl font-semibold text-green-800 flex items-center gap-2">Income Categories</CardTitle>
-                <Button disabled={addCategoryMutation.isPending} onClick={handleAddIncome} size="sm" className="bg-green-600 hover:bg-green-700 text-white">
-                  <Plus className="h-4 w-4 mr-1" />
-                  Add
-                </Button>
+                <div className="flex gap-2">
+                  {incomeCategories.length > 0 && (
+                    <Button disabled={addCategoryMutation.isPending} onClick={() => handleScrollToCustomOptions('income')} size="sm" className="bg-green-600 hover:bg-green-700 text-white">
+                      <LucideArrowDownNarrowWide className="h-4 w-4 mr-1" />
+                      Custom Income Categories
+                    </Button>
+                  )}
+                  <Button disabled={addCategoryMutation.isPending} onClick={handleAddIncome} size="sm" className="bg-green-600 hover:bg-green-700 text-white">
+                    <Plus className="h-4 w-4 mr-1" />
+                    Add
+                  </Button>
+                </div>
               </div>
             </CardHeader>
-            <CardContent className="p-6 max-h-[50vh] overflow-y-scroll">
+            <CardContent ref={scrollRefs.income} className="p-6 max-h-[50vh] overflow-y-scroll">
               <div className="space-y-3">
                 {Object.values(IncomeCategory).map((category) => (
                   <div key={category} className="flex items-center justify-between p-3 bg-white border rounded-lg hover:shadow-md transition-shadow cursor-pointer">
@@ -162,7 +137,7 @@ const CategoryPage = () => {
                   </div>
                 ))}
               </div>
-              {(incomeCategories?.length || 0) > 0 && (
+              {incomeCategories.length > 0 && (
                 <fieldset className="border p-2 mt-4">
                   <legend className="text-xs font-bold">Custom Income Categories</legend>
                   <div className="flex flex-col gap-4">
@@ -181,13 +156,21 @@ const CategoryPage = () => {
             <CardHeader className="bg-red-50 border-b py-6">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-xl font-semibold text-red-800 flex items-center gap-2">Expense Categories</CardTitle>
-                <Button disabled={addCategoryMutation.isPending} onClick={handleAddExpense} size="sm" className="bg-red-600 hover:bg-red-700 text-white">
-                  <Plus className="h-4 w-4 mr-1" />
-                  Add
-                </Button>
+                <div className="flex gap-2">
+                  {expenseCategories.length > 0 && (
+                    <Button disabled={addCategoryMutation.isPending} onClick={() => handleScrollToCustomOptions('expense')} size="sm" className="bg-red-600 hover:bg-red-700 text-white">
+                      <LucideArrowDownNarrowWide className="h-4 w-4 mr-1" />
+                      Custom Expense Categories
+                    </Button>
+                  )}
+                  <Button disabled={addCategoryMutation.isPending} onClick={handleAddExpense} size="sm" className="bg-red-600 hover:bg-red-700 text-white">
+                    <Plus className="h-4 w-4 mr-1" />
+                    Add
+                  </Button>
+                </div>
               </div>
             </CardHeader>
-            <CardContent className="p-6 max-h-[50vh] overflow-y-scroll">
+            <CardContent ref={scrollRefs.expense} className="p-6 max-h-[50vh] overflow-y-scroll">
               <div className="space-y-3">
                 {Object.values(ExpenseCategory).map((category) => (
                   <div key={category} className="flex items-center justify-between p-3 bg-white border rounded-lg hover:shadow-md transition-shadow cursor-pointer">
@@ -197,7 +180,7 @@ const CategoryPage = () => {
                     </Badge>
                   </div>
                 ))}
-                {(expenseCategories?.length || 0) > 0 && (
+                {expenseCategories.length > 0 && (
                   <fieldset className="border p-2 mt-4">
                     <legend className="text-xs font-bold">Custom Expense Categories</legend>
                     <div className="flex flex-col gap-4">
