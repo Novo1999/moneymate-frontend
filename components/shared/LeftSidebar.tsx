@@ -4,7 +4,6 @@ import AccountTypeApiService from '@/app/ApiService/AccountTypeApiService'
 import UserApiService from '@/app/ApiService/UserApiService'
 import { useAuth } from '@/app/hooks/use-auth'
 import { accountTypeAtom } from '@/app/stores/accountType'
-import { userAtom } from '@/app/stores/auth'
 import { Button } from '@/components/ui/button'
 import { Calendar as CalendarComponent } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
@@ -34,11 +33,12 @@ export const dateAtom = atom<Date | undefined>(undefined)
 export default function LeftSidebar() {
   const [accountTypeId, setAccountTypeId] = useAtom(accountTypeAtom)
   const [date, setDate] = useAtom(dateAtom)
-  const { isLoading } = useAuth()
   const [activeView, setActiveView] = useAtom(activeViewAtom)
-  const [user, setUser] = useAtom(userAtom)
+  console.log('🚀 ~ LeftSidebar ~ activeView:', activeView)
 
-  // Fetch account types using TanStack Query
+  const { user, isLoading, updateUser } = useAuth()
+  console.log('🚀 ~ LeftSidebar ~ user:', user)
+
   const {
     data: accountTypes,
     isLoading: isLoadingAccountTypes,
@@ -50,32 +50,32 @@ export default function LeftSidebar() {
     gcTime: 10 * 60 * 1000,
   })
 
-  activeViewAtom.onMount = (setAtom) => {
-    setAtom(user?.viewMode || '')
-  }
-
   // Set default account type when data loads
   useEffect(() => {
     if (!user) return
+    setActiveView(user?.viewMode)
     setAccountTypeId(user?.activeAccountTypeId ?? 0)
-  }, [user, setAccountTypeId])
+  }, [user, setAccountTypeId, setActiveView])
 
-  const handleChangeActiveView = async (mode: string) => {
+  const handleChangeActiveView = async (mode: ActiveViewModes) => {
     if (!user?.id) return
-    UserApiService.editUser(user?.id, { viewMode: mode })
+    await UserApiService.editUser(user?.id, { viewMode: mode })
+    updateUser({ viewMode: mode })
   }
 
   const handleChangeAccountType = async (val: number) => {
     setAccountTypeId(val)
-    if (user?.id) await UserApiService.editUser(user?.id, { activeAccountTypeId: Number(val) })
-    setUser((prev) => prev && { ...prev, activeAccountTypeId: val || 0 })
+    if (user?.id) {
+      await UserApiService.editUser(user?.id, { activeAccountTypeId: Number(val) })
+      updateUser({ activeAccountTypeId: val })
+    }
   }
 
   const renderAccountTypeSelect = () => {
     if (isLoadingAccountTypes) {
       return (
-        <div className="px-2">
-          <Skeleton className="h-10 w-full" />
+        <div>
+          <Skeleton className="h-10 w-full bg-custom-green" />
         </div>
       )
     }
@@ -114,6 +114,7 @@ export default function LeftSidebar() {
       </div>
     )
   }
+
   return (
     <Sidebar>
       <SidebarHeader>
@@ -132,27 +133,26 @@ export default function LeftSidebar() {
           <SidebarGroupLabel>View Mode</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {viewModes.map((mode) => {
-                const Icon = mode.icon
-                return (
-                  <SidebarMenuItem key={mode.value}>
-                    <SidebarMenuButton
-                      isActive={activeView === mode.value}
-                      onClick={() => {
-                        setActiveView(mode.value)
-                        handleChangeActiveView(mode.value)
-                        // if (mode.value === 'day') {
-                        //   setTransactionInfoInterval(new Date().toISOString())
-                        // } else if (mode.value === 'week') {
-                        // }
-                      }}
-                    >
-                      <Icon className="h-4 w-4" />
-                      <span>{mode.label}</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                )
-              })}
+              {isLoading
+                ? Array.from({ length: 6 }).map((_, index) => <Skeleton key={index} className="h-8 w-full bg-custom-green" />)
+                : viewModes.map((mode) => {
+                    const Icon = mode.icon
+
+                    return (
+                      <SidebarMenuItem key={mode.value}>
+                        <SidebarMenuButton
+                          isActive={activeView === mode.value}
+                          onClick={() => {
+                            setActiveView(mode.value)
+                            handleChangeActiveView(mode.value)
+                          }}
+                        >
+                          <Icon className="h-4 w-4" />
+                          <span>{mode.label}</span>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    )
+                  })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -169,7 +169,7 @@ export default function LeftSidebar() {
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
-                  <CalendarComponent mode="single" selected={date} onSelect={setDate} initialFocus />
+                  <CalendarComponent mode="single" selected={date} onSelect={setDate} />
                 </PopoverContent>
               </Popover>
             </div>

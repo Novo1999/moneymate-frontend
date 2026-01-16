@@ -31,4 +31,24 @@ export default class AuthApiService {
       throw error
     }
   }
+  static async logout() {
+    try {
+      const response = await axiosInstance.post('/auth/logout')
+      toast.success('Logged out successfully!')
+      return response.data
+    } catch (error: any) {
+      toast.error('Logout failed')
+      throw error
+    }
+  }
+
+  static async refreshToken() {
+    try {
+      const response = await axiosInstance.post('/auth/refreshToken')
+      return response.data
+    } catch (error: any) {
+      toast.error('Failed to refresh token')
+      throw error
+    }
+  }
 }

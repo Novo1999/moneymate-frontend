@@ -1,5 +1,5 @@
+import AuthApiService from '@/app/ApiService/AuthApiService'
 import axios from 'axios'
-import Cookies from 'js-cookie'
 import { toast } from 'sonner'
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL
@@ -9,28 +9,27 @@ const axiosInstance = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true,
 })
-
-axiosInstance.interceptors.request.use(
-  (config) => {
-    const token = Cookies.get('accessToken')
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
-    }
-    return config
-  },
-  (error) => {
-    toast.error('Authentication Error')
-    return Promise.reject(error)
-  }
-)
 
 axiosInstance.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      Cookies.remove('accessToken')
+  async (error) => {
+    const originalRequest = error.config
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true
+
+      try {
+        await AuthApiService.refreshToken()
+        return axiosInstance(originalRequest)
+      } catch (error) {
+        toast.error('Session Expired. Please login again.')
+        window.location.href = '/login'
+        return Promise.reject(error)
+      }
     }
+
     return Promise.reject(error)
   }
 )

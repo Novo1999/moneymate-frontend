@@ -23,8 +23,8 @@ export default function HomePage() {
       <div className="max-w-7xl mb-8">
         <Card className="bg-white/80 backdrop-blur-sm shadow-sm">
           <CardContent className="p-6">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-4">
+            <div className="flex justify-between items-center flex-wrap">
+              <div className="flex items-center gap-4 flex-wrap">
                 <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
                   <span className="text-md font-bold text-white">{user?.currency}</span>
                 </div>
@@ -35,7 +35,7 @@ export default function HomePage() {
                   </p>
                 </div>
               </div>
-              <Button variant="ghost" onClick={logout} className="text-destructive hover:bg-destructive/10">
+              <Button variant="ghost" onClick={() => logout()} className="text-destructive hover:bg-destructive/10">
                 Logout
               </Button>
             </div>

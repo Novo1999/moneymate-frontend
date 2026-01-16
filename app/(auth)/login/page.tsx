@@ -7,35 +7,27 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 
 export default function LoginPage() {
-  const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
-
-  const { login } = useAuth()
-  const router = useRouter()
+  const { login, isLoggingIn } = useAuth()
 
   const form = useFormContext<DynamicPageForm>()
 
-  const onSubmit = async (data: DynamicPageForm) => {
+  const onSubmit = (data: DynamicPageForm) => {
     if (data.pageType !== 'login') return
     setError('')
-    setIsLoading(true)
 
     try {
-      await login({
+      login({
         email: data.email,
         password: data.password,
       })
-      router.push('/')
     } catch (err: unknown) {
       const error = err as { response?: { data?: { msg?: string } } }
       setError(error?.response?.data?.msg || 'Login failed')
-    } finally {
-      setIsLoading(false)
     }
   }
 
@@ -83,8 +75,8 @@ export default function LoginPage() {
 
               {error && <div className="text-destructive text-sm text-center bg-destructive/10 p-3 rounded-lg border border-destructive/20">{error}</div>}
 
-              <Button type="submit" className="w-full h-12 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700" disabled={isLoading}>
-                {isLoading ? 'Signing In...' : 'Sign In'}
+              <Button type="submit" className="w-full h-12 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700" disabled={isLoggingIn}>
+                {isLoggingIn ? 'Signing In...' : 'Sign In'}
               </Button>
             </form>
           </Form>
@@ -94,13 +86,11 @@ export default function LoginPage() {
               <p className="text-sm text-foreground font-medium mb-1">Demo Credentials</p>
               <p className="text-sm text-muted-foreground">novo12@gmail.com / password</p>
             </div>
-            <div className="mt-6">
-              <p className="text-sm text-muted-foreground">
-                Don&apos;t have an account?{' '}
-                <Link onClick={() => form.clearErrors()} href="/signup" className="text-green-600 hover:text-green-700 font-medium">
-                  Sign up
-                </Link>
-              </p>
+            <div className="mt-6 text-center flex justify-center items-center">
+              <p className="text-sm text-muted-foreground">Don&apos;t have an account? </p>
+              <Button variant="link" className="p-1">
+                <Link href="/signup">Sign up</Link>
+              </Button>
             </div>
           </div>
         </CardContent>
