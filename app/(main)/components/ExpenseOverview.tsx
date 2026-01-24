@@ -4,28 +4,56 @@ import AccountTypeApiService from '@/app/ApiService/AccountTypeApiService'
 import TransactionApiService from '@/app/ApiService/TransactionApiService'
 import { useAuth } from '@/app/hooks/use-auth'
 import { accountTypeAtom } from '@/app/stores/accountType'
-import { activeViewAtom } from '@/components/shared/LeftSidebar'
+import { activeViewAtom, dateRangeAtom } from '@/components/shared/LeftSidebar'
 import RechartsDonutChart from '@/components/shared/RechartsDonutChart'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ActiveViewModes } from '@/types/activeViewMode'
 import { useQuery } from '@tanstack/react-query'
-import { addDays, subDays } from 'date-fns'
-import { atom, useAtom, useAtomValue } from 'jotai'
+import { addDays, endOfMonth, endOfYear, isSameDay, startOfMonth, startOfYear, subDays } from 'date-fns'
+import { atom, useAtomValue } from 'jotai'
 import { Loader } from 'lucide-react'
 import { useMemo } from 'react'
+import { DateRange } from 'react-day-picker'
 
-export const getDateIntervalBasedOnActiveViewMode = (activeView: ActiveViewModes, intervalDate: Date): { from: string; to: string } => {
+export const getDateIntervalBasedOnActiveViewMode = (activeView: ActiveViewModes, intervalDate: Date, customRange?: DateRange): { from: string; to: string } => {
   switch (activeView) {
     case 'day':
       return {
-        from: subDays(intervalDate, 1).toISOString(), // 2 days ago
-        to: intervalDate.toISOString(), // today
+        from: subDays(intervalDate, 1).toISOString(),
+        to: intervalDate.toISOString(),
       }
     case 'week':
       return {
         from: subDays(intervalDate, 7).toISOString(),
         to: intervalDate.toISOString(),
+      }
+    case 'month':
+      return {
+        from: startOfMonth(intervalDate).toISOString(),
+        to: endOfMonth(intervalDate).toISOString(),
+      }
+    case 'year':
+      return {
+        from: startOfYear(intervalDate).toISOString(),
+        to: endOfYear(intervalDate).toISOString(),
+      }
+    case 'all':
+      return {
+        from: new Date('1970-01-01').toISOString(),
+        to: new Date().toISOString(),
+      }
+    case 'custom':
+      if (customRange?.from && customRange?.to) {
+        return {
+          from: customRange.from.toISOString(),
+          to: customRange.to.toISOString(),
+        }
+      }
+      // Fallback if custom range not fully selected
+      return {
+        from: new Date().toISOString(),
+        to: addDays(new Date(), 1).toISOString(),
       }
     default:
       return {
@@ -34,24 +62,34 @@ export const getDateIntervalBasedOnActiveViewMode = (activeView: ActiveViewModes
       }
   }
 }
-
 export const transactionInfoIntervalAtom = atom(new Date().toISOString())
 const ExpenseOverview = () => {
   const { user } = useAuth()
   const accountTypeId = useAtomValue(accountTypeAtom)
   const activeView = useAtomValue(activeViewAtom)
-  const [transactionInfoInterval, setTransactionInfoInterval] = useAtom(transactionInfoIntervalAtom)
+  const transactionInfoInterval = useAtomValue(transactionInfoIntervalAtom)
 
   const transactionInfoIntervalDate = useMemo(() => new Date(transactionInfoInterval), [transactionInfoInterval])
-
-  const { from, to } = useMemo(() => getDateIntervalBasedOnActiveViewMode(activeView, transactionInfoIntervalDate), [activeView, transactionInfoIntervalDate])
+  const dateRange = useAtomValue(dateRangeAtom)
+  const { from, to } = useMemo(() => getDateIntervalBasedOnActiveViewMode(activeView, transactionInfoIntervalDate, dateRange), [activeView, transactionInfoIntervalDate, dateRange])
 
   const { data: transactionInfo, isLoading: transactionInfoLoading } = useQuery({
     queryKey: ['userTransactionsInfo', accountTypeId, from, to, user?.email],
     queryFn: () => TransactionApiService.getUserTransactionsInfo(Number(accountTypeId), from, to),
-    enabled: !!accountTypeId && accountTypeId > 0 && !!from && !!to && !!user?.email && !!user?.activeAccountTypeId,
+    enabled: () => {
+      if (!accountTypeId || accountTypeId <= 0) return false
+      if (!from || !to) return false
+      if (!user?.email || !user?.activeAccountTypeId) return false
+
+      if (activeView === 'custom') {
+        if (!dateRange?.from || !dateRange?.to) return false
+        if (isSameDay(dateRange.from, dateRange.to)) return false
+      }
+
+      return true
+    },
   })
-  const { data: accountType, isLoading: accountTypeLoading } = useQuery({
+  const { data: accountType } = useQuery({
     queryKey: ['userAccountType', accountTypeId],
     queryFn: () => AccountTypeApiService.getUserAccountType(Number(accountTypeId)),
     enabled: !!accountTypeId && accountTypeId > 0,

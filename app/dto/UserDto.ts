@@ -10,4 +10,5 @@ export interface UserDto {
   firstDayOfMonth: number
   viewMode: ActiveViewModes
   activeAccountTypeId: number
+  interval: {from: string, to: string}
 }
