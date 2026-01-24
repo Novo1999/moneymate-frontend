@@ -1,76 +1,46 @@
 'use client'
-import CategoryItem from '@/app/(main)/categories/components/CategoryItem'
+import CategoryList from '@/app/(main)/categories/components/CategoryList'
+import { categoryNameAtom, isModalOpenAtom, modalTypeAtom, selectedIconAtom } from '@/app/(main)/categories/store/categoryAtoms'
 import CategoryApiService from '@/app/ApiService/CategoryApiService'
 import { CategoryDto } from '@/app/dto/CategoryDto'
 import { useAuth } from '@/app/hooks/use-auth'
 import { iconOptions } from '@/app/utils/constants'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
-import { ExpenseCategory, IncomeCategory } from '@/types/categories'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { DollarSign, Loader, LucideArrowDownNarrowWide, Plus } from 'lucide-react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useAtom } from 'jotai'
+import { DollarSign, Loader } from 'lucide-react'
 
-import { useRef, useState } from 'react'
+import { useRef } from 'react'
 import { toast } from 'sonner'
 
-const formatCategoryName = (category: string) => {
-  return category
-    .split('_')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ')
-}
-
 const CategoryPage = () => {
-  const [isEditing, setIsEditing] = useState(0)
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [modalType, setModalType] = useState<'income' | 'expense'>('income')
-  const [categoryName, setCategoryName] = useState('')
-  const [selectedIcon, setSelectedIcon] = useState('DollarSign')
+  const [isModalOpen, setIsModalOpen] = useAtom(isModalOpenAtom)
+  const [modalType] = useAtom(modalTypeAtom)
+  const [categoryName, setCategoryName] = useAtom(categoryNameAtom)
+  const [selectedIcon, setSelectedIcon] = useAtom(selectedIconAtom)
+
   const { user } = useAuth()
   const queryClient = useQueryClient()
 
-  const scrollRefs = {
-    income: useRef<HTMLDivElement | null>(null),
-    expense: useRef<HTMLDivElement | null>(null),
-  }
-
-  const { data: categories, isLoading: isCategoriesLoading } = useQuery({
-    queryKey: ['categories'],
-    queryFn: () => CategoryApiService.getAllCategories(),
-  })
-
-  const handleAddIncome = () => {
-    setModalType('income')
-    setIsModalOpen(true)
-    setCategoryName('')
-    setSelectedIcon('DollarSign')
-  }
-
-  const handleAddExpense = () => {
-    setModalType('expense')
-    setIsModalOpen(true)
-    setCategoryName('')
-    setSelectedIcon('DollarSign')
-  }
-
-  const handleScrollToCustomOptions = (type: 'income' | 'expense') => {
-    const el = scrollRefs[type].current
-    if (!el) return
-
-    el.scrollTo({
-      top: el.scrollHeight,
-      behavior: 'smooth',
-    })
+  const shouldScrollRefs = {
+    income: useRef<boolean>(false),
+    expense: useRef<boolean>(false),
   }
 
   const addCategoryMutation = useMutation({
     mutationFn: (payload: CategoryDto) => CategoryApiService.addCategory(payload),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['categories'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['categories'] })
+      toast.success(`Added ${modalType} category - ${categoryName}`)
+      setIsModalOpen(false)
+      setCategoryName('')
+      setSelectedIcon('DollarSign')
+      shouldScrollRefs[modalType].current = true
+    },
   })
 
   const handleSubmit = async () => {
@@ -83,21 +53,10 @@ const CategoryPage = () => {
       icon: selectedIcon,
     }
 
-    await addCategoryMutation.mutateAsync(payload, {
-      onSuccess: () => {
-        toast.success(`Added ${modalType} category - ${categoryName}`)
-        setIsModalOpen(false)
-        setCategoryName('')
-        setSelectedIcon('DollarSign')
-        setTimeout(() => handleScrollToCustomOptions(modalType), 0)
-      },
-    })
+    await addCategoryMutation.mutateAsync(payload)
   }
 
   const SelectedIconComponent = iconOptions.find((opt) => opt.name === selectedIcon)?.icon || DollarSign
-
-  const incomeCategories = categories?.filter((cat) => cat.type === 'income') || []
-  const expenseCategories = categories?.filter((cat) => cat.type === 'expense') || []
 
   return (
     <div className="min-h-[90vh]">
@@ -107,93 +66,8 @@ const CategoryPage = () => {
           <Label className="text-gray-400">Add Custom Categories for Income/Expense</Label>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4">
-          {/* Income Column */}
-          <Card className="shadow-lg h-fit relative pb-8">
-            <CardHeader className="bg-green-50 border-b py-6">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-xl font-semibold text-green-800 flex items-center gap-2">Income Categories</CardTitle>
-                <div className="flex gap-2">
-                  {incomeCategories.length > 0 && (
-                    <Button disabled={addCategoryMutation.isPending} onClick={() => handleScrollToCustomOptions('income')} size="sm" className="bg-green-600 hover:bg-green-700 text-white">
-                      <LucideArrowDownNarrowWide className="h-4 w-4 mr-1" />
-                      Custom Income Categories
-                    </Button>
-                  )}
-                  <Button disabled={addCategoryMutation.isPending} onClick={handleAddIncome} size="sm" className="bg-green-600 hover:bg-green-700 text-white">
-                    <Plus className="h-4 w-4 mr-1" />
-                    Add
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent ref={scrollRefs.income} className="p-6 max-h-[50vh] overflow-y-scroll">
-              <div className="space-y-3">
-                {Object.values(IncomeCategory).map((category) => (
-                  <div key={category} className="flex items-center justify-between p-3 bg-white border rounded-lg hover:shadow-md transition-shadow cursor-pointer">
-                    <span className="font-medium text-gray-700">{formatCategoryName(category)}</span>
-                    <Badge variant="secondary" className="bg-green-100 text-green-800">
-                      Income
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-              {incomeCategories.length > 0 && (
-                <fieldset className="border p-2 mt-4">
-                  <legend className="text-xs font-bold">Custom Income Categories</legend>
-                  <div className="flex flex-col gap-4">
-                    {incomeCategories?.map((cat) => (
-                      <CategoryItem isEditing={isEditing} setIsEditing={setIsEditing} type={cat.type} category={cat} key={cat.id} />
-                    ))}
-                  </div>
-                  <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-green-500/10 to-transparent backdrop-blur-sm rounded-b-sm"></div>
-                </fieldset>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Expense Column */}
-          <Card className="shadow-lg h-fit relative pb-8">
-            <CardHeader className="bg-red-50 border-b py-6">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-xl font-semibold text-red-800 flex items-center gap-2">Expense Categories</CardTitle>
-                <div className="flex gap-2">
-                  {expenseCategories.length > 0 && (
-                    <Button disabled={addCategoryMutation.isPending} onClick={() => handleScrollToCustomOptions('expense')} size="sm" className="bg-red-600 hover:bg-red-700 text-white">
-                      <LucideArrowDownNarrowWide className="h-4 w-4 mr-1" />
-                      Custom Expense Categories
-                    </Button>
-                  )}
-                  <Button disabled={addCategoryMutation.isPending} onClick={handleAddExpense} size="sm" className="bg-red-600 hover:bg-red-700 text-white">
-                    <Plus className="h-4 w-4 mr-1" />
-                    Add
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent ref={scrollRefs.expense} className="p-6 max-h-[50vh] overflow-y-scroll">
-              <div className="space-y-3">
-                {Object.values(ExpenseCategory).map((category) => (
-                  <div key={category} className="flex items-center justify-between p-3 bg-white border rounded-lg hover:shadow-md transition-shadow cursor-pointer">
-                    <span className="font-medium text-gray-700">{formatCategoryName(category)}</span>
-                    <Badge variant="secondary" className="bg-red-100 text-red-800">
-                      Expense
-                    </Badge>
-                  </div>
-                ))}
-                {expenseCategories.length > 0 && (
-                  <fieldset className="border p-2 mt-4">
-                    <legend className="text-xs font-bold">Custom Expense Categories</legend>
-                    <div className="flex flex-col gap-4">
-                      {expenseCategories?.map((cat) => (
-                        <CategoryItem isEditing={isEditing} setIsEditing={setIsEditing} type={cat.type} category={cat} key={cat.id} />
-                      ))}
-                    </div>
-                  </fieldset>
-                )}
-              </div>
-            </CardContent>
-            <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-red-500/10 to-transparent backdrop-blur-sm rounded-b-sm"></div>
-          </Card>
+          <CategoryList shouldScrollRef={shouldScrollRefs.income} categoryType="income" />
+          <CategoryList shouldScrollRef={shouldScrollRefs.expense} categoryType="expense" />
         </div>
       </div>
 

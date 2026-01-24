@@ -1,18 +1,16 @@
 'use client'
-import UserApiService from '@/app/ApiService/UserApiService'
-import { userAtom } from '@/app/stores/auth'
+import { useAuth } from '@/app/hooks/use-auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
 import { Currency, getCurrencyDisplayName } from '@/types/currency'
 import { useMutation } from '@tanstack/react-query'
-import { useAtom } from 'jotai'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 const CurrenciesPage = () => {
-  const [user, setUser] = useAtom(userAtom)
+  const { user, updateUser } = useAuth()
   const [search, setSearch] = useState('')
 
   const currencyOptions = Object.values(Currency).map((currency) => ({
@@ -27,8 +25,7 @@ const CurrenciesPage = () => {
       const updateData = {
         currency: selectedCurrency,
       }
-      await UserApiService.editUser(user?.id, updateData)
-      setUser((prev) => prev && { ...prev, ...updateData })
+      updateUser({ ...updateData, id: user?.id })
       if (search) setSearch('')
     },
   })
@@ -49,19 +46,21 @@ const CurrenciesPage = () => {
       </div>
       <Input value={search} onChange={(e) => setSearch(e.target.value)} type="search" className="w-fit" placeholder="Search Currency" />
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 max-w-7xl">
-        {currencyOptions?.map((opt) => (
-          <Button
-            onClick={() => changeCurrencyMutate(opt.value)}
-            className={cn(
-              'transform transition duration-300 w-full',
-              user?.currency !== opt.value ? 'bg-green-200 text-black' : 'bg-custom-green',
-              search && (opt.label.toLowerCase().includes(search.toLowerCase()) || opt.value.toLowerCase().includes(search.toLowerCase())) ? 'scale-102 border-2 border-green-500' : 'scale-100'
-            )}
-            key={opt.value}
-          >
-            {opt.label}
-          </Button>
-        ))}
+        {currencyOptions?.length > 0 &&
+          user?.id &&
+          currencyOptions?.map((opt) => (
+            <Button
+              onClick={() => changeCurrencyMutate(opt.value)}
+              className={cn(
+                'transform transition duration-300 w-full hover:bg-green-300',
+                user?.currency !== opt.value ? 'bg-green-200 text-black' : 'bg-custom-green',
+                search && (opt.label.toLowerCase().includes(search.toLowerCase()) || opt.value.toLowerCase().includes(search.toLowerCase())) ? 'scale-102 border-2 border-green-500' : 'scale-100'
+              )}
+              key={opt.value}
+            >
+              {opt.label}
+            </Button>
+          ))}
       </div>
     </div>
   )

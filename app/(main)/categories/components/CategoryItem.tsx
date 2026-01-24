@@ -1,3 +1,4 @@
+import { isEditingAtom } from '@/app/(main)/categories/store/categoryAtoms'
 import CategoryApiService from '@/app/ApiService/CategoryApiService'
 import { CategoryDto } from '@/app/dto/CategoryDto'
 import { Badge } from '@/components/ui/badge'
@@ -7,18 +8,17 @@ import { Input } from '@/components/ui/input'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { SetStateAction } from 'jotai'
+import { useAtom } from 'jotai'
 import { ArrowLeft, ArrowRight, Pen, Trash, X } from 'lucide-react'
-import { Dispatch, useState } from 'react'
+import { useState } from 'react'
 
 type CategoryItemProp = {
   category: CategoryDto
   type: 'income' | 'expense'
-  isEditing: number
-  setIsEditing: Dispatch<SetStateAction<number>>
 }
 
-const CategoryItem = ({ category, type, setIsEditing, isEditing }: CategoryItemProp) => {
+const CategoryItem = ({ category, type }: CategoryItemProp) => {
+  const [isEditing, setIsEditing] = useAtom(isEditingAtom)
   const [inputVal, setInputVal] = useState(category.name)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const queryClient = useQueryClient()
@@ -58,7 +58,7 @@ const CategoryItem = ({ category, type, setIsEditing, isEditing }: CategoryItemP
         </Badge>
       </TooltipTrigger>
       <TooltipContent>
-        <p>Move to {type === 'income' ? 'expense' : 'income'}</p>
+        <p className='capitalize'>Move to {type === 'income' ? 'expense' : 'income'}</p>
       </TooltipContent>
     </Tooltip>
   )
