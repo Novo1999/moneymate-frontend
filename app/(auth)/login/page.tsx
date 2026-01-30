@@ -7,29 +7,28 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import Link from 'next/link'
-import { useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 
 export default function LoginPage() {
-  const [error, setError] = useState('')
   const { login, isLoggingIn } = useAuth()
 
   const form = useFormContext<DynamicPageForm>()
 
   const onSubmit = (data: DynamicPageForm) => {
     if (data.pageType !== 'login') return
-    setError('')
 
-    try {
-      login({
+    login(
+      {
         email: data.email,
         password: data.password,
-      })
-    } catch (err: unknown) {
-      const error = err as { response?: { data?: { msg?: string } } }
-      setError(error?.response?.data?.msg || 'Login failed')
-    }
+      },
+      {
+        onError: (err) => form.setError('root', { message: err.response.data.msg }),
+      },
+    )
   }
+
+  const loginError = form.formState.errors.root?.message
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-emerald-100 px-4">
@@ -73,7 +72,7 @@ export default function LoginPage() {
                 )}
               />
 
-              {error && <div className="text-destructive text-sm text-center bg-destructive/10 p-3 rounded-lg border border-destructive/20">{error}</div>}
+              {loginError && <div className="text-destructive text-sm text-center bg-destructive/10 p-3 rounded-lg border border-destructive/20">{loginError}</div>}
 
               <Button type="submit" className="w-full h-12 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700" disabled={isLoggingIn}>
                 {isLoggingIn ? 'Signing In...' : 'Sign In'}

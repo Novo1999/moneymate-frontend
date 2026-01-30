@@ -2,7 +2,7 @@ import { getDateIntervalBasedOnActiveViewMode, transactionInfoIntervalAtom } fro
 import { useAuth } from '@/app/hooks/use-auth'
 import { activeViewAtom, dateRangeAtom } from '@/components/shared/LeftSidebar'
 import { Button } from '@/components/ui/button'
-import { addDays, addMonths, addYears, format, isBefore, startOfDay, startOfMonth, startOfYear, subDays, subMonths, subYears } from 'date-fns'
+import { addDays, addMonths, addYears, format, isAfter, isBefore, startOfDay, startOfMonth, startOfYear, subDays, subMonths, subYears } from 'date-fns'
 import { useAtom, useAtomValue } from 'jotai'
 import { ChevronLeft, ChevronRight, Loader } from 'lucide-react'
 import { useMemo } from 'react'
@@ -65,17 +65,22 @@ const DateController = () => {
       updateUser({ id: user.id, interval })
     }
   }
-
   const canGoForward = () => {
+    const today = new Date()
+
     switch (activeView) {
       case 'day':
-        return isBefore(transactionInfoIntervalDate, startOfDay(new Date()))
+        const nextDay = addDays(transactionInfoIntervalDate, 1)
+        return !isAfter(startOfDay(nextDay), startOfDay(today))
       case 'week':
-        return isBefore(transactionInfoIntervalDate, startOfDay(new Date()))
+        const nextWeek = addDays(transactionInfoIntervalDate, 7)
+        return !isAfter(startOfDay(nextWeek), startOfDay(today))
       case 'month':
-        return isBefore(transactionInfoIntervalDate, startOfMonth(new Date()))
+        const nextMonth = addMonths(transactionInfoIntervalDate, 1)
+        return !isAfter(startOfMonth(nextMonth), startOfMonth(today))
       case 'year':
-        return isBefore(transactionInfoIntervalDate, startOfYear(new Date()))
+        const nextYear = addYears(transactionInfoIntervalDate, 1)
+        return !isAfter(startOfYear(nextYear), startOfYear(today))
       case 'all':
       case 'custom':
         return false

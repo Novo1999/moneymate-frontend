@@ -3,6 +3,7 @@ import UserApiService from '@/app/ApiService/UserApiService'
 import { UserDto } from '@/app/dto/UserDto'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { usePathname, useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 const authKeys = {
@@ -14,7 +15,7 @@ export function useAuth() {
   const queryClient = useQueryClient()
   const router = useRouter()
   const pathname = usePathname()
-
+  const [isAuthInitialized, setIsAuthInitialized] = useState(false)
   const userQuery = useQuery({
     queryKey: authKeys.currentUser,
     queryFn: async () => {
@@ -24,6 +25,10 @@ export function useAuth() {
     staleTime: 5 * 60 * 1000,
     enabled: !ignoredPaths.includes(pathname),
   })
+
+  useEffect(() => {
+    setIsAuthInitialized(true)
+  }, [])
 
   const loginMutation = useMutation({
     mutationFn: async ({ email, password }: { email: string; password: string }) => {
@@ -35,7 +40,7 @@ export function useAuth() {
       router.push('/')
     },
     onError: (error: any) => {
-      toast.error(error?.response?.data?.msg || 'Login failed')
+      return error
     },
   })
 
@@ -99,5 +104,6 @@ export function useAuth() {
     isUpdating: updateUserMutation.isPending,
 
     refetch: userQuery.refetch,
+    isAuthInitialized,
   }
 }

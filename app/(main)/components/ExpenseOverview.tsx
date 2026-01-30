@@ -1,3 +1,4 @@
+'use client'
 import AddTransactionModal from '@/app/(main)/components/AddTransaction'
 import DateController from '@/app/(main)/components/DateController'
 import AccountTypeApiService from '@/app/ApiService/AccountTypeApiService'
@@ -8,6 +9,7 @@ import { activeViewAtom, dateRangeAtom } from '@/components/shared/LeftSidebar'
 import RechartsDonutChart from '@/components/shared/RechartsDonutChart'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
 import { ActiveViewModes } from '@/types/activeViewMode'
 import { useQuery } from '@tanstack/react-query'
 import { addDays, endOfMonth, endOfYear, isSameDay, startOfMonth, startOfYear, subDays } from 'date-fns'
@@ -64,7 +66,7 @@ export const getDateIntervalBasedOnActiveViewMode = (activeView: ActiveViewModes
 }
 export const transactionInfoIntervalAtom = atom(new Date().toISOString())
 const ExpenseOverview = () => {
-  const { user } = useAuth()
+  const { user, isAuthInitialized } = useAuth()
   const accountTypeId = useAtomValue(accountTypeAtom)
   const activeView = useAtomValue(activeViewAtom)
   const transactionInfoInterval = useAtomValue(transactionInfoIntervalAtom)
@@ -94,6 +96,10 @@ const ExpenseOverview = () => {
     queryFn: () => AccountTypeApiService.getUserAccountType(Number(accountTypeId)),
     enabled: !!accountTypeId && accountTypeId > 0,
   })
+
+  if (!isAuthInitialized) {
+    return <Skeleton className="max-w-7xl min-h-[757px] bg-white/80" />
+  }
 
   return (
     <div className="max-w-7xl grid grid-cols-1 xl:grid-cols-3 gap-6">
