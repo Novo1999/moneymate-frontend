@@ -1,5 +1,6 @@
 import { CategoryDto } from '@/app/dto/CategoryDto'
 import { DataResponse } from '@/app/dto/DataResponse'
+import { handleApiError } from '@/lib/api'
 import axiosInstance from '@/lib/axios'
 import { toast } from 'sonner'
 
@@ -9,10 +10,8 @@ export default class CategoryApiService {
       const response = await axiosInstance.get<DataResponse<CategoryDto[]>>('/categories')
 
       return response.data.data.sort((a, b) => (a?.id || 0) - (b?.id || 0))
-    } catch (error: any) {
-      const errorMessage = error?.response?.data?.msg || 'Failed to fetch all categories'
-      toast.error(errorMessage)
-      throw error
+    } catch (error) {
+      handleApiError(error, 'Failed to fetch all categories')
     }
   }
 
@@ -21,10 +20,8 @@ export default class CategoryApiService {
       const response = await axiosInstance.get(`/categories/${id}`)
 
       return response.data.data
-    } catch (error: any) {
-      const errorMessage = error?.response?.data?.msg || 'Failed to fetch category'
-      toast.error(errorMessage)
-      throw error
+    } catch (error) {
+      handleApiError(error, 'Failed to fetch category')
     }
   }
 
@@ -35,10 +32,8 @@ export default class CategoryApiService {
       })
 
       return response.data.data
-    } catch (error: any) {
-      const errorMessage = error?.response?.data?.msg || 'Failed to fetch user categories'
-      toast.error(errorMessage)
-      throw error
+    } catch (error) {
+      handleApiError(error, 'Failed to fetch user categories')
     }
   }
 
@@ -48,10 +43,8 @@ export default class CategoryApiService {
 
       toast.success('Category added successfully!')
       return response.data
-    } catch (error: any) {
-      const errorMessage = error?.response?.data?.msg || 'Failed to add category'
-      toast.error(errorMessage)
-      throw error
+    } catch (error) {
+      handleApiError(error, 'Failed to add category')
     }
   }
 
@@ -61,10 +54,8 @@ export default class CategoryApiService {
 
       toast.success('Category updated successfully!')
       return response.data
-    } catch (error: any) {
-      const errorMessage = error?.response?.data?.msg || 'Failed to update category'
-      toast.error(errorMessage)
-      throw error
+    } catch (error) {
+      handleApiError(error, 'Failed to update category')
     }
   }
 
@@ -74,10 +65,8 @@ export default class CategoryApiService {
 
       toast.success('Category deleted successfully!')
       return response.data
-    } catch (error: any) {
-      const errorMessage = error?.response?.data?.msg || 'Failed to delete category'
-      toast.error(errorMessage)
-      throw error
+    } catch (error) {
+      handleApiError(error, 'Failed to delete category')
     }
   }
 }

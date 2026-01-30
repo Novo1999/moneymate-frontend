@@ -1,3 +1,4 @@
+import { handleApiError } from '@/lib/api'
 import axiosInstance from '@/lib/axios'
 import { toast } from 'sonner'
 
@@ -11,8 +12,8 @@ export default class AuthApiService {
 
       toast.success('Login successful!')
       return response.data.data
-    } catch (error: any) {
-      throw error
+    } catch (error) {
+      handleApiError(error, 'Login failed')
     }
   }
 
@@ -27,18 +28,18 @@ export default class AuthApiService {
 
       toast.success('Account created successfully!')
       return response.data
-    } catch (error: any) {
-      throw error
+    } catch (error) {
+      handleApiError(error, 'Registration failed')
     }
   }
+
   static async logout() {
     try {
       const response = await axiosInstance.post('/auth/logout')
       toast.success('Logged out successfully!')
       return response.data
-    } catch (error: any) {
-      toast.error('Logout failed')
-      throw error
+    } catch (error) {
+      handleApiError(error, 'Logout failed')
     }
   }
 
@@ -46,9 +47,8 @@ export default class AuthApiService {
     try {
       const response = await axiosInstance.post('/auth/refreshToken')
       return response.data
-    } catch (error: any) {
-      toast.error('Failed to refresh token')
-      throw error
+    } catch (error) {
+      handleApiError(error, 'Failed to refresh token')
     }
   }
 }

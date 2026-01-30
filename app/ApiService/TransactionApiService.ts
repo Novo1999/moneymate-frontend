@@ -1,3 +1,4 @@
+import { handleApiError } from '@/lib/api'
 import axiosInstance from '@/lib/axios'
 import { toast } from 'sonner'
 
@@ -7,10 +8,8 @@ export default class TransactionApiService {
       const response = await axiosInstance.get('/transaction')
 
       return response.data.data
-    } catch (error: any) {
-      const errorMessage = error?.response?.data?.msg || 'Failed to fetch all transactions'
-      toast.error(errorMessage)
-      throw error
+    } catch (error) {
+      handleApiError(error, 'Failed to fetch all transactions')
     }
   }
 
@@ -21,10 +20,8 @@ export default class TransactionApiService {
       })
 
       return response.data.data
-    } catch (error: any) {
-      const errorMessage = error?.response?.data?.msg || 'Failed to fetch user transactions'
-      toast.error(errorMessage)
-      throw error
+    } catch (error) {
+      handleApiError(error, 'Failed to fetch user transactions')
     }
   }
 
@@ -35,10 +32,8 @@ export default class TransactionApiService {
       })
 
       return response.data.data
-    } catch (error: any) {
-      const errorMessage = error?.response?.data?.msg || 'Failed to fetch transaction info'
-      toast.error(errorMessage)
-      throw error
+    } catch (error) {
+      handleApiError(error, 'Failed to fetch transaction info')
     }
   }
 
@@ -48,10 +43,8 @@ export default class TransactionApiService {
 
       toast.success('Transaction added successfully!')
       return response.data
-    } catch (error: any) {
-      const errorMessage = error?.response?.data?.msg || 'Failed to add transaction'
-      toast.error(errorMessage)
-      throw error
+    } catch (error) {
+      handleApiError(error, 'Failed to add transaction')
     }
   }
 
@@ -69,10 +62,8 @@ export default class TransactionApiService {
 
       toast.success('Transaction updated successfully!')
       return response.data
-    } catch (error: any) {
-      const errorMessage = error?.response?.data?.msg || 'Failed to update transaction'
-      toast.error(errorMessage)
-      throw error
+    } catch (error) {
+      handleApiError(error, 'Failed to update transaction')
     }
   }
 
@@ -82,10 +73,8 @@ export default class TransactionApiService {
 
       toast.success('Transaction deleted successfully!')
       return response.data
-    } catch (error: any) {
-      const errorMessage = error?.response?.data?.msg || 'Failed to delete transaction'
-      toast.error(errorMessage)
-      throw error
+    } catch (error) {
+      handleApiError(error, 'Failed to delete transaction')
     }
   }
 }

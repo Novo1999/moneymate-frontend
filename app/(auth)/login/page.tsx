@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { ApiErrorResponse } from '@/types/error'
+import { AxiosError } from 'axios'
 import Link from 'next/link'
 import { useFormContext } from 'react-hook-form'
 
@@ -23,7 +25,11 @@ export default function LoginPage() {
         password: data.password,
       },
       {
-        onError: (err) => form.setError('root', { message: err.response.data.msg }),
+        onError: (err) => {
+          const axiosError = err as AxiosError<ApiErrorResponse>
+          const message = axiosError.response?.data?.msg || 'Login failed'
+          form.setError('root', { message })
+        },
       },
     )
   }

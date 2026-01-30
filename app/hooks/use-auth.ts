@@ -39,9 +39,7 @@ export function useAuth() {
       queryClient.invalidateQueries({ queryKey: authKeys.currentUser })
       router.push('/')
     },
-    onError: (error: any) => {
-      return error
-    },
+    onError: (error) => error,
   })
 
   const registerMutation = useMutation({
@@ -52,9 +50,6 @@ export function useAuth() {
     onSuccess: () => {
       toast.success('Account created successfully!')
     },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.msg || 'Registration failed')
-    },
   })
 
   const logoutMutation = useMutation({
@@ -62,9 +57,6 @@ export function useAuth() {
     onSuccess: () => {
       queryClient.clear()
       router.push('/login')
-    },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.msg || 'Logout failed')
     },
   })
 

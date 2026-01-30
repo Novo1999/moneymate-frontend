@@ -1,14 +1,14 @@
 import { EditUserDto } from '@/app/dto/EditUserDto'
+import { handleApiError } from '@/lib/api'
 import axiosInstance from '@/lib/axios'
-import { toast } from 'sonner'
 
 export default class UserApiService {
   static async getCurrentUser() {
     try {
       const response = await axiosInstance.get('/auth/me')
       return response.data.data
-    } catch (error: any) {
-      throw error
+    } catch (error) {
+      handleApiError(error, 'Failed to get current user')
     }
   }
 
@@ -17,10 +17,8 @@ export default class UserApiService {
       const response = await axiosInstance.patch(`/auth/user/${id}`, payload)
 
       return response.data
-    } catch (error: any) {
-      const errorMessage = error?.response?.data?.msg || 'Failed to edit user'
-      toast.error(errorMessage)
-      throw error
+    } catch (error) {
+      handleApiError(error, 'Failed to edit user')
     }
   }
 }
