@@ -40,14 +40,25 @@ export default class AuthApiService {
 
   static async logout() {
     try {
-      const response = await axiosInstance.post('/auth/logout')
+      const refreshToken = localStorage.getItem('refreshToken')
+
+      const response = await axiosInstance.post('/auth/logout', {
+        refreshToken,
+      })
+
+      // Clear tokens from localStorage
+      localStorage.removeItem('accessToken')
+      localStorage.removeItem('refreshToken')
+
       toast.success('Logged out successfully!')
       return response.data
     } catch (error) {
+      // Clear tokens even if logout request fails
+      localStorage.removeItem('accessToken')
+      localStorage.removeItem('refreshToken')
       handleApiError(error, 'Logout failed')
     }
   }
-
   static async refreshToken() {
     try {
       const refreshToken = localStorage.getItem('refreshToken')
