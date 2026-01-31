@@ -5,8 +5,8 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
-        source: '/api/:path*',
-        destination: 'https://moneymate-backend-tau.vercel.app/api/:path*',
+        source: '/api/v1/:path*',
+        destination: 'https://moneymate-backend-tau.vercel.app/api/v1/:path*',
       },
     ]
   },
