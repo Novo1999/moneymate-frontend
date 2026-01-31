@@ -99,6 +99,15 @@ export default function LoginPage() {
               </Button>
             </form>
           </Form>
+
+          <div className="mt-8 text-center">
+            <div className="mt-6 text-center flex justify-center items-center">
+              <p className="text-sm text-muted-foreground">Don&apos;t have an account? </p>
+              <Button variant="link" className="p-1">
+                <Link href="/signup">Sign up</Link>
+              </Button>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>
