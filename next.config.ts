@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: 'https://moneymate-backend-tau.vercel.app/:path*',
+        destination: `${process.env.NEXT_PUBLIC_BASE_URL}/:path*`,
       },
     ]
   },
