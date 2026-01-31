@@ -5,25 +5,30 @@ export function middleware(request: NextRequest) {
   const token = request.cookies.get('accessToken')?.value;
   const { pathname } = request.nextUrl;
 
-  // Public routes that don't require authentication
+  console.log('[MIDDLEWARE] Path:', pathname);
+  console.log('[MIDDLEWARE] Token exists:', Boolean(token));
+
   const publicRoutes = ['/login', '/signup'];
   const isPublicRoute = publicRoutes.includes(pathname);
 
-  // If user is logged in and trying to access login/signup, redirect to home
+  console.log('[MIDDLEWARE] Is public route:', isPublicRoute);
+
   if (token && isPublicRoute) {
+    console.log('[MIDDLEWARE] Logged in user tried to access public route → redirecting to /');
     return NextResponse.redirect(new URL('/', request.url));
   }
 
-  // If user is not logged in and trying to access protected routes, redirect to login
   if (!token && !isPublicRoute && pathname !== '/') {
+    console.log('[MIDDLEWARE] Unauthenticated user tried to access protected route → redirecting to /login');
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  // If user is not logged in and trying to access home, redirect to login
   if (!token && pathname === '/') {
+    console.log('[MIDDLEWARE] Unauthenticated user tried to access home → redirecting to /login');
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
+  console.log('[MIDDLEWARE] Access allowed → proceeding');
   return NextResponse.next();
 }
 
