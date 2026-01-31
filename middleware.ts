@@ -5,6 +5,7 @@ export function middleware(request: NextRequest) {
   const token = request.cookies.get('accessToken')?.value;
   const { pathname } = request.nextUrl;
 
+  console.log('[MIDDLEWARE] Cookies:', request.cookies.getAll());
   console.log('[MIDDLEWARE] Path:', pathname);
   console.log('[MIDDLEWARE] Token exists:', Boolean(token));
 
