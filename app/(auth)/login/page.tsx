@@ -83,21 +83,22 @@ export default function LoginPage() {
               <Button type="submit" className="w-full h-12 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700" disabled={isLoggingIn}>
                 {isLoggingIn ? 'Signing In...' : 'Sign In'}
               </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full h-12"
+                disabled={isLoggingIn}
+                onClick={() =>
+                  login({
+                    email: 'tester@gmail.com',
+                    password: 'test123',
+                  })
+                }
+              >
+                Login as Tester
+              </Button>
             </form>
           </Form>
-
-          <div className="mt-8 text-center">
-            <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-              <p className="text-sm text-foreground font-medium mb-1">Demo Credentials</p>
-              <p className="text-sm text-muted-foreground">novo12@gmail.com / password</p>
-            </div>
-            <div className="mt-6 text-center flex justify-center items-center">
-              <p className="text-sm text-muted-foreground">Don&apos;t have an account? </p>
-              <Button variant="link" className="p-1">
-                <Link href="/signup">Sign up</Link>
-              </Button>
-            </div>
-          </div>
         </CardContent>
       </Card>
     </div>
