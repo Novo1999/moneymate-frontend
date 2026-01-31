@@ -2,8 +2,10 @@ import AuthApiService from '@/app/ApiService/AuthApiService'
 import axios from 'axios'
 import { toast } from 'sonner'
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL
+
 const axiosInstance = axios.create({
-  baseURL: '/api/v1/',
+  baseURL: BASE_URL || 'http://localhost:8000/api/v1/',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -29,7 +31,7 @@ axiosInstance.interceptors.response.use(
     }
 
     return Promise.reject(error)
-  },
+  }
 )
 
 export default axiosInstance
