@@ -10,8 +10,13 @@ export default class AuthApiService {
         password,
       })
 
+      const { accessToken, refreshToken, ...userData } = response.data.data
+
+      localStorage.setItem('accessToken', accessToken)
+      localStorage.setItem('refreshToken', refreshToken)
+
       toast.success('Login successful!')
-      return response.data.data
+      return userData
     } catch (error) {
       handleApiError(error, 'Login failed')
     }
@@ -45,10 +50,27 @@ export default class AuthApiService {
 
   static async refreshToken() {
     try {
-      const response = await axiosInstance.post('/auth/refreshToken')
-      return response.data
+      const refreshToken = localStorage.getItem('refreshToken')
+
+      if (!refreshToken) {
+        throw new Error('No refresh token available')
+      }
+
+      const response = await axiosInstance.post('/auth/refreshToken', {
+        refreshToken,
+      })
+
+      const { accessToken, refreshToken: newRefreshToken } = response.data.data
+
+      localStorage.setItem('accessToken', accessToken)
+      localStorage.setItem('refreshToken', newRefreshToken)
+
+      return accessToken
     } catch (error) {
+      localStorage.removeItem('accessToken')
+      localStorage.removeItem('refreshToken')
       handleApiError(error, 'Failed to refresh token')
+      throw error
     }
   }
 }
