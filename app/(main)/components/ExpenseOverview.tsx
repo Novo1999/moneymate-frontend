@@ -5,6 +5,7 @@ import AccountTypeApiService from '@/app/ApiService/AccountTypeApiService'
 import TransactionApiService from '@/app/ApiService/TransactionApiService'
 import { useAuth } from '@/app/hooks/use-auth'
 import { accountTypeAtom } from '@/app/stores/accountType'
+import { getCurrentMonthFirstAndLastDate } from '@/app/utils/date'
 import { activeViewAtom, dateRangeAtom } from '@/components/shared/LeftSidebar'
 import RechartsDonutChart from '@/components/shared/RechartsDonutChart'
 import { Button } from '@/components/ui/button'
@@ -74,10 +75,11 @@ const ExpenseOverview = () => {
   const transactionInfoIntervalDate = useMemo(() => new Date(transactionInfoInterval), [transactionInfoInterval])
   const dateRange = useAtomValue(dateRangeAtom)
   const { from, to } = useMemo(() => getDateIntervalBasedOnActiveViewMode(activeView, transactionInfoIntervalDate, dateRange), [activeView, transactionInfoIntervalDate, dateRange])
+  console.log('🚀 ~ ExpenseOverview', { to, from })
 
   const { data: transactionInfo, isLoading: transactionInfoLoading } = useQuery({
     queryKey: ['userTransactionsInfo', accountTypeId, from, to, user?.email],
-    queryFn: () => TransactionApiService.getUserTransactionsInfo(Number(accountTypeId), from, to),
+    queryFn: () => TransactionApiService.getUserTransactionsInfo(accountTypeId, from, to),
     enabled: () => {
       if (!accountTypeId || accountTypeId <= 0) return false
       if (!from || !to) return false
@@ -91,10 +93,22 @@ const ExpenseOverview = () => {
       return true
     },
   })
+
   const { data: accountType } = useQuery({
     queryKey: ['userAccountType', accountTypeId],
-    queryFn: () => AccountTypeApiService.getUserAccountType(Number(accountTypeId)),
+    queryFn: () => AccountTypeApiService.getUserAccountType(accountTypeId),
     enabled: !!accountTypeId && accountTypeId > 0,
+  })
+  const { fromDate, toDate } = useMemo(() => getCurrentMonthFirstAndLastDate(), [])
+
+  const { data: monthlySpending, isLoading: monthlySpendingLoading } = useQuery({
+    queryKey: ['monthlySpending', accountTypeId, fromDate, toDate],
+    queryFn: async () => {
+      const data = await TransactionApiService.getUserTransactionsInfo(accountTypeId, fromDate, toDate)
+
+      return data?.transactions.reduce((total, t) => total + Number(t.money), 0)
+    },
+    enabled: !!accountTypeId && !!user?.activeAccountTypeId,
   })
 
   if (!isAuthInitialized) {
@@ -141,7 +155,7 @@ const ExpenseOverview = () => {
         <Card className="shadow-lg">
           <CardContent className="text-center p-8">
             <h3 className="text-lg font-semibold text-foreground mb-3">This Month Spending</h3>
-            <p className="text-4xl font-bold text-destructive mb-2">2,720 {user?.currency}</p>
+            <p className="text-4xl font-bold text-destructive mb-2">{monthlySpendingLoading ? <Loader className="animate-spin mx-auto" /> : monthlySpending}</p>
             <p className="text-muted-foreground text-sm">Total expenses</p>
           </CardContent>
         </Card>

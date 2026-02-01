@@ -1,5 +1,6 @@
 import { handleApiError } from '@/lib/api'
 import axiosInstance from '@/lib/axios'
+import { TransactionResponse } from '@/types/response'
 import { toast } from 'sonner'
 
 export default class TransactionApiService {
@@ -27,7 +28,9 @@ export default class TransactionApiService {
 
   static async getUserTransactionsInfo(accountTypeId: number, from: string, to: string) {
     try {
-      const response = await axiosInstance.get(`/transaction/info`, {
+      const response = await axiosInstance.get<{
+        data: TransactionResponse
+      }>(`/transaction/info`, {
         params: { accountTypeId, from, to },
       })
 
@@ -55,7 +58,7 @@ export default class TransactionApiService {
       money?: number
       type?: 'income' | 'expense'
       createdAt?: string
-    }
+    },
   ) {
     try {
       const response = await axiosInstance.patch(`/transaction/edit/${id}`, transactionData)

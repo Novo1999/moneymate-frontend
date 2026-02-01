@@ -7,18 +7,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Cell, Pie, PieChart, ResponsiveContainer } from 'recharts'
 import { ImplicitLabelListType } from 'recharts/types/component/LabelList'
 
-interface TransactionData {
-  id: number
-  category: string
-  money: string
-  color: string
-  icon?: string
-  type: string
-  createdAt: string
-}
-
 interface RechartsDonutChartProps {
-  data: TransactionData[]
+  data: TransactionType[]
   width?: number
   height?: number
 }
@@ -27,6 +17,7 @@ import { transactionInfoIntervalAtom } from '@/app/(main)/components/ExpenseOver
 import { useAuth } from '@/app/hooks/use-auth'
 import { cn } from '@/lib/utils'
 import { ExpenseCategory } from '@/types/categories'
+import { TransactionType } from '@/types/transaction'
 import { MoreHorizontal, TrendingUp } from 'lucide-react'
 
 export const categoryIconMap: Record<ExpenseCategory, LucideIcon> = {
@@ -226,18 +217,21 @@ export default function RechartsDonutChart({ data, width, height }: RechartsDonu
 
   const chartData = useMemo(() => {
     const expenseData = data.filter((item) => item.type === 'expense')
-    const categoryTotals = expenseData.reduce((acc, item) => {
-      const category = item.category
-      const money = parseFloat(item.money)
+    const categoryTotals = expenseData.reduce(
+      (acc, item) => {
+        const category = item.category
+        const money = parseFloat(item.money)
 
-      if (acc[category]) {
-        acc[category] += money
-      } else {
-        acc[category] = money
-      }
+        if (acc[category]) {
+          acc[category] += money
+        } else {
+          acc[category] = money
+        }
 
-      return acc
-    }, {} as Record<string, number>)
+        return acc
+      },
+      {} as Record<string, number>,
+    )
 
     const colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#FF6384', '#C9CBCF', '#4BC0C0', '#FF6384', '#36A2EB']
 
