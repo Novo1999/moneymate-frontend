@@ -31,7 +31,6 @@ const RecentTransactions = () => {
   }
 
   const handleEdit = (transaction: TransactionType) => {
-    console.log("🚀 ~ handleEdit ~ transaction:", transaction)
     setTransactionModalState({
       open: true,
       data: transaction,

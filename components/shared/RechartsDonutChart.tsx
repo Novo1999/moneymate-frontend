@@ -1,7 +1,7 @@
 'use client'
 
 import { categoryKeyAtom } from '@/lib/atoms'
-import { atom, useAtom, useAtomValue } from 'jotai'
+import { atom, useAtom } from 'jotai'
 import { Car, CreditCard, Fuel, Gamepad2, Home, LucideIcon, Phone, PiggyBank, ShoppingBag, Utensils } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Cell, Pie, PieChart, ResponsiveContainer } from 'recharts'
@@ -13,7 +13,6 @@ interface RechartsDonutChartProps {
   height?: number
 }
 
-import { transactionInfoIntervalAtom } from '@/app/(main)/components/ExpenseOverview'
 import { useAuth } from '@/app/hooks/use-auth'
 import { cn } from '@/lib/utils'
 import { ExpenseCategory } from '@/types/categories'
@@ -160,9 +159,7 @@ const CustomLabel = ({
 }
 
 export default function RechartsDonutChart({ data, width, height }: RechartsDonutChartProps) {
-  console.log("🚀 ~ RechartsDonutChart ~ data:", data)
   const { user } = useAuth()
-  const transactionInfoInterval = useAtomValue(transactionInfoIntervalAtom)
   const [screenSize, setScreenSize] = useState({ width: 1024, height: 768 })
   const [categoryKey] = useAtom(categoryKeyAtom)
 
