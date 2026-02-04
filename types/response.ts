@@ -8,6 +8,7 @@ type TransactionResponse = {
 type TransactionResponsePaginated = {
   transactions: TransactionType[]
   nextCursor: number
+  count: number
 }
 
 export type { TransactionResponse, TransactionResponsePaginated }

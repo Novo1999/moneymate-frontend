@@ -1,7 +1,6 @@
 import ExpenseOverview from '@/app/(main)/components/ExpenseOverview'
-import RecentTransactions from '@/app/(main)/components/RecentTransactions'
+import RecentTransactionContainer from '@/app/(main)/components/RecentTransactionContainer'
 import UserBlock from '@/app/(main)/components/UserBlock'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function HomePage() {
   return (
@@ -10,14 +9,7 @@ export default function HomePage() {
 
       <ExpenseOverview />
 
-      <Card className="shadow-lg max-w-7xl mt-8">
-        <CardHeader className="pb-4">
-          <CardTitle className="text-2xl">Recent Transactions</CardTitle>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <RecentTransactions />
-        </CardContent>
-      </Card>
+      <RecentTransactionContainer />
     </div>
   )
 }

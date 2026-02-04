@@ -1,5 +1,3 @@
-'use client'
-
 import TransactionApiService from '@/app/ApiService/TransactionApiService'
 import { useAuth } from '@/app/hooks/use-auth'
 import useInfiniteScroll from '@/app/hooks/useInfiniteScroll'
