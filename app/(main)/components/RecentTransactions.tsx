@@ -1,11 +1,15 @@
+import { transactionModalStateAtom } from '@/app/(main)/components/store'
 import TransactionApiService from '@/app/ApiService/TransactionApiService'
 import { useAuth } from '@/app/hooks/use-auth'
 import useInfiniteScroll from '@/app/hooks/useInfiniteScroll'
 import { accountTypeAtom } from '@/app/stores/accountType'
-import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { TransactionType } from '@/types/transaction'
 import { useInfiniteQuery } from '@tanstack/react-query'
-import { useAtomValue } from 'jotai'
+import { format } from 'date-fns'
+import { useAtomValue, useSetAtom } from 'jotai'
+import { Pen } from 'lucide-react'
 
 const RecentTransactions = () => {
   const { user, isAuthInitialized } = useAuth()
@@ -18,11 +22,20 @@ const RecentTransactions = () => {
     enabled: !!accountTypeId,
   })
   const { loadMoreRef } = useInfiniteScroll({ hasNextPage, fetch: fetchNextPage })
+  const setTransactionModalState = useSetAtom(transactionModalStateAtom)
 
   const paginatedTransactions = data?.pages?.flatMap((page) => page?.transactions) || []
 
   if (!isAuthInitialized) {
     return <Skeleton className="max-w-7xl min-h-[757px] bg-white/80" />
+  }
+
+  const handleEdit = (transaction: TransactionType) => {
+    console.log("🚀 ~ handleEdit ~ transaction:", transaction)
+    setTransactionModalState({
+      open: true,
+      data: transaction,
+    })
   }
 
   return (
@@ -36,18 +49,22 @@ const RecentTransactions = () => {
               </div>
               <div>
                 <p className="font-semibold text-foreground text-lg capitalize">{transaction?.category}</p>
-                <p className="text-sm text-muted-foreground">{transaction?.createdAt}</p>
+                <p className="text-sm text-muted-foreground">{format(new Date(transaction?.createdAt || ''), 'yyyy-MM-dd HH:mm:ss')}</p>
               </div>
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <Badge variant={transaction?.type === 'income' ? 'default' : 'destructive'} className="font-semibold capitalize">
+            {/* edit */}
+            <Button onClick={() => transaction && handleEdit(transaction)} size="sm">
+              <Pen />
+            </Button>
+            <Button size="sm" variant={transaction?.type === 'income' ? 'default' : 'destructive'} className="font-semibold capitalize">
               {transaction?.category}
-            </Badge>
-            <span className={`font-bold text-lg ${Number(transaction?.money) > 0 ? 'text-green-600' : 'text-red-600'}`}>
+            </Button>
+            <p className={`font-bold text-lg ${Number(transaction?.money) > 0 ? 'text-green-600' : 'text-red-600'}`}>
               {Number(transaction?.money) > 0 ? '+' : '-'}
               {user?.currency} {Math.abs(Number(transaction?.money)).toFixed(2)}
-            </span>
+            </p>
           </div>
         </div>
       ))}

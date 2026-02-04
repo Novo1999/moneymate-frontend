@@ -1,6 +1,6 @@
 import { ExpenseCategory, IncomeCategory } from '@/types/categories'
 
-export type TransactionType = {
+type TransactionType = {
   id: number
   money: string
   note: string | null
@@ -8,4 +8,11 @@ export type TransactionType = {
   category: IncomeCategory | ExpenseCategory
   createdAt: string
 }
+
+type TransactionModalState = {
+  open: boolean
+  data: Partial<TransactionType>
+}
+
+export type { TransactionModalState, TransactionType }
 

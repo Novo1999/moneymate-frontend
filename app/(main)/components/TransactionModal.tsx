@@ -1,7 +1,9 @@
 import { getDateIntervalBasedOnActiveViewMode, transactionInfoIntervalAtom } from '@/app/(main)/components/ExpenseOverview'
+import { transactionModalStateAtom } from '@/app/(main)/components/store'
 import TransactionApiService from '@/app/ApiService/TransactionApiService'
 import { useAuth } from '@/app/hooks/use-auth'
 import { accountTypeAtom } from '@/app/stores/accountType'
+import { TransactionSchema } from '@/app/zod/transaction.schema'
 import { activeViewAtom } from '@/components/shared/LeftSidebar'
 import { addTransactionCategoryAtom } from '@/components/shared/RechartsDonutChart'
 import { Button } from '@/components/ui/button'
@@ -19,14 +21,9 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { format } from 'date-fns'
 import { useAtom, useAtomValue } from 'jotai'
 import { Calendar as CalendarIcon, Plus } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
-
-const TransactionType = {
-  INCOME: 'income',
-  EXPENSE: 'expense',
-} as const
 
 const ExpenseCategory = {
   FOOD_DRINKS: 'food_drinks',
@@ -57,28 +54,15 @@ const IncomeCategory = {
   TRANSFER: 'transfer',
 } as const
 
-export { ExpenseCategory, IncomeCategory, TransactionType }
+export { ExpenseCategory, IncomeCategory }
 
-// Form schema
-const formSchema = z.object({
-  money: z
-    .number()
-    .min(1, 'Amount is required')
-    .refine((val) => val > 0, 'Amount must be greater than 0'),
+type FormData = z.infer<typeof TransactionSchema>
 
-  type: z.enum(TransactionType),
-
-  category: z.string().min(1, 'Category is required'),
-
-  createdAt: z.date(),
-})
-
-type FormData = z.infer<typeof formSchema>
-
-const AddTransactionModal = () => {
+const TransactionModal = () => {
   const [addTransactionCategory, setAddTransactionCategory] = useAtom(addTransactionCategoryAtom)
   const { user } = useAuth()
-  const [open, setOpen] = useState(false)
+  const [transactionModalState, setTransactionModalState] = useAtom(transactionModalStateAtom)
+
   const queryClient = useQueryClient()
   const activeView = useAtomValue(activeViewAtom)
   const [transactionInfoInterval] = useAtom(transactionInfoIntervalAtom)
@@ -88,7 +72,7 @@ const AddTransactionModal = () => {
   const { from, to } = useMemo(() => getDateIntervalBasedOnActiveViewMode(activeView, transactionInfoIntervalDate), [activeView, transactionInfoIntervalDate])
 
   const form = useForm<FormData>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(TransactionSchema),
     defaultValues: {
       money: undefined,
       type: undefined,
@@ -97,11 +81,26 @@ const AddTransactionModal = () => {
     },
   })
 
+  const editingTransaction = transactionModalState.data.id
+
+  useEffect(() => {
+    if (!transactionModalState.data.id) return
+    form.reset({
+      category: transactionModalState.data?.category || '',
+      createdAt: new Date(transactionModalState.data?.createdAt || '') || new Date(),
+      money: Number(transactionModalState.data?.money) || 0,
+      type: transactionModalState.data?.type || 'expense',
+    })
+  }, [form, transactionModalState])
+
   useEffect(() => {
     if (!addTransactionCategory) return
     form.setValue('type', 'expense')
     form.setValue('category', addTransactionCategory)
-    setOpen(true)
+    setTransactionModalState({
+      open: true,
+      data: {},
+    })
   }, [addTransactionCategory, form])
 
   const watchedType = form.watch('type')
@@ -109,10 +108,28 @@ const AddTransactionModal = () => {
   const addTransactionMutation = useMutation({
     mutationFn: (data: Parameters<typeof TransactionApiService.addTransaction>[0]) => TransactionApiService.addTransaction(data),
     onSuccess: () => {
-      setOpen(false)
+      setTransactionModalState({
+        open: false,
+        data: {},
+      })
       form.reset()
-      queryClient.invalidateQueries({ queryKey: ['userTransactionsInfo', accountTypeId, from, to] })
+      queryClient.invalidateQueries({ queryKey: ['userTransactionsInfo'] })
       queryClient.invalidateQueries({ queryKey: ['accountTypes'] })
+      queryClient.invalidateQueries({ queryKey: ['userTransactionsPaginated', accountTypeId] })
+    },
+  })
+
+  const editTransactionMutation = useMutation({
+    mutationFn: (data: Parameters<typeof TransactionApiService.addTransaction>[0]) => TransactionApiService.editTransaction(transactionModalState.data.id || 0, data),
+    onSuccess: () => {
+      setTransactionModalState({
+        open: false,
+        data: {},
+      })
+      form.reset()
+      queryClient.invalidateQueries({ queryKey: ['userTransactionsInfo'] })
+      queryClient.invalidateQueries({ queryKey: ['accountTypes'] })
+      queryClient.invalidateQueries({ queryKey: ['userTransactionsPaginated', accountTypeId] })
     },
   })
 
@@ -120,15 +137,18 @@ const AddTransactionModal = () => {
     if (!user?.id || !user?.activeAccountTypeId) return
 
     const transactionData = {
-      userId: user.id,
+      ...(editingTransaction ? { user } : { userId: user.id, accountTypeId: user.activeAccountTypeId }),
       money: data.money,
       type: data.type,
       category: data.category,
-      accountTypeId: user.activeAccountTypeId,
       createdAt: format(data.createdAt, 'yyyy-MM-dd'),
     }
 
-    addTransactionMutation.mutate(transactionData)
+    if (editingTransaction) {
+      editTransactionMutation.mutate(transactionData)
+    } else {
+      addTransactionMutation.mutate(transactionData)
+    }
   }
 
   const getCategoryOptions = () => {
@@ -157,25 +177,43 @@ const AddTransactionModal = () => {
     form.handleSubmit(onSubmit)(e)
   }
 
+  const getSubmitButtonText = () => {
+    if (editingTransaction) {
+      return editTransactionMutation.isPending ? 'Editing' : 'Edit Transaction'
+    } else {
+      return addTransactionMutation.isPending ? 'Adding...' : 'Add Transaction'
+    }
+  }
+
   return (
     <Dialog
-      open={open}
+      open={transactionModalState.open}
       onOpenChange={(open) => {
-        setOpen(open)
+        setTransactionModalState({
+          open,
+          data: {},
+        })
         if (!open) setAddTransactionCategory(null)
       }}
     >
       <DialogTrigger asChild>
         <Button size="lg" className="w-full bg-green-500 hover:bg-green-600 text-white">
           <Plus className="w-5 h-5 mr-2" />
-          Add Transaction
+          {editingTransaction ? 'Edit' : 'Add'} Transaction
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Add New Transaction</DialogTitle>
-          <DialogDescription>Add a new income or expense transaction to your account.</DialogDescription>
-        </DialogHeader>
+        {editingTransaction ? (
+          <DialogHeader>
+            <DialogTitle>Edit Transaction</DialogTitle>
+            <DialogDescription>Edit existing transaction</DialogDescription>
+          </DialogHeader>
+        ) : (
+          <DialogHeader>
+            <DialogTitle>Add New Transaction</DialogTitle>
+            <DialogDescription>Add a new income or expense transaction to your account.</DialogDescription>
+          </DialogHeader>
+        )}
 
         <Form {...form}>
           <div onSubmit={handleSubmit} className="space-y-4">
@@ -187,7 +225,7 @@ const AddTransactionModal = () => {
                 <FormItem>
                   <FormLabel>Amount</FormLabel>
                   <FormControl>
-                    <Input type="number" step="0.01" min="0" placeholder="Enter amount" onChange={(e) => field.onChange(Number(e.target.value))} />
+                    <Input defaultValue={Number(field.value)} type="number" step="0.01" min="0" placeholder="Enter amount" onChange={(e) => field.onChange(Number(e.target.value))} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -278,11 +316,20 @@ const AddTransactionModal = () => {
             />
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() =>
+                  setTransactionModalState({
+                    open: false,
+                    data: {},
+                  })
+                }
+              >
                 Cancel
               </Button>
               <Button type="submit" onClick={handleSubmit} disabled={addTransactionMutation.isPending} className="bg-green-500 hover:bg-green-600">
-                {addTransactionMutation.isPending ? 'Adding...' : 'Add Transaction'}
+                {getSubmitButtonText()}
               </Button>
             </DialogFooter>
           </div>
@@ -292,4 +339,4 @@ const AddTransactionModal = () => {
   )
 }
 
-export default AddTransactionModal
+export default TransactionModal

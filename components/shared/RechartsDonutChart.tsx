@@ -160,6 +160,7 @@ const CustomLabel = ({
 }
 
 export default function RechartsDonutChart({ data, width, height }: RechartsDonutChartProps) {
+  console.log("🚀 ~ RechartsDonutChart ~ data:", data)
   const { user } = useAuth()
   const transactionInfoInterval = useAtomValue(transactionInfoIntervalAtom)
   const [screenSize, setScreenSize] = useState({ width: 1024, height: 768 })
@@ -213,7 +214,6 @@ export default function RechartsDonutChart({ data, width, height }: RechartsDonu
   const responsive = useCallback(() => getResponsiveDimensions(), [getResponsiveDimensions])
 
   const responsiveConfig = useMemo(() => responsive(), [responsive])
-  const transactionInfoIntervalDate = useMemo(() => new Date(transactionInfoInterval), [transactionInfoInterval])
 
   const chartData = useMemo(() => {
     const expenseData = data.filter((item) => item.type === 'expense')
@@ -247,7 +247,7 @@ export default function RechartsDonutChart({ data, width, height }: RechartsDonu
       type: 'expense',
       percentage: ((amount / expenseTotal) * 100).toFixed(1),
     }))
-  }, [data, transactionInfoInterval])
+  }, [data])
 
   const total = useMemo(() => data.filter((item) => item.type === 'expense').reduce((sum, item) => sum + parseFloat(item.money), 0), [data])
 

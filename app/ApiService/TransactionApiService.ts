@@ -53,7 +53,7 @@ export default class TransactionApiService {
     }
   }
 
-  static async addTransaction(transactionData: { category: string; money: number; type: 'income' | 'expense'; userId: number; accountTypeId: number; createdAt?: string }) {
+  static async addTransaction(transactionData: { category: string; money: number; type: 'income' | 'expense'; userId?: number; accountTypeId?: number; createdAt?: string }) {
     try {
       const response = await axiosInstance.post('/transaction/add', transactionData)
 

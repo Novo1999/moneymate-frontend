@@ -1,6 +1,6 @@
 'use client'
-import AddTransactionModal from '@/app/(main)/components/AddTransaction'
 import DateController from '@/app/(main)/components/DateController'
+import TransactionModal from '@/app/(main)/components/TransactionModal'
 import AccountTypeApiService from '@/app/ApiService/AccountTypeApiService'
 import TransactionApiService from '@/app/ApiService/TransactionApiService'
 import { useAuth } from '@/app/hooks/use-auth'
@@ -165,7 +165,7 @@ const ExpenseOverview = () => {
             <CardTitle className="text-xl">Quick Actions</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 pt-0">
-            <AddTransactionModal />
+            <TransactionModal />
             <Button className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white" size="lg">
               Add Expense
             </Button>
