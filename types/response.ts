@@ -5,4 +5,10 @@ type TransactionResponse = {
   transactions: TransactionType[]
 }
 
-export type { TransactionResponse }
+type TransactionResponsePaginated = {
+  transactions: TransactionType[]
+  nextCursor: number
+}
+
+export type { TransactionResponse, TransactionResponsePaginated }
+

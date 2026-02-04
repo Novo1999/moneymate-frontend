@@ -1,6 +1,7 @@
+import { DataResponse } from '@/app/dto/DataResponse'
 import { handleApiError } from '@/lib/api'
 import axiosInstance from '@/lib/axios'
-import { TransactionResponse } from '@/types/response'
+import { TransactionResponse, TransactionResponsePaginated } from '@/types/response'
 import { toast } from 'sonner'
 
 export default class TransactionApiService {
@@ -18,6 +19,18 @@ export default class TransactionApiService {
     try {
       const response = await axiosInstance.get('/transaction/user', {
         params: { accountTypeId, from, to },
+      })
+
+      return response.data.data
+    } catch (error) {
+      handleApiError(error, 'Failed to fetch user transactions')
+    }
+  }
+
+  static async getUserTransactionsPaginated(accountTypeId: number, cursor: number, limit: number) {
+    try {
+      const response = await axiosInstance.get<DataResponse<TransactionResponsePaginated>>('/transaction/paginated', {
+        params: { accountTypeId, limit, ...(cursor ? { cursor } : {}) },
       })
 
       return response.data.data

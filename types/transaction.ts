@@ -8,3 +8,4 @@ export type TransactionType = {
   category: IncomeCategory | ExpenseCategory
   createdAt: string
 }
+

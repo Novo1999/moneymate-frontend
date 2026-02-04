@@ -2,7 +2,8 @@ import { getDateIntervalBasedOnActiveViewMode, transactionInfoIntervalAtom } fro
 import { useAuth } from '@/app/hooks/use-auth'
 import { activeViewAtom, dateRangeAtom } from '@/components/shared/LeftSidebar'
 import { Button } from '@/components/ui/button'
-import { addDays, addMonths, addYears, format, isAfter, isBefore, startOfDay, startOfMonth, startOfYear, subDays, subMonths, subYears } from 'date-fns'
+import { useIsFetching } from '@tanstack/react-query'
+import { addDays, addMonths, addYears, format, isAfter, startOfDay, startOfMonth, startOfYear, subDays, subMonths, subYears } from 'date-fns'
 import { useAtom, useAtomValue } from 'jotai'
 import { ChevronLeft, ChevronRight, Loader } from 'lucide-react'
 import { useMemo } from 'react'
@@ -13,6 +14,7 @@ const DateController = () => {
   const dateRange = useAtomValue(dateRangeAtom)
   const transactionInfoIntervalDate = useMemo(() => new Date(transactionInfoInterval), [transactionInfoInterval])
   const { user, updateUser, isLoading } = useAuth()
+  const isFetchingTransactions = useIsFetching({ queryKey: ['userTransactionsInfo'] }) > 0
 
   const handlePrevDate = () => {
     let prevDate: Date
@@ -65,25 +67,35 @@ const DateController = () => {
       updateUser({ id: user.id, interval })
     }
   }
+
   const canGoForward = () => {
     const today = new Date()
 
     switch (activeView) {
-      case 'day':
+      case 'day': {
         const nextDay = addDays(transactionInfoIntervalDate, 1)
         return !isAfter(startOfDay(nextDay), startOfDay(today))
-      case 'week':
+      }
+
+      case 'week': {
         const nextWeek = addDays(transactionInfoIntervalDate, 7)
         return !isAfter(startOfDay(nextWeek), startOfDay(today))
-      case 'month':
+      }
+
+      case 'month': {
         const nextMonth = addMonths(transactionInfoIntervalDate, 1)
         return !isAfter(startOfMonth(nextMonth), startOfMonth(today))
-      case 'year':
+      }
+
+      case 'year': {
         const nextYear = addYears(transactionInfoIntervalDate, 1)
         return !isAfter(startOfYear(nextYear), startOfYear(today))
+      }
+
       case 'all':
       case 'custom':
         return false
+
       default:
         return true
     }
@@ -131,14 +143,15 @@ const DateController = () => {
       </div>
     )
   }
+
   return (
     <div className="flex justify-center gap-4 items-center">
-      <Button onClick={handlePrevDate}>
+      <Button disabled={isFetchingTransactions} onClick={handlePrevDate}>
         <ChevronLeft />
       </Button>
       <p className="text-center font-bold text-green-500">{renderDateBasedOnViewMode()}</p>
       {canGoForward() && (
-        <Button onClick={handleNextDate}>
+        <Button disabled={isFetchingTransactions} onClick={handleNextDate}>
           <ChevronRight />
         </Button>
       )}

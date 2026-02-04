@@ -75,7 +75,6 @@ const ExpenseOverview = () => {
   const transactionInfoIntervalDate = useMemo(() => new Date(transactionInfoInterval), [transactionInfoInterval])
   const dateRange = useAtomValue(dateRangeAtom)
   const { from, to } = useMemo(() => getDateIntervalBasedOnActiveViewMode(activeView, transactionInfoIntervalDate, dateRange), [activeView, transactionInfoIntervalDate, dateRange])
-  console.log('🚀 ~ ExpenseOverview', { to, from })
 
   const { data: transactionInfo, isLoading: transactionInfoLoading } = useQuery({
     queryKey: ['userTransactionsInfo', accountTypeId, from, to, user?.email],
