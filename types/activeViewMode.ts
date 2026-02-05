@@ -1,1 +1,1 @@
-export type ActiveViewModes = 'day' | 'week' | 'month' | 'year' | '' | 'all' | 'custom'
+export type ActiveViewModes = 'today' | 'day' | 'week' | 'month' | 'year' | '' | 'all' | 'custom'

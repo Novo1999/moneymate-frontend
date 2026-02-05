@@ -5,6 +5,7 @@ import AccountTypeApiService from '@/app/ApiService/AccountTypeApiService'
 import UserApiService from '@/app/ApiService/UserApiService'
 import { useAuth } from '@/app/hooks/use-auth'
 import { accountTypeAtom } from '@/app/stores/accountType'
+import { activeViewAtom, dateRangeAtom } from '@/components/shared/store'
 import { Button } from '@/components/ui/button'
 import { Calendar as CalendarComponent } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
@@ -14,13 +15,13 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { ActiveViewModes } from '@/types/activeViewMode'
 import { useQuery } from '@tanstack/react-query'
 import { format, isSameDay } from 'date-fns'
-import { atom, useAtom } from 'jotai'
+import { useAtom } from 'jotai'
 import { BarChart3, Calendar, CalendarIcon, Clock, Eye, Loader, LucideIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useMemo } from 'react'
-import { DateRange } from 'react-day-picker'
 
 const viewModes: Array<{ value: ActiveViewModes; label: string; icon: LucideIcon }> = [
+  { value: 'today', label: 'Today', icon: Clock },
   { value: 'day', label: 'Day', icon: Clock },
   { value: 'week', label: 'Week', icon: Calendar },
   { value: 'month', label: 'Month', icon: BarChart3 },
@@ -29,8 +30,6 @@ const viewModes: Array<{ value: ActiveViewModes; label: string; icon: LucideIcon
   { value: 'custom', label: 'Custom Range', icon: CalendarIcon },
 ]
 
-export const activeViewAtom = atom<ActiveViewModes>('day')
-export const dateRangeAtom = atom<DateRange | undefined>(undefined)
 
 export default function LeftSidebar() {
   const [accountTypeId, setAccountTypeId] = useAtom(accountTypeAtom)
@@ -54,15 +53,15 @@ export default function LeftSidebar() {
   // Set default account type and interval when data loads
   useEffect(() => {
     if (!user) return
-    
+
     setActiveView(user?.viewMode)
     setAccountTypeId(user?.activeAccountTypeId ?? 0)
-    
+
     // Set interval from user data
     if (user?.interval?.to) {
       setTransactionInfoInterval(user.interval.to)
     }
-    
+
     // If custom view mode and interval exists, set the date range
     if (user?.viewMode === 'custom' && user?.interval?.from && user?.interval?.to) {
       setDateRange({
@@ -188,11 +187,11 @@ export default function LeftSidebar() {
             <SidebarMenu>
               {isLoading
                 ? Array.from({ length: 6 }).map((_, index) => <Skeleton key={index} className="h-8 w-full bg-custom-green" />)
-                : viewModes.map((mode) => {
+                : viewModes.map((mode, index) => {
                     const Icon = mode.icon
 
                     return (
-                      <SidebarMenuItem key={mode.value}>
+                      <SidebarMenuItem key={mode.value + index}>
                         <SidebarMenuButton
                           isActive={activeView === mode.value}
                           onClick={() => {

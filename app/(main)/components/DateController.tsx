@@ -1,9 +1,9 @@
 import { getDateIntervalBasedOnActiveViewMode, transactionInfoIntervalAtom } from '@/app/(main)/components/ExpenseOverview'
 import { useAuth } from '@/app/hooks/use-auth'
-import { activeViewAtom, dateRangeAtom } from '@/components/shared/LeftSidebar'
+import { activeViewAtom, dateRangeAtom } from '@/components/shared/store'
 import { Button } from '@/components/ui/button'
 import { useIsFetching } from '@tanstack/react-query'
-import { addDays, addMonths, addYears, format, isAfter, startOfDay, startOfMonth, startOfYear, subDays, subMonths, subYears } from 'date-fns'
+import { addDays, addMonths, addYears, format, isAfter, isSameDay, startOfDay, startOfMonth, startOfYear, subDays, subMonths, subYears } from 'date-fns'
 import { useAtom, useAtomValue } from 'jotai'
 import { ChevronLeft, ChevronRight, Loader } from 'lucide-react'
 import { useMemo } from 'react'
@@ -18,12 +18,14 @@ const DateController = () => {
 
   const handlePrevDate = () => {
     let prevDate: Date
+
     switch (activeView) {
       case 'day':
+      case 'today':
         prevDate = subDays(transactionInfoIntervalDate, 1)
         break
       case 'week':
-        prevDate = subDays(transactionInfoInterval, 7)
+        prevDate = subDays(transactionInfoIntervalDate, 7)
         break
       case 'month':
         prevDate = subMonths(transactionInfoIntervalDate, 1)
@@ -32,8 +34,9 @@ const DateController = () => {
         prevDate = subYears(transactionInfoIntervalDate, 1)
         break
       default:
-        prevDate = new Date()
+        return
     }
+
     setTransactionInfoInterval(prevDate.toISOString())
 
     if (user?.id) {
@@ -46,8 +49,10 @@ const DateController = () => {
     let nextDate: Date
     switch (activeView) {
       case 'day':
-        nextDate = addDays(transactionInfoInterval, 1)
+      case 'today':
+        nextDate = addDays(transactionInfoIntervalDate, 1)
         break
+
       case 'week':
         nextDate = addDays(transactionInfoInterval, 7)
         break
@@ -72,7 +77,8 @@ const DateController = () => {
     const today = new Date()
 
     switch (activeView) {
-      case 'day': {
+      case 'day':
+      case 'today': {
         const nextDay = addDays(transactionInfoIntervalDate, 1)
         return !isAfter(startOfDay(nextDay), startOfDay(today))
       }
@@ -108,6 +114,11 @@ const DateController = () => {
 
   const renderDateBasedOnViewMode = () => {
     switch (activeView) {
+      case 'today': {
+        const today = new Date()
+        return isSameDay(transactionInfoIntervalDate, today) ? 'Today' : format(transactionInfoIntervalDate, 'd MMMM')
+      }
+
       case 'day':
         return format(transactionInfoIntervalDate, 'd MMMM')
       case 'week':

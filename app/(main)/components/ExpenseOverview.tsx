@@ -6,14 +6,14 @@ import TransactionApiService from '@/app/ApiService/TransactionApiService'
 import { useAuth } from '@/app/hooks/use-auth'
 import { accountTypeAtom } from '@/app/stores/accountType'
 import { getCurrentMonthFirstAndLastDate } from '@/app/utils/date'
-import { activeViewAtom, dateRangeAtom } from '@/components/shared/LeftSidebar'
 import RechartsDonutChart from '@/components/shared/RechartsDonutChart'
+import { activeViewAtom, dateRangeAtom } from '@/components/shared/store'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ActiveViewModes } from '@/types/activeViewMode'
 import { useQuery } from '@tanstack/react-query'
-import { addDays, endOfMonth, endOfYear, isSameDay, startOfMonth, startOfYear, subDays } from 'date-fns'
+import { addDays, endOfDay, endOfMonth, endOfYear, isSameDay, startOfDay, startOfMonth, startOfYear, subDays } from 'date-fns'
 import { atom, useAtomValue } from 'jotai'
 import { Loader } from 'lucide-react'
 import { useMemo } from 'react'
@@ -21,6 +21,14 @@ import { DateRange } from 'react-day-picker'
 
 export const getDateIntervalBasedOnActiveViewMode = (activeView: ActiveViewModes, intervalDate: Date, customRange?: DateRange): { from: string; to: string } => {
   switch (activeView) {
+    case 'today': {
+      const now = new Date()
+      return {
+        from: startOfDay(now).toISOString(),
+        to: endOfDay(now).toISOString(),
+      }
+    }
+
     case 'day':
       return {
         from: subDays(intervalDate, 1).toISOString(),
