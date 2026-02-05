@@ -1,5 +1,6 @@
 'use client'
 import DateController from '@/app/(main)/components/DateController'
+import { transactionInfoIntervalAtom } from '@/app/(main)/components/store'
 import TransactionModal from '@/app/(main)/components/TransactionModal'
 import AccountTypeApiService from '@/app/ApiService/AccountTypeApiService'
 import TransactionApiService from '@/app/ApiService/TransactionApiService'
@@ -11,69 +12,13 @@ import { activeViewAtom, dateRangeAtom } from '@/components/shared/store'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { ActiveViewModes } from '@/types/activeViewMode'
+import { getDateIntervalBasedOnActiveViewMode } from '@/lib/interval'
 import { useQuery } from '@tanstack/react-query'
-import { addDays, endOfDay, endOfMonth, endOfYear, isSameDay, startOfDay, startOfMonth, startOfYear, subDays } from 'date-fns'
-import { atom, useAtomValue } from 'jotai'
+import { isSameDay } from 'date-fns'
+import { useAtomValue } from 'jotai'
 import { Loader } from 'lucide-react'
 import { useMemo } from 'react'
-import { DateRange } from 'react-day-picker'
 
-export const getDateIntervalBasedOnActiveViewMode = (activeView: ActiveViewModes, intervalDate: Date, customRange?: DateRange): { from: string; to: string } => {
-  switch (activeView) {
-    case 'today': {
-      const now = new Date()
-      return {
-        from: startOfDay(now).toISOString(),
-        to: endOfDay(now).toISOString(),
-      }
-    }
-
-    case 'day':
-      return {
-        from: subDays(intervalDate, 1).toISOString(),
-        to: intervalDate.toISOString(),
-      }
-    case 'week':
-      return {
-        from: subDays(intervalDate, 7).toISOString(),
-        to: intervalDate.toISOString(),
-      }
-    case 'month':
-      return {
-        from: startOfMonth(intervalDate).toISOString(),
-        to: endOfMonth(intervalDate).toISOString(),
-      }
-    case 'year':
-      return {
-        from: startOfYear(intervalDate).toISOString(),
-        to: endOfYear(intervalDate).toISOString(),
-      }
-    case 'all':
-      return {
-        from: new Date('1970-01-01').toISOString(),
-        to: new Date().toISOString(),
-      }
-    case 'custom':
-      if (customRange?.from && customRange?.to) {
-        return {
-          from: customRange.from.toISOString(),
-          to: customRange.to.toISOString(),
-        }
-      }
-      // Fallback if custom range not fully selected
-      return {
-        from: new Date().toISOString(),
-        to: addDays(new Date(), 1).toISOString(),
-      }
-    default:
-      return {
-        from: new Date().toISOString(),
-        to: addDays(new Date(), 1).toISOString(),
-      }
-  }
-}
-export const transactionInfoIntervalAtom = atom(new Date().toISOString())
 const ExpenseOverview = () => {
   const { user, isAuthInitialized } = useAuth()
   const accountTypeId = useAtomValue(accountTypeAtom)
@@ -82,7 +27,10 @@ const ExpenseOverview = () => {
 
   const transactionInfoIntervalDate = useMemo(() => new Date(transactionInfoInterval), [transactionInfoInterval])
   const dateRange = useAtomValue(dateRangeAtom)
-  const { from, to } = useMemo(() => getDateIntervalBasedOnActiveViewMode(activeView, transactionInfoIntervalDate, dateRange), [activeView, transactionInfoIntervalDate, dateRange])
+  const { from, to } = useMemo(
+    () => getDateIntervalBasedOnActiveViewMode(activeView === 'today' ? 'day' : activeView, transactionInfoIntervalDate, dateRange),
+    [activeView, transactionInfoIntervalDate, dateRange],
+  )
 
   const { data: transactionInfo, isLoading: transactionInfoLoading } = useQuery({
     queryKey: ['userTransactionsInfo', accountTypeId, from, to, user?.email],

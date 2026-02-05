@@ -1,6 +1,6 @@
 'use client'
 
-import { getDateIntervalBasedOnActiveViewMode, transactionInfoIntervalAtom } from '@/app/(main)/components/ExpenseOverview'
+import { transactionInfoIntervalAtom } from '@/app/(main)/components/store'
 import AccountTypeApiService from '@/app/ApiService/AccountTypeApiService'
 import UserApiService from '@/app/ApiService/UserApiService'
 import { useAuth } from '@/app/hooks/use-auth'
@@ -12,6 +12,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar'
 import { Skeleton } from '@/components/ui/skeleton'
+import { getDateIntervalBasedOnActiveViewMode } from '@/lib/interval'
 import { ActiveViewModes } from '@/types/activeViewMode'
 import { useQuery } from '@tanstack/react-query'
 import { format, isSameDay } from 'date-fns'
@@ -29,7 +30,6 @@ const viewModes: Array<{ value: ActiveViewModes; label: string; icon: LucideIcon
   { value: 'all', label: 'All Time', icon: BarChart3 },
   { value: 'custom', label: 'Custom Range', icon: CalendarIcon },
 ]
-
 
 export default function LeftSidebar() {
   const [accountTypeId, setAccountTypeId] = useAtom(accountTypeAtom)

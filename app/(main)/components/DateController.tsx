@@ -1,7 +1,8 @@
-import { getDateIntervalBasedOnActiveViewMode, transactionInfoIntervalAtom } from '@/app/(main)/components/ExpenseOverview'
+import { transactionInfoIntervalAtom } from '@/app/(main)/components/store'
 import { useAuth } from '@/app/hooks/use-auth'
 import { activeViewAtom, dateRangeAtom } from '@/components/shared/store'
 import { Button } from '@/components/ui/button'
+import { getDateIntervalBasedOnActiveViewMode } from '@/lib/interval'
 import { useIsFetching } from '@tanstack/react-query'
 import { addDays, addMonths, addYears, format, isAfter, isSameDay, startOfDay, startOfMonth, startOfYear, subDays, subMonths, subYears } from 'date-fns'
 import { useAtom, useAtomValue } from 'jotai'
@@ -10,7 +11,7 @@ import { useMemo } from 'react'
 
 const DateController = () => {
   const [transactionInfoInterval, setTransactionInfoInterval] = useAtom(transactionInfoIntervalAtom)
-  const activeView = useAtomValue(activeViewAtom)
+  const [activeView, setActiveView] = useAtom(activeViewAtom)
   const dateRange = useAtomValue(dateRangeAtom)
   const transactionInfoIntervalDate = useMemo(() => new Date(transactionInfoInterval), [transactionInfoInterval])
   const { user, updateUser, isLoading } = useAuth()
@@ -37,11 +38,17 @@ const DateController = () => {
         return
     }
 
+    if (activeView === 'today' && !isSameDay(prevDate, new Date())) {
+      setActiveView('day')
+      const interval = getDateIntervalBasedOnActiveViewMode('day', prevDate, dateRange)
+      updateUser({ id: user.id, interval, viewMode: 'day' })
+    }
+
     setTransactionInfoInterval(prevDate.toISOString())
 
     if (user?.id) {
       const interval = getDateIntervalBasedOnActiveViewMode(activeView, prevDate, dateRange)
-      updateUser({ id: user.id, interval })
+      updateUser({ id: user.id, interval, viewMode: activeView })
     }
   }
 
