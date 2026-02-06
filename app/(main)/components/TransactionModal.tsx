@@ -64,12 +64,7 @@ const TransactionModal = () => {
   const [transactionModalState, setTransactionModalState] = useAtom(transactionModalStateAtom)
 
   const queryClient = useQueryClient()
-  const activeView = useAtomValue(activeViewAtom)
-  const [transactionInfoInterval] = useAtom(transactionInfoIntervalAtom)
-  const transactionInfoIntervalDate = useMemo(() => new Date(transactionInfoInterval), [transactionInfoInterval])
   const accountTypeId = useAtomValue(accountTypeAtom)
-
-  const { from, to } = useMemo(() => getDateIntervalBasedOnActiveViewMode(activeView, transactionInfoIntervalDate), [activeView, transactionInfoIntervalDate])
 
   const form = useForm<FormData>({
     resolver: zodResolver(TransactionSchema),
