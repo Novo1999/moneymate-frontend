@@ -8,8 +8,10 @@ import {
   Crown,
   Diamond,
   DollarSign,
+  FolderTree,
   Gamepad2,
   Gift,
+  HandCoins,
   Heart,
   Home,
   Loader,
@@ -17,6 +19,7 @@ import {
   Phone,
   PiggyBank,
   Plus,
+  Settings,
   ShoppingCart,
   Star,
   Target,
@@ -26,7 +29,6 @@ import {
   Wallet,
   Zap,
 } from 'lucide-react'
-
 // Predefined icons to choose from in categories page
 const iconOptions = [
   { name: 'DollarSign', icon: DollarSign },
@@ -83,4 +85,33 @@ const TRANSACTION_CATEGORY_LABEL: Record<string, string> = {
   others_income: 'Others',
 }
 
-export { iconOptions, TRANSACTION_CATEGORY_LABEL }
+const NAVIGATION_ITEMS = [
+  {
+    title: 'Categories',
+    icon: FolderTree,
+    href: '/categories',
+  },
+  {
+    title: 'Accounts',
+    icon: CreditCard,
+    href: '/accounts',
+  },
+  {
+    title: 'Currencies',
+    icon: DollarSign,
+    href: '/currencies',
+  },
+  {
+    title: 'Settings',
+    icon: Settings,
+    href: '/settings',
+  },
+  {
+    title: 'Transactions',
+    icon: HandCoins,
+    href: '/#transactions',
+  },
+]
+
+export { iconOptions, NAVIGATION_ITEMS, TRANSACTION_CATEGORY_LABEL }
+

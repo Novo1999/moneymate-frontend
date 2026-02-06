@@ -1,50 +1,18 @@
 'use client'
 
 import { rightSidebarOpenAtom } from '@/app/layout/store'
+import { NAVIGATION_ITEMS } from '@/app/utils/constants'
 import { cn } from '@/lib/utils'
 import { useSetAtom } from 'jotai'
-import { CreditCard, DollarSign, FolderTree, HandCoins, Settings } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
-const navigationItems = [
-  {
-    title: 'Categories',
-    icon: FolderTree,
-    href: '/categories',
-  },
-  {
-    title: 'Accounts',
-    icon: CreditCard,
-    href: '/accounts',
-  },
-  {
-    title: 'Currencies',
-    icon: DollarSign,
-    href: '/currencies',
-  },
-  {
-    title: 'Settings',
-    icon: Settings,
-    href: '/settings',
-  },
-  {
-    title: 'Transactions',
-    icon: HandCoins,
-    href: '/#transactions',
-  },
-]
-
-interface RightSidebarProps {
-  className?: string
-}
-
-export default function RightSidebar({ className }: RightSidebarProps) {
+export default function RightSidebar({ className }: { className?: string }) {
   const setRightSidebarOpen = useSetAtom(rightSidebarOpenAtom)
 
   const pathname = usePathname()
 
-  const handleClickNavigation = (item: (typeof navigationItems)[number]) => {
+  const handleClickNavigation = (item: (typeof NAVIGATION_ITEMS)[number]) => {
     if (item.title === 'Transactions') return
     setRightSidebarOpen(false)
   }
@@ -55,7 +23,7 @@ export default function RightSidebar({ className }: RightSidebarProps) {
         <div className="mb-4">
           <h3 className="text-sm font-medium text-muted-foreground px-2 mb-2">Navigation</h3>
           <nav className="space-y-1">
-            {navigationItems.map((item) => {
+            {NAVIGATION_ITEMS.map((item) => {
               const Icon = item.icon
               const isActive = pathname === item.href
 
