@@ -2,8 +2,8 @@
 
 import { rightSidebarOpenAtom } from '@/app/layout/store'
 import { cn } from '@/lib/utils'
-import { useAtom, useSetAtom } from 'jotai'
-import { CreditCard, DollarSign, FolderTree, Settings } from 'lucide-react'
+import { useSetAtom } from 'jotai'
+import { CreditCard, DollarSign, FolderTree, HandCoins, Settings } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
@@ -28,6 +28,11 @@ const navigationItems = [
     icon: Settings,
     href: '/settings',
   },
+  {
+    title: 'Transactions',
+    icon: HandCoins,
+    href: '#transactions',
+  },
 ]
 
 interface RightSidebarProps {
@@ -38,6 +43,11 @@ export default function RightSidebar({ className }: RightSidebarProps) {
   const setRightSidebarOpen = useSetAtom(rightSidebarOpenAtom)
 
   const pathname = usePathname()
+
+  const handleClickNavigation = (item: (typeof navigationItems)[number]) => {
+    if (item.title === 'Transactions') return
+    setRightSidebarOpen(false)
+  }
 
   return (
     <div className={cn('w-64 h-full border-l right-0 2xl:right- absolute bg-background flex flex-col', className)}>
@@ -51,12 +61,12 @@ export default function RightSidebar({ className }: RightSidebarProps) {
 
               return (
                 <Link
-                  onClick={() => setRightSidebarOpen(false)}
+                  onClick={() => handleClickNavigation(item)}
                   key={item.title}
                   href={item.href}
                   className={cn(
                     'flex items-center gap-3 rounded-md px-2 py-2 text-sm font-medium transition-colors',
-                    isActive ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                    isActive ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
                   )}
                 >
                   <Icon className="h-4 w-4" />

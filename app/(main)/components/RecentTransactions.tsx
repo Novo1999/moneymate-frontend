@@ -38,7 +38,7 @@ const RecentTransactions = () => {
   }
 
   return (
-    <div className="space-y-3 max-h-96 overflow-auto">
+    <div id='transactions' className="space-y-3 max-h-96 overflow-auto">
       {paginatedTransactions.map((transaction) => (
         <div key={transaction?.id} className="flex items-center justify-between p-4 rounded-xl bg-muted hover:bg-muted/80 transition-colors border border-border">
           <div className="flex-1">

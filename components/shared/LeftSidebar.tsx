@@ -5,6 +5,7 @@ import AccountTypeApiService from '@/app/ApiService/AccountTypeApiService'
 import UserApiService from '@/app/ApiService/UserApiService'
 import { useAuth } from '@/app/hooks/use-auth'
 import { accountTypeAtom } from '@/app/stores/accountType'
+import MoneyMateLogo from '@/assets/moneymate_logo.png'
 import { activeViewAtom, dateRangeAtom } from '@/components/shared/store'
 import { Button } from '@/components/ui/button'
 import { Calendar as CalendarComponent } from '@/components/ui/calendar'
@@ -18,6 +19,7 @@ import { useQuery } from '@tanstack/react-query'
 import { format, isSameDay } from 'date-fns'
 import { useAtom } from 'jotai'
 import { BarChart3, Calendar, CalendarIcon, Clock, Eye, Loader, LucideIcon } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useMemo } from 'react'
 
@@ -170,9 +172,7 @@ export default function LeftSidebar() {
   return (
     <Sidebar>
       <SidebarHeader>
-        <Link href={'/'} className="text-lg font-semibold py-2">
-          Moneymate
-        </Link>
+        <Image src={MoneyMateLogo} alt="moneymate" width={1000} height={1000} />
       </SidebarHeader>
 
       <SidebarContent>

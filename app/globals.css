@@ -48,6 +48,10 @@
   background-image: var(--gradient-custom-green);
 }
 
+* {
+  scroll-behavior: smooth;
+}
+
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);

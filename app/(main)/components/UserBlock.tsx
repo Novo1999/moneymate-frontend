@@ -24,7 +24,7 @@ const UserBlock = () => {
                 <span className="text-md font-bold text-white">{user?.currency}</span>
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-foreground">MoneyMate</h1>
+                <h1 className="text-3xl font-bold text-primary">MoneyMate</h1>
                 <p className="text-muted-foreground mt-1">
                   Welcome back, <span className="font-bold">{user?.name}</span>
                 </p>
