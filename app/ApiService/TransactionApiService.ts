@@ -30,7 +30,7 @@ export default class TransactionApiService {
   }
 
   static async getUserTransactionsPaginated(accountTypeId: number, cursor: number, limit: number, category?: IncomeCategory | ExpenseCategory | '', type?: TransactionType['type'] | "") {
-    let filters: Record<string, unknown> = {}
+    const filters: Record<string, unknown> = {}
 
     if (category) {
       filters.category = category
