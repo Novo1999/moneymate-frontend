@@ -31,7 +31,7 @@ const navigationItems = [
   {
     title: 'Transactions',
     icon: HandCoins,
-    href: '#transactions',
+    href: '/#transactions',
   },
 ]
 
