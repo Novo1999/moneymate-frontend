@@ -60,8 +60,8 @@ const RecentTransactions = () => {
             <Button size="sm" variant={transaction?.type === 'income' ? 'default' : 'destructive'} className="font-semibold capitalize">
               {transaction?.category}
             </Button>
-            <p className={`font-bold text-lg ${Number(transaction?.money) > 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {Number(transaction?.money) > 0 ? '+' : '-'}
+            <p className={`font-bold text-lg ${transaction?.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
+              {transaction?.type === 'income' ? '+' : '-'}
               {user?.currency} {Math.abs(Number(transaction?.money)).toFixed(2)}
             </p>
           </div>
