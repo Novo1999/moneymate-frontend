@@ -29,7 +29,14 @@ export default class TransactionApiService {
     }
   }
 
-  static async getUserTransactionsPaginated(accountTypeId: number, cursor: number, limit: number, category?: IncomeCategory | ExpenseCategory | '', type?: TransactionType['type'] | "") {
+  static async getUserTransactionsPaginated(
+    accountTypeId: number,
+    cursor: number,
+    limit: number,
+    category?: IncomeCategory | ExpenseCategory | '',
+    type?: TransactionType['type'] | '',
+    money?: { min: number; max: number },
+  ) {
     const filters: Record<string, unknown> = {}
 
     if (category) {
@@ -37,6 +44,10 @@ export default class TransactionApiService {
     }
     if (type) {
       filters.type = type
+    }
+    if (money) {
+      filters.minMoney = money?.min
+      filters.maxMoney = money?.max
     }
 
     try {
@@ -61,6 +72,22 @@ export default class TransactionApiService {
       return response.data.data
     } catch (error) {
       handleApiError(error, 'Failed to fetch transaction info')
+    }
+  }
+
+  static async getUserMaxMoneyAmount(accountTypeId: number) {
+    try {
+      const response = await axiosInstance.get<{
+        data: {
+          maxAmount: number
+        }
+      }>(`/transaction/amount-range`, {
+        params: { accountTypeId },
+      })
+
+      return response.data.data
+    } catch (error) {
+      handleApiError(error, 'Failed to fetch max amount')
     }
   }
 

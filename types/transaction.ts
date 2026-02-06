@@ -17,6 +17,7 @@ type TransactionModalState = {
 type TransactionFilter = {
   category?: IncomeCategory | ExpenseCategory | ''
   type?: TransactionType['type'] | ''
+  money?: { min: number; max: number }
 }
 
 export type { TransactionFilter, TransactionModalState, TransactionType }

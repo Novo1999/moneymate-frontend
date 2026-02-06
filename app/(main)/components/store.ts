@@ -9,4 +9,5 @@ export const transactionInfoIntervalAtom = atom(new Date().toISOString())
 export const transactionFiltersAtom = atom<TransactionFilter>({
   category: '',
   type: '',
+  money: { min: 0, max: 0 },
 })

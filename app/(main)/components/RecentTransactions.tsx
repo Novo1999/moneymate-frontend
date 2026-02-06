@@ -1,11 +1,13 @@
 import { transactionFiltersAtom, transactionModalStateAtom } from '@/app/(main)/components/store'
 import TransactionApiService from '@/app/ApiService/TransactionApiService'
 import { useAuth } from '@/app/hooks/use-auth'
-import useInfiniteScroll from '@/app/hooks/useInfiniteScroll'
+import useInfiniteScroll from '@/app/hooks/use-infinite-scroll'
 import { accountTypeAtom } from '@/app/stores/accountType'
 import { TRANSACTION_CATEGORY_LABEL } from '@/app/utils/constants'
 import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
+import getTransactionNotFoundText from '@/lib/transactionNotFound'
 import { TransactionType } from '@/types/transaction'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { format } from 'date-fns'
@@ -18,7 +20,11 @@ const RecentTransactions = () => {
   const transactionFilters = useAtomValue(transactionFiltersAtom)
   const { data, fetchNextPage, hasNextPage, isLoading } = useInfiniteQuery({
     queryKey: ['userTransactionsPaginated', accountTypeId, transactionFilters],
-    queryFn: async ({ pageParam }) => await TransactionApiService.getUserTransactionsPaginated(accountTypeId, pageParam, 10, transactionFilters.category, transactionFilters?.type),
+    queryFn: async ({ pageParam }) =>
+      await TransactionApiService.getUserTransactionsPaginated(accountTypeId, pageParam, 10, transactionFilters.category, transactionFilters?.type, {
+        min: transactionFilters.money?.min || 0,
+        max: transactionFilters.money?.max || 0,
+      }),
     initialPageParam: 0,
     getNextPageParam: (lastPage) => lastPage?.nextCursor,
     enabled: !!accountTypeId,
@@ -39,53 +45,59 @@ const RecentTransactions = () => {
     })
   }
 
-  return isLoading ? (
-    <div className="min-h-96 flex justify-center items-center">
-      <Loader className="animate-spin text-green-500" />
-    </div>
-  ) : (
-    <div id="transactions" className="space-y-3 max-h-96 overflow-auto">
-      {paginatedTransactions.map((transaction) => (
-        <div
-          key={transaction?.id}
-          className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between
+  if (isLoading) {
+    return (
+      <div className="min-h-96 flex justify-center items-center">
+        <Loader className="animate-spin text-green-500" />
+      </div>
+    )
+  } else if (!isLoading && paginatedTransactions.length === 0) {
+    return <Label className="text-primary capitalize underline underline-offset-8 flex justify-center">No Transactions found for {getTransactionNotFoundText(transactionFilters)}</Label>
+  } else {
+    return (
+      <div id="transactions" className="space-y-3 max-h-96 overflow-auto">
+        {paginatedTransactions.map((transaction) => (
+          <div
+            key={transaction?.id}
+            className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between
                p-4 rounded-xl bg-muted hover:bg-muted/80 transition-colors
                border border-border"
-        >
-          {/* Left section */}
-          <div className="flex items-center gap-3 flex-1">
-            <div className="w-10 h-10 bg-gradient-to-br from-gray-400 to-gray-500 rounded-full flex items-center justify-center shrink-0">
-              <span className="text-white font-bold text-sm capitalize">{transaction?.category.charAt(0)}</span>
+          >
+            {/* Left section */}
+            <div className="flex items-center gap-3 flex-1">
+              <div className="w-10 h-10 bg-gradient-to-br from-gray-400 to-gray-500 rounded-full flex items-center justify-center shrink-0">
+                <span className="text-white font-bold text-sm capitalize">{transaction?.category.charAt(0)}</span>
+              </div>
+
+              <div className="min-w-0">
+                <p className="font-semibold text-foreground text-base sm:text-lg capitalize truncate">{transaction?.category}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">{format(new Date(transaction?.createdAt || ''), 'yyyy-MM-dd HH:mm:ss')}</p>
+              </div>
             </div>
 
-            <div className="min-w-0">
-              <p className="font-semibold text-foreground text-base sm:text-lg capitalize truncate">{transaction?.category}</p>
-              <p className="text-xs sm:text-sm text-muted-foreground">{format(new Date(transaction?.createdAt || ''), 'yyyy-MM-dd HH:mm:ss')}</p>
+            {/* Right section */}
+            <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-4 flex-wrap">
+              <div className="flex items-center gap-2">
+                <Button onClick={() => transaction && handleEdit(transaction)} size="sm">
+                  <Pen className="w-4 h-4" />
+                </Button>
+
+                <Button size="sm" variant={transaction?.type === 'income' ? 'default' : 'destructive'} className="font-semibold capitalize text-xs sm:text-sm">
+                  {TRANSACTION_CATEGORY_LABEL?.[transaction?.category || ''] ?? transaction?.category}
+                </Button>
+              </div>
+
+              <p className={`font-bold text-base sm:text-lg whitespace-nowrap ${transaction?.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
+                {transaction?.type === 'income' ? '+' : '-'}
+                {user?.currency} {Math.abs(Number(transaction?.money)).toFixed(2)}
+              </p>
             </div>
           </div>
+        ))}
 
-          {/* Right section */}
-          <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-4 flex-wrap">
-            <div className="flex items-center gap-2">
-              <Button onClick={() => transaction && handleEdit(transaction)} size="sm">
-                <Pen className="w-4 h-4" />
-              </Button>
-
-              <Button size="sm" variant={transaction?.type === 'income' ? 'default' : 'destructive'} className="font-semibold capitalize text-xs sm:text-sm">
-                {TRANSACTION_CATEGORY_LABEL?.[transaction?.category || ''] ?? transaction?.category}
-              </Button>
-            </div>
-
-            <p className={`font-bold text-base sm:text-lg whitespace-nowrap ${transaction?.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
-              {transaction?.type === 'income' ? '+' : '-'}
-              {user?.currency} {Math.abs(Number(transaction?.money)).toFixed(2)}
-            </p>
-          </div>
-        </div>
-      ))}
-
-      <div ref={loadMoreRef} className="min-h-6"></div>
-    </div>
-  )
+        <div ref={loadMoreRef} className="min-h-6"></div>
+      </div>
+    )
+  }
 }
 export default RecentTransactions

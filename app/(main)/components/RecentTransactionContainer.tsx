@@ -1,115 +1,91 @@
 'use client'
+
+import CategoryFilter from '@/app/(main)/components/filter/CategoryFilter'
+import RangeFilter from '@/app/(main)/components/filter/RangeFilter'
+import TypeTabs from '@/app/(main)/components/filter/TypeTabs'
 import RecentTransactions from '@/app/(main)/components/RecentTransactions'
 import { transactionFiltersAtom } from '@/app/(main)/components/store'
 import TransactionApiService from '@/app/ApiService/TransactionApiService'
+import { useDebounce } from '@/app/hooks/use-debounce'
 import { accountTypeAtom } from '@/app/stores/accountType'
-import { TRANSACTION_CATEGORY_LABEL } from '@/app/utils/constants'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, MenubarSub, MenubarSubContent, MenubarSubTrigger, MenubarTrigger } from '@/components/ui/menubar'
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { ExpenseCategory, IncomeCategory } from '@/types/categories'
-import { TransactionType } from '@/types/transaction'
-import { useInfiniteQuery } from '@tanstack/react-query'
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { useAtom, useAtomValue } from 'jotai'
-import { Check, X } from 'lucide-react'
-
-const formatCategoryLabel = (category: string) => {
-  return category
-    .split('_')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ')
-}
+import { useEffect, useMemo, useState } from 'react'
 
 const RecentTransactionContainer = () => {
   const accountTypeId = useAtomValue(accountTypeAtom)
+  const [transactionFilters, setTransactionFilters] = useAtom(transactionFiltersAtom)
+  const [rangeValue, setRangeValue] = useState<[number, number]>([0, 0])
+
+  const debouncedRangeValue = useDebounce(rangeValue, 500)
+
   const { data } = useInfiniteQuery({
     queryKey: ['userTransactionsPaginated', accountTypeId],
-    queryFn: async ({ pageParam }) => await TransactionApiService.getUserTransactionsPaginated(accountTypeId, pageParam, 10),
+    queryFn: ({ pageParam }) => TransactionApiService.getUserTransactionsPaginated(accountTypeId, pageParam, 10),
     initialPageParam: 0,
     getNextPageParam: (lastPage) => lastPage?.nextCursor,
     enabled: !!accountTypeId,
   })
 
-  const [transactionFilters, setTransactionFilters] = useAtom(transactionFiltersAtom)
+  const { data: maxRangeData, isLoading: isLoadingMax } = useQuery({
+    queryKey: ['transactions', 'max-amount', accountTypeId],
+    queryFn: () => TransactionApiService.getUserMaxMoneyAmount(accountTypeId),
+    enabled: !!accountTypeId,
+  })
 
-  const handleCategorySelect = (category: IncomeCategory | ExpenseCategory) => {
+  const maxValue = useMemo(() => maxRangeData?.maxAmount || 10000, [maxRangeData])
+
+  useEffect(() => {
+    setRangeValue([0, maxValue])
+  }, [maxValue])
+
+  useEffect(() => {
     setTransactionFilters({
-      category,
+      ...transactionFilters,
+      money: {
+        min: debouncedRangeValue[0],
+        max: debouncedRangeValue[1],
+      },
     })
-  }
-
-  const handleClearCategory = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    e.preventDefault()
-    setTransactionFilters({ category: '' })
-  }
-
-  const handleTypeChange = (value: string) => {
-    if (value === '' || value === 'income' || value === 'expense') {
-      setTransactionFilters({
-        ...transactionFilters,
-        type: value as TransactionType['type'] | '',
-      })
-    }
-  }
+  }, [debouncedRangeValue])
 
   return (
     <Card className="shadow-lg max-w-7xl mt-8">
-      <div className="flex justify-between items-center">
-        <CardHeader className="pb-4 w-full">
-          <CardTitle className="text-lg sm:text-2xl text-primary">Recent Transactions ({data?.pages?.[0]?.count})</CardTitle>
-        </CardHeader>
-        <div className="pr-6 flex items-center gap-3">
-          <Tabs defaultValue="" value={transactionFilters.type || ''} onValueChange={handleTypeChange}>
-            <TabsList>
-              <TabsTrigger value="">All</TabsTrigger>
-              <TabsTrigger value="income">Income</TabsTrigger>
-              <TabsTrigger value="expense">Expense</TabsTrigger>
-            </TabsList>
-          </Tabs>
-          <Menubar>
-            <MenubarMenu>
-              <MenubarTrigger className="capitalize truncate">
-                {transactionFilters.category && <span>Category : </span>} {TRANSACTION_CATEGORY_LABEL?.[transactionFilters?.category || ''] || 'Category'}
-              </MenubarTrigger>
-              <MenubarContent>
-                <MenubarSub>
-                  <MenubarSubTrigger>Income</MenubarSubTrigger>
-                  <MenubarSubContent>
-                    {Object.values(IncomeCategory).map((category) => (
-                      <MenubarItem key={category} onClick={() => handleCategorySelect(category)} className="flex items-center justify-between">
-                        {formatCategoryLabel(category)}
-                        {transactionFilters.category === category && <Check className="h-4 w-4 ml-2" />}
-                      </MenubarItem>
-                    ))}
-                  </MenubarSubContent>
-                </MenubarSub>
-                <MenubarSeparator />
-                <MenubarSub>
-                  <MenubarSubTrigger>Expense</MenubarSubTrigger>
-                  <MenubarSubContent>
-                    {Object.values(ExpenseCategory).map((category) => (
-                      <MenubarItem key={category} onClick={() => handleCategorySelect(category)} className="flex items-center justify-between">
-                        {formatCategoryLabel(category)}
-                        {transactionFilters.category === category && <Check className="h-4 w-4 ml-2" />}
-                      </MenubarItem>
-                    ))}
-                  </MenubarSubContent>
-                </MenubarSub>
-              </MenubarContent>
-            </MenubarMenu>
-          </Menubar>
-          {transactionFilters.category && (
-            <button onClick={handleClearCategory} className="hover:bg-primary hover:text-white rounded-full p-1 transition-colors" aria-label="Clear category filter">
-              <X size={20} />
-            </button>
-          )}
-        </div>
+      <CardHeader className="pb-4">
+        <CardTitle className="text-lg sm:text-2xl text-primary">Recent Transactions ({data?.pages?.[0]?.count})</CardTitle>
+      </CardHeader>
+
+      <div className="px-6 flex items-center gap-3 w-full max-w-xl flex-wrap sm:flex-nowrap">
+        <RangeFilter value={rangeValue} max={maxValue} isLoading={isLoadingMax} onChange={setRangeValue} />
+
+        <TypeTabs
+          value={transactionFilters.type || ''}
+          onChange={(type) =>
+            setTransactionFilters({
+              ...transactionFilters,
+              type,
+            })
+          }
+        />
+
+        <CategoryFilter
+          value={transactionFilters.category || ''}
+          onChange={(category) =>
+            setTransactionFilters({
+              ...transactionFilters,
+              category,
+            })
+          }
+          onClear={() => setTransactionFilters({ category: '' })}
+        />
       </div>
+
       <CardContent className="pt-0">
         <RecentTransactions />
       </CardContent>
     </Card>
   )
 }
+
 export default RecentTransactionContainer
