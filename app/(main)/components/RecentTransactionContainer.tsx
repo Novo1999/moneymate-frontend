@@ -22,7 +22,7 @@ const formatCategoryLabel = (category: string) => {
 
 const RecentTransactionContainer = () => {
   const accountTypeId = useAtomValue(accountTypeAtom)
-  const { data, isLoading } = useInfiniteQuery({
+  const { data } = useInfiniteQuery({
     queryKey: ['userTransactionsPaginated', accountTypeId],
     queryFn: async ({ pageParam }) => await TransactionApiService.getUserTransactionsPaginated(accountTypeId, pageParam, 10),
     initialPageParam: 0,

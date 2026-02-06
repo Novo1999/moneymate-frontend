@@ -7,7 +7,6 @@ import TransactionApiService from '@/app/ApiService/TransactionApiService'
 import { useAuth } from '@/app/hooks/use-auth'
 import { accountTypeAtom } from '@/app/stores/accountType'
 import { getCurrentMonthFirstAndLastDate } from '@/app/utils/date'
-import RechartsDonutChart from '@/components/shared/RechartsDonutChart'
 import { activeViewAtom, dateRangeAtom } from '@/components/shared/store'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -17,7 +16,16 @@ import { useQuery } from '@tanstack/react-query'
 import { isSameDay } from 'date-fns'
 import { useAtomValue } from 'jotai'
 import { Loader } from 'lucide-react'
+import dynamic from 'next/dynamic'
 import { useMemo } from 'react'
+
+const DynamicChart = dynamic(() => import('@/components/shared/RechartsDonutChart'), {
+  ssr: false,
+  loading({ isLoading, error }) {
+    if (isLoading) return <Loader className="animate-spin" />
+    if (error) return <p className="text-red-500">Failed to load chart</p>
+  },
+})
 
 const ExpenseOverview = () => {
   const { user, isAuthInitialized } = useAuth()
@@ -81,7 +89,7 @@ const ExpenseOverview = () => {
           <CardContent className="pt-0 px-0">
             <DateController />
             <div className="flex flex-col lg:flex-row min-h-[70vh] justify-center items-center gap-8">
-              {transactionInfoLoading ? <Loader className="text-green-500 animate-spin" /> : transactionInfo && <RechartsDonutChart data={transactionInfo?.transactions} />}
+              {transactionInfoLoading ? <Loader className="text-green-500 animate-spin" /> : transactionInfo && <DynamicChart data={transactionInfo?.transactions} />}
             </div>
           </CardContent>
         </Card>
