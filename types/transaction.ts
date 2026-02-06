@@ -14,5 +14,9 @@ type TransactionModalState = {
   data: Partial<TransactionType>
 }
 
-export type { TransactionModalState, TransactionType }
+type TransactionFilter = {
+  category?: IncomeCategory | ExpenseCategory | ''
+  type?: TransactionType['type'] | ''
+}
 
+export type { TransactionFilter, TransactionModalState, TransactionType }

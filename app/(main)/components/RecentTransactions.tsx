@@ -1,4 +1,4 @@
-import { transactionModalStateAtom } from '@/app/(main)/components/store'
+import { transactionFiltersAtom, transactionModalStateAtom } from '@/app/(main)/components/store'
 import TransactionApiService from '@/app/ApiService/TransactionApiService'
 import { useAuth } from '@/app/hooks/use-auth'
 import useInfiniteScroll from '@/app/hooks/useInfiniteScroll'
@@ -10,14 +10,15 @@ import { TransactionType } from '@/types/transaction'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { format } from 'date-fns'
 import { useAtomValue, useSetAtom } from 'jotai'
-import { Pen } from 'lucide-react'
+import { Loader, Pen } from 'lucide-react'
 
 const RecentTransactions = () => {
   const { user, isAuthInitialized } = useAuth()
   const accountTypeId = useAtomValue(accountTypeAtom)
-  const { data, fetchNextPage, hasNextPage } = useInfiniteQuery({
-    queryKey: ['userTransactionsPaginated', accountTypeId],
-    queryFn: async ({ pageParam }) => await TransactionApiService.getUserTransactionsPaginated(accountTypeId, pageParam, 10),
+  const transactionFilters = useAtomValue(transactionFiltersAtom)
+  const { data, fetchNextPage, hasNextPage, isLoading } = useInfiniteQuery({
+    queryKey: ['userTransactionsPaginated', accountTypeId, transactionFilters],
+    queryFn: async ({ pageParam }) => await TransactionApiService.getUserTransactionsPaginated(accountTypeId, pageParam, 10, transactionFilters.category, transactionFilters?.type),
     initialPageParam: 0,
     getNextPageParam: (lastPage) => lastPage?.nextCursor,
     enabled: !!accountTypeId,
@@ -38,7 +39,11 @@ const RecentTransactions = () => {
     })
   }
 
-  return (
+  return isLoading ? (
+    <div className="min-h-96 flex justify-center items-center">
+      <Loader className="animate-spin text-green-500" />
+    </div>
+  ) : (
     <div id="transactions" className="space-y-3 max-h-96 overflow-auto">
       {paginatedTransactions.map((transaction) => (
         <div
@@ -67,7 +72,7 @@ const RecentTransactions = () => {
               </Button>
 
               <Button size="sm" variant={transaction?.type === 'income' ? 'default' : 'destructive'} className="font-semibold capitalize text-xs sm:text-sm">
-                {TRANSACTION_CATEGORY_LABEL?.[transaction?.category || ""] ?? transaction?.category}
+                {TRANSACTION_CATEGORY_LABEL?.[transaction?.category || ''] ?? transaction?.category}
               </Button>
             </div>
 

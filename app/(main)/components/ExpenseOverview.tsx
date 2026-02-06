@@ -76,7 +76,7 @@ const ExpenseOverview = () => {
       <div className="lg:col-span-2">
         <Card className="shadow-lg">
           <CardHeader className="pb-4">
-            <CardTitle className="text-2xl">Expense Overview</CardTitle>
+            <CardTitle className="text-2xl text-primary">Expense Overview</CardTitle>
           </CardHeader>
           <CardContent className="pt-0 px-0">
             <DateController />

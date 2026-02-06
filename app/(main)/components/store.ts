@@ -1,4 +1,4 @@
-import { TransactionModalState } from '@/types/transaction'
+import { TransactionFilter, TransactionModalState } from '@/types/transaction'
 import { atom } from 'jotai'
 
 export const transactionModalStateAtom = atom<TransactionModalState>({
@@ -6,3 +6,7 @@ export const transactionModalStateAtom = atom<TransactionModalState>({
   data: {},
 })
 export const transactionInfoIntervalAtom = atom(new Date().toISOString())
+export const transactionFiltersAtom = atom<TransactionFilter>({
+  category: '',
+  type: '',
+})

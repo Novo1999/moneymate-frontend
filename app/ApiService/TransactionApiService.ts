@@ -1,7 +1,9 @@
 import { DataResponse } from '@/app/dto/DataResponse'
 import { handleApiError } from '@/lib/api'
 import axiosInstance from '@/lib/axios'
+import { ExpenseCategory, IncomeCategory } from '@/types/categories'
 import { TransactionResponse, TransactionResponsePaginated } from '@/types/response'
+import { TransactionType } from '@/types/transaction'
 import { toast } from 'sonner'
 
 export default class TransactionApiService {
@@ -27,10 +29,19 @@ export default class TransactionApiService {
     }
   }
 
-  static async getUserTransactionsPaginated(accountTypeId: number, cursor: number, limit: number) {
+  static async getUserTransactionsPaginated(accountTypeId: number, cursor: number, limit: number, category?: IncomeCategory | ExpenseCategory | '', type?: TransactionType['type'] | "") {
+    let filters: Record<string, unknown> = {}
+
+    if (category) {
+      filters.category = category
+    }
+    if (type) {
+      filters.type = type
+    }
+
     try {
       const response = await axiosInstance.get<DataResponse<TransactionResponsePaginated>>('/transaction/paginated', {
-        params: { accountTypeId, limit, ...(cursor ? { cursor } : {}) },
+        params: { accountTypeId, limit, ...filters, ...(cursor ? { cursor } : {}) },
       })
 
       return response.data.data
