@@ -55,4 +55,32 @@ const iconOptions = [
   { name: 'Diamond', icon: Diamond },
 ]
 
-export { iconOptions }
+const TRANSACTION_CATEGORY_LABEL: Record<string, string> = {
+  // Expense
+  food_drinks: 'Food & Drinks',
+  shopping: 'Shopping',
+  housing: 'Housing',
+  transportation: 'Transportation',
+  vehicle: 'Vehicle',
+  life_entertainment: 'Life & Entertainment',
+  communication_pc: 'Communication & PC',
+  financial_expenses: 'Financial Expenses',
+  investments: 'Investments',
+  others_expense: 'Others',
+  transfer: 'Transfer',
+
+  // Income
+  salary: 'Salary',
+  awards: 'Awards',
+  grants: 'Grants',
+  sale: 'Sale',
+  rental: 'Rental',
+  refunds: 'Refunds',
+  coupon: 'Coupon',
+  lottery: 'Lottery',
+  gifts: 'Gifts',
+  interests: 'Interests',
+  others_income: 'Others',
+}
+
+export { iconOptions, TRANSACTION_CATEGORY_LABEL }

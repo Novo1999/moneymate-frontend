@@ -172,7 +172,9 @@ export default function LeftSidebar() {
   return (
     <Sidebar>
       <SidebarHeader>
-        <Image src={MoneyMateLogo} alt="moneymate" width={1000} height={1000} />
+        <Link href="/">
+          <Image src={MoneyMateLogo} alt="moneymate" width={1000} height={1000} />
+        </Link>
       </SidebarHeader>
 
       <SidebarContent>
