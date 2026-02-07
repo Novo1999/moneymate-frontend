@@ -58,7 +58,6 @@ export const expenseCategoryIcons: Record<ExpenseCategory, string> = {
 
 // Helper function to get icon name by category
 export const getCategoryIcon = (category: IncomeCategory | ExpenseCategory, type?: 'income' | 'expense'): string => {
-  console.log("🚀 ~ getCategoryIcon ~ category:", category)
   if (type === 'income') {
     return incomeCategoryIcons[category as IncomeCategory] || 'HelpCircle'
   } else if (type === 'expense') {
