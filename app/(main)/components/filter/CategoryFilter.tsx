@@ -27,6 +27,8 @@ const CategoryFilter = ({ value, onChange, onClear }: Props) => {
   const filteredIncomeCategories = categories?.filter((cat) => cat.type === 'income') || []
   const filteredExpenseCategories = categories?.filter((cat) => cat.type === 'expense') || []
 
+  const mergedCategories = [...filteredIncomeCategories, ...filteredExpenseCategories]
+
   return (
     <div className="flex items-center gap-1">
       <Menubar>
@@ -35,7 +37,7 @@ const CategoryFilter = ({ value, onChange, onClear }: Props) => {
             {value ? (
               <>
                 <CategoryIcon iconName={getCategoryIcon(value as IncomeCategory | ExpenseCategory)} />
-                <span>Category : {TRANSACTION_CATEGORY_LABEL[value]}</span>
+                <span>Category : {TRANSACTION_CATEGORY_LABEL[value] || mergedCategories.find((category) => category.name === value)?.name}</span>
               </>
             ) : (
               'Category'
@@ -56,7 +58,7 @@ const CategoryFilter = ({ value, onChange, onClear }: Props) => {
                   </MenubarItem>
                 ))}
                 {isCategoriesLoading ? (
-                  <Skeleton className='min-h-5 bg-primary' />
+                  <Skeleton className="min-h-5 bg-primary" />
                 ) : (
                   filteredIncomeCategories?.map((category) => (
                     <MenubarItem key={category.id} onClick={() => onChange(category.name)} className="flex items-center justify-between gap-3">
@@ -87,7 +89,7 @@ const CategoryFilter = ({ value, onChange, onClear }: Props) => {
                 ))}
 
                 {isCategoriesLoading ? (
-                  <Skeleton className='min-h-5 bg-primary' />
+                  <Skeleton className="min-h-5 bg-primary" />
                 ) : (
                   filteredExpenseCategories?.map((category) => (
                     <MenubarItem key={category.id} onClick={() => onChange(category.name)} className="flex items-center justify-between gap-3">

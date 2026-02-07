@@ -10,7 +10,7 @@ type Props = {
 
 const RangeFilter = ({ value, max, isLoading, onChange }: Props) => {
   return (
-    <div className="flex w-full max-w-md flex-col gap-2">
+    <div className="flex w-full max-w-md flex-col gap-2 min-w-xs">
       <div className="flex items-center justify-between">
         <Label>Range</Label>
         <span className="text-muted-foreground text-sm">
