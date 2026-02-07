@@ -45,7 +45,7 @@ const CustomCategoryItem = ({ category, type }: CustomCategoryItemProp) => {
     },
   })
 
-  const operationsDisabled = editCategoryMutation?.isPending || deleteCategoryMutation?.isPending
+  const operationsDisabled = editCategoryMutation.isPending || deleteCategoryMutation.isPending
 
   const handleEditCategory = (id?: number | undefined, type?: CategoryDto['type'] | undefined) => !operationsDisabled && inputVal && editCategoryMutation.mutateAsync({ id, type })
   const handleDeleteCategory = () => !operationsDisabled && deleteCategoryMutation.mutateAsync()
@@ -64,7 +64,7 @@ const CustomCategoryItem = ({ category, type }: CustomCategoryItemProp) => {
         <Badge
           variant={operationsDisabled ? 'disabled' : 'outline'}
           onClick={() => handleEditCategory(category.id, type === 'income' ? 'expense' : 'income')}
-          className={cn('hover:bg-white text-black gap-2', isEditing === category.id ? 'flex' : 'flex lg:hidden lg:group-hover:flex')}
+          className={cn('gap-2', isEditing === category.id ? 'flex' : 'flex lg:hidden lg:group-hover:flex')}
         >
           {type === 'expense' ? <ArrowLeft className="rotate-90 lg:rotate-0" /> : <ArrowRight className="rotate-90 lg:rotate-0" />}
         </Badge>
@@ -78,11 +78,11 @@ const CustomCategoryItem = ({ category, type }: CustomCategoryItemProp) => {
   return (
     <div
       key={category.id}
-      className="flex items-center flex-wrap gap-2 justify-between p-3 group *:transition-all *:duration-300 bg-white border rounded-lg hover:shadow-md transition-shadow cursor-pointer"
+      className="flex items-center flex-wrap gap-2 justify-between p-3 group *:transition-all *:duration-300 border rounded-lg hover:shadow-md transition-shadow cursor-pointer"
     >
       <div className="flex gap-2 items-center">
         <CategoryIcon iconName={category.icon} />
-        <span className="font-medium text-gray-700">{category.name}</span>
+        <span className="font-medium">{category.name}</span>
       </div>
       <div className="flex gap-2">
         {isEditing !== category.id && (

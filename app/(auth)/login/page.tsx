@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { cn } from '@/lib/utils'
 import { ApiErrorResponse } from '@/types/error'
 import { AxiosError } from 'axios'
 import Link from 'next/link'
@@ -37,7 +38,7 @@ export default function LoginPage() {
   const loginError = form.formState.errors.root?.message
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-emerald-100 px-4">
+    <div className={cn('min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-emerald-100 px-4')}>
       <Card className="w-full max-w-md shadow-xl">
         <CardContent className="p-10">
           <div className="text-center mb-10">

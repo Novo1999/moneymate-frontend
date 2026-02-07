@@ -94,8 +94,8 @@ const CategoryList = ({ categoryType, shouldScrollRef }: CategoryListProp) => {
       <CardContent ref={scrollContainerRef} className="p-6 max-h-[50vh] overflow-y-scroll">
         <div className="space-y-3">
           {Object.values(categoryType === 'income' ? IncomeCategory : ExpenseCategory).map((category) => (
-            <div key={category} className="flex items-center justify-between p-3 bg-white border rounded-lg hover:shadow-md transition-shadow cursor-pointer">
-              <span className="font-medium text-gray-700">{formatCategoryName(category)}</span>
+            <div key={category} className="flex items-center justify-between p-3 border rounded-lg hover:shadow-md transition-shadow cursor-pointer">
+              <span className="font-medium">{formatCategoryName(category)}</span>
               <Badge variant="secondary" className={cn('capitalize', color.badge[categoryType])}>
                 {categoryType}
               </Badge>
