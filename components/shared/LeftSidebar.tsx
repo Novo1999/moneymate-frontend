@@ -6,6 +6,7 @@ import UserApiService from '@/app/ApiService/UserApiService'
 import { useAuth } from '@/app/hooks/use-auth'
 import { accountTypeAtom } from '@/app/stores/accountType'
 import MoneyMateLogo from '@/assets/moneymate_logo.png'
+import Brand from '@/components/shared/Brand'
 import { activeViewAtom, dateRangeAtom } from '@/components/shared/store'
 import { Button } from '@/components/ui/button'
 import { Calendar as CalendarComponent } from '@/components/ui/calendar'
@@ -172,9 +173,7 @@ export default function LeftSidebar() {
   return (
     <Sidebar>
       <SidebarHeader>
-        <Link href="/">
-          <Image src={MoneyMateLogo} alt="moneymate" width={1000} height={1000} />
-        </Link>
+        <Brand />
       </SidebarHeader>
 
       <SidebarContent>
