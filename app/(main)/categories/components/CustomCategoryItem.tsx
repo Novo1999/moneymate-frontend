@@ -1,4 +1,5 @@
-import { isEditingAtom } from '@/app/(main)/categories/store/categoryAtoms'
+import CategoryIcon from '@/app/(main)/categories/components/CategoryIcon'
+import { categoryNameAtom, isEditingAtom, isModalOpenAtom, modalTypeAtom, selectedIconAtom } from '@/app/(main)/categories/store/categoryAtoms'
 import CategoryApiService from '@/app/ApiService/CategoryApiService'
 import { CategoryDto } from '@/app/dto/CategoryDto'
 import { Badge } from '@/components/ui/badge'
@@ -8,7 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useAtom } from 'jotai'
+import { useAtom, useSetAtom } from 'jotai'
 import { ArrowLeft, ArrowRight, Pen, Trash, X } from 'lucide-react'
 import { useState } from 'react'
 
@@ -22,6 +23,10 @@ const CustomCategoryItem = ({ category, type }: CustomCategoryItemProp) => {
   const [inputVal, setInputVal] = useState(category.name)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const queryClient = useQueryClient()
+  const setIsModalOpen = useSetAtom(isModalOpenAtom)
+  const setCategoryName = useSetAtom(categoryNameAtom)
+  const setSelectedIcon = useSetAtom(selectedIconAtom)
+  const setModalType = useSetAtom(modalTypeAtom)
 
   const editCategoryMutation = useMutation({
     mutationFn: ({ id, type }: { type?: CategoryDto['type'] | undefined; id?: number | undefined }) => CategoryApiService.editCategory(isEditing || id || 0, { name: inputVal, ...(type && { type }) }),
@@ -46,6 +51,14 @@ const CustomCategoryItem = ({ category, type }: CustomCategoryItemProp) => {
   const handleEditCategory = (id?: number | undefined, type?: CategoryDto['type'] | undefined) => !operationsDisabled && inputVal && editCategoryMutation.mutateAsync({ id, type })
   const handleDeleteCategory = () => !operationsDisabled && deleteCategoryMutation.mutateAsync()
 
+  const handleEditOpen = (category: CategoryDto) => {
+    setIsModalOpen(true)
+    setIsEditing(category.id || 0)
+    setCategoryName(category.name)
+    setSelectedIcon(category.icon)
+    setModalType(category.type)
+  }
+
   const categoryMover = (
     <Tooltip>
       <TooltipTrigger asChild>
@@ -58,7 +71,7 @@ const CustomCategoryItem = ({ category, type }: CustomCategoryItemProp) => {
         </Badge>
       </TooltipTrigger>
       <TooltipContent>
-        <p className='capitalize'>Move to {type === 'income' ? 'expense' : 'income'}</p>
+        <p className="capitalize">Move to {type === 'income' ? 'expense' : 'income'}</p>
       </TooltipContent>
     </Tooltip>
   )
@@ -68,19 +81,22 @@ const CustomCategoryItem = ({ category, type }: CustomCategoryItemProp) => {
       key={category.id}
       className="flex items-center flex-wrap gap-2 justify-between p-3 group *:transition-all *:duration-300 bg-white border rounded-lg hover:shadow-md transition-shadow cursor-pointer"
     >
-      {isEditing === category.id ? (
-        <Input
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') handleEditCategory()
-          }}
-          value={inputVal}
-          className="mr-4"
-          onChange={(e) => setInputVal(e.target.value)}
-          autoFocus
-        />
-      ) : (
-        <span className="font-medium text-gray-700">{category.name}</span>
-      )}
+      <div className="flex gap-2 items-center">
+        <CategoryIcon iconName={category.icon} />
+        {isEditing === category.id ? (
+          <Input
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') handleEditCategory()
+            }}
+            value={inputVal}
+            className="mr-4"
+            onChange={(e) => setInputVal(e.target.value)}
+            autoFocus
+          />
+        ) : (
+          <span className="font-medium text-gray-700">{category.name}</span>
+        )}
+      </div>
       <div className="flex gap-2">
         {isEditing !== category.id && (
           <Badge variant="secondary" className={cn('capitalize lg:group-hover:hidden', type === 'income' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800')}>
@@ -89,7 +105,7 @@ const CustomCategoryItem = ({ category, type }: CustomCategoryItemProp) => {
         )}
         {type === 'expense' && categoryMover}
         <Badge
-          onClick={() => !operationsDisabled && setIsEditing((prev) => (prev === category.id ? 0 : category.id || 0))}
+          onClick={() => !operationsDisabled && handleEditOpen(category)}
           variant={operationsDisabled ? 'disabled' : 'secondary'}
           className={cn('bg-green-100 hover:bg-green-200 text-green-800 gap-2', isEditing === category.id ? 'flex' : 'flex lg:hidden lg:group-hover:flex')}
         >

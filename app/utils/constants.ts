@@ -57,6 +57,95 @@ const iconOptions = [
   { name: 'Diamond', icon: Diamond },
 ]
 
+const FINANCE_ICONS = [
+  // Money & Payments
+  'Wallet',
+  'CreditCard',
+  'Banknote',
+  'DollarSign',
+  'Coins',
+  'PiggyBank',
+  'Landmark', // Bank building
+
+  // Income Categories
+  'Briefcase', // Salary/Job
+  'TrendingUp', // Investment gains
+  'Gift', // Bonus/Gift
+  'Trophy', // Awards/Prizes
+  'Sparkles', // Extra income
+
+  // Expense Categories - Essential
+  'Home', // Rent/Mortgage
+  'Zap', // Utilities
+  'Wifi', // Internet
+  'Smartphone', // Phone bill
+  'Droplet', // Water bill
+  'Flame', // Gas/Heating
+
+  // Expense Categories - Food & Drink
+  'UtensilsCrossed', // Dining out
+  'ShoppingCart', // Groceries
+  'Coffee', // Coffee/Cafe
+  'Pizza', // Fast food
+  'Beer', // Alcohol
+
+  // Expense Categories - Transportation
+  'Car', // Car expenses
+  'Fuel', // Gas/Fuel
+  'Bus', // Public transport
+  'Plane', // Travel/Flights
+  'Train', // Train
+  'Bike', // Bicycle
+
+  // Expense Categories - Shopping
+  'ShoppingBag', // General shopping
+  'Shirt', // Clothing
+  'Gem', // Jewelry/Luxury
+  'Package', // Online shopping
+
+  // Expense Categories - Entertainment
+  'Film', // Movies
+  'Music', // Music/Concerts
+  'Gamepad2', // Gaming
+  'Tv', // Streaming services
+  'Ticket', // Events/Shows
+  'Book', // Books
+
+  // Expense Categories - Health & Fitness
+  'Heart', // Healthcare
+  'Pill', // Pharmacy/Medicine
+  'Dumbbell', // Gym/Fitness
+  'Activity', // Sports
+  'Stethoscope', // Medical
+
+  // Expense Categories - Personal
+  'Scissors', // Haircut/Grooming
+  'Sparkles', // Beauty/Spa
+  'Users', // Family expenses
+  'Baby', // Childcare
+  'Dog', // Pets
+  'GraduationCap', // Education
+
+  // Savings & Goals
+  'Target', // Financial goals
+  'TrendingUp', // Investments
+  'LineChart', // Stocks
+  'Shield', // Insurance
+  'Umbrella', // Emergency fund
+
+  // Bills & Subscriptions
+  'Receipt', // Bills
+  'Calendar', // Recurring payments
+  'Bell', // Reminders
+  'FileText', // Documents
+
+  // Miscellaneous
+  'Settings', // Other/Settings
+  'MoreHorizontal', // Miscellaneous
+  'HelpCircle', // Unknown/Default
+  'CircleDollarSign', // General finance
+] as const
+
 const TRANSACTION_CATEGORY_LABEL: Record<string, string> = {
   // Expense
   food_drinks: 'Food & Drinks',
@@ -113,5 +202,5 @@ const NAVIGATION_ITEMS = [
   },
 ]
 
-export { iconOptions, NAVIGATION_ITEMS, TRANSACTION_CATEGORY_LABEL }
+export { FINANCE_ICONS, iconOptions, NAVIGATION_ITEMS, TRANSACTION_CATEGORY_LABEL }
 
