@@ -5,7 +5,6 @@ import { CategoryDto } from '@/app/dto/CategoryDto'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -83,19 +82,7 @@ const CustomCategoryItem = ({ category, type }: CustomCategoryItemProp) => {
     >
       <div className="flex gap-2 items-center">
         <CategoryIcon iconName={category.icon} />
-        {isEditing === category.id ? (
-          <Input
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') handleEditCategory()
-            }}
-            value={inputVal}
-            className="mr-4"
-            onChange={(e) => setInputVal(e.target.value)}
-            autoFocus
-          />
-        ) : (
-          <span className="font-medium text-gray-700">{category.name}</span>
-        )}
+        <span className="font-medium text-gray-700">{category.name}</span>
       </div>
       <div className="flex gap-2">
         {isEditing !== category.id && (
@@ -109,8 +96,8 @@ const CustomCategoryItem = ({ category, type }: CustomCategoryItemProp) => {
           variant={operationsDisabled ? 'disabled' : 'secondary'}
           className={cn('bg-green-100 hover:bg-green-200 text-green-800 gap-2', isEditing === category.id ? 'flex' : 'flex lg:hidden lg:group-hover:flex')}
         >
-          {isEditing === category.id ? <X /> : <Pen />}
-          {isEditing === category.id ? 'Close' : 'Edit'}
+          <Pen />
+          Edit
         </Badge>
         <Badge
           onClick={() => setShowDeleteModal(true)}

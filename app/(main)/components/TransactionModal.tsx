@@ -160,8 +160,6 @@ const TransactionModal = () => {
     return categories
   }
 
-  console.log(getCategoryOptions())
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     form.handleSubmit(onSubmit)(e)
