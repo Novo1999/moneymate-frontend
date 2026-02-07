@@ -3,7 +3,6 @@ import { LucideIcon } from 'lucide-react'
 import { lazy, LazyExoticComponent, Suspense, useMemo } from 'react'
 
 const iconCache: Record<string, LazyExoticComponent<LucideIcon>> = {}
-console.log("🚀 ~ iconCache:", iconCache)
 
 const CategoryIcon = ({ iconName, className }: { iconName: string; className?: string }) => {
   const Icon = useMemo(() => {

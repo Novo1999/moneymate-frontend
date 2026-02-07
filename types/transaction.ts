@@ -15,7 +15,7 @@ type TransactionModalState = {
 }
 
 type TransactionFilter = {
-  category?: IncomeCategory | ExpenseCategory | ''
+  category?: IncomeCategory | ExpenseCategory | string
   type?: TransactionType['type'] | ''
   money?: { min: number; max: number }
 }

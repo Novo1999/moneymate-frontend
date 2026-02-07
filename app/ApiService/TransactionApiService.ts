@@ -33,7 +33,7 @@ export default class TransactionApiService {
     accountTypeId: number,
     cursor: number,
     limit: number,
-    category?: IncomeCategory | ExpenseCategory | '',
+    category?: IncomeCategory | ExpenseCategory | string,
     type?: TransactionType['type'] | '',
     money?: { min: number; max: number },
   ) {

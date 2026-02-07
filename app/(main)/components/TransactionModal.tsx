@@ -1,4 +1,6 @@
+import CategoryIcon from '@/app/(main)/categories/components/CategoryIcon'
 import { transactionModalStateAtom } from '@/app/(main)/components/store'
+import CategoryApiService from '@/app/ApiService/CategoryApiService'
 import TransactionApiService from '@/app/ApiService/TransactionApiService'
 import { useAuth } from '@/app/hooks/use-auth'
 import { accountTypeAtom } from '@/app/stores/accountType'
@@ -14,45 +16,15 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
+import { ExpenseCategory, getCategoryIcon, IncomeCategory } from '@/types/categories'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { format } from 'date-fns'
 import { useAtom, useAtomValue } from 'jotai'
 import { Calendar as CalendarIcon, Plus } from 'lucide-react'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
-
-const ExpenseCategory = {
-  FOOD_DRINKS: 'food_drinks',
-  SHOPPING: 'shopping',
-  HOUSING: 'housing',
-  TRANSPORTATION: 'transportation',
-  VEHICLE: 'vehicle',
-  LIFE_ENTERTAINMENT: 'life_entertainment',
-  COMMUNICATION_PC: 'communication_pc',
-  FINANCIAL_EXPENSES: 'financial_expenses',
-  INVESTMENTS: 'investments',
-  OTHERS_EXPENSE: 'others_expense',
-  TRANSFER: 'transfer_income',
-} as const
-
-const IncomeCategory = {
-  SALARY: 'salary',
-  AWARDS: 'awards',
-  GRANTS: 'grants',
-  SALE: 'sale',
-  RENTAL: 'rental',
-  REFUNDS: 'refunds',
-  COUPON: 'coupon',
-  LOTTERY: 'lottery',
-  GIFTS: 'gifts',
-  INTERESTS: 'interests',
-  OTHERS_INCOME: 'others_income',
-  TRANSFER: 'transfer',
-} as const
-
-export { ExpenseCategory, IncomeCategory }
 
 type FormData = z.infer<typeof TransactionSchema>
 
@@ -63,7 +35,12 @@ const TransactionModal = () => {
 
   const queryClient = useQueryClient()
   const accountTypeId = useAtomValue(accountTypeAtom)
-
+  const { data: categories, isLoading: isCategoriesLoading } = useQuery({
+    queryKey: ['categories'],
+    queryFn: () => CategoryApiService.getAllCategories(),
+  })
+  const filteredIncomeCategories = categories?.filter((cat) => cat.type === 'income') || []
+  const filteredExpenseCategories = categories?.filter((cat) => cat.type === 'expense') || []
   const form = useForm<FormData>({
     resolver: zodResolver(TransactionSchema),
     defaultValues: {
@@ -97,6 +74,7 @@ const TransactionModal = () => {
   }, [addTransactionCategory, form])
 
   const watchedType = form.watch('type')
+  const watchedCategory = form.watch('category')
 
   const addTransactionMutation = useMutation({
     mutationFn: (data: Parameters<typeof TransactionApiService.addTransaction>[0]) => TransactionApiService.addTransaction(data),
@@ -145,25 +123,44 @@ const TransactionModal = () => {
   }
 
   const getCategoryOptions = () => {
+    let categories: { label: string; value: string; icon?: string }[] = []
     if (watchedType === 'income') {
-      return Object.entries(IncomeCategory).map(([key, value]) => ({
+      categories = Object.entries(IncomeCategory).map(([key, value]) => ({
         label: key
           .replace(/_/g, ' ')
           .toLowerCase()
           .replace(/\b\w/g, (l) => l.toUpperCase()),
         value,
       }))
+      categories = [
+        ...categories,
+        ...filteredIncomeCategories?.map((category) => ({
+          label: category.name,
+          value: category.name,
+          icon: category.icon,
+        })),
+      ]
     } else if (watchedType === 'expense') {
-      return Object.entries(ExpenseCategory).map(([key, value]) => ({
+      categories = Object.entries(ExpenseCategory).map(([key, value]) => ({
         label: key
           .replace(/_/g, ' ')
           .toLowerCase()
           .replace(/\b\w/g, (l) => l.toUpperCase()),
         value,
       }))
+      categories = [
+        ...categories,
+        ...filteredExpenseCategories?.map((category) => ({
+          label: category.name,
+          value: category.name,
+          icon: category.icon,
+        })),
+      ]
     }
-    return []
+    return categories
   }
+
+  console.log(getCategoryOptions())
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -236,7 +233,7 @@ const TransactionModal = () => {
                     <RadioGroup
                       onValueChange={(value) => {
                         field.onChange(value)
-                        form.setValue('category', '') // Reset category when type changes
+                        form.setValue('category', '')
                       }}
                       value={field.value}
                       className="flex flex-row space-x-4"
@@ -267,13 +264,28 @@ const TransactionModal = () => {
                   <Select onValueChange={field.onChange} value={field.value} disabled={!watchedType}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder={watchedType ? `Select ${watchedType} category` : 'Select transaction type first'} />
+                        <SelectValue placeholder={watchedType ? `Select ${watchedType} category` : 'Select transaction type first'}>
+                          {field.value && (
+                            <div className="flex items-center gap-2">
+                              <CategoryIcon
+                                iconName={
+                                  [...filteredIncomeCategories, ...filteredExpenseCategories].find((category) => field.value === category.name)?.icon ||
+                                  getCategoryIcon(field.value as IncomeCategory | ExpenseCategory)
+                                }
+                              />
+                              <span>{getCategoryOptions().find((opt) => opt.value === field.value)?.label}</span>
+                            </div>
+                          )}
+                        </SelectValue>
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
                       {getCategoryOptions().map((option) => (
                         <SelectItem key={option.value} value={option.value}>
-                          {option.label}
+                          <div className="flex items-center gap-2">
+                            <CategoryIcon iconName={option.icon || getCategoryIcon(option.value as IncomeCategory | ExpenseCategory)} />
+                            <span>{option.label}</span>
+                          </div>
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -300,7 +312,7 @@ const TransactionModal = () => {
                       </FormControl>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus />
+                      <Calendar mode="single" selected={field.value} onSelect={field.onChange} />
                     </PopoverContent>
                   </Popover>
                   <FormMessage />
