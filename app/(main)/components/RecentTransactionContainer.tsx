@@ -56,7 +56,7 @@ const RecentTransactionContainer = () => {
         <CardTitle className="text-lg sm:text-2xl text-primary">Recent Transactions ({data?.pages?.[0]?.count})</CardTitle>
       </CardHeader>
 
-      <div className="px-6 flex items-center gap-3 w-full max-w-xl flex-wrap sm:flex-nowrap">
+      <div className="px-6 flex items-center gap-3 w-full max-w-2xl flex-wrap sm:flex-nowrap">
         <RangeFilter value={rangeValue} max={maxValue} isLoading={isLoadingMax} onChange={setRangeValue} />
 
         <TypeTabs

@@ -1,4 +1,4 @@
-import CategoryItem from '@/app/(main)/categories/components/CategoryItem'
+import CustomCategoryItem from '@/app/(main)/categories/components/CustomCategoryItem'
 import { categoryNameAtom, isModalOpenAtom, modalTypeAtom, selectedIconAtom } from '@/app/(main)/categories/store/categoryAtoms'
 import CategoryApiService from '@/app/ApiService/CategoryApiService'
 import { Badge } from '@/components/ui/badge'
@@ -68,25 +68,6 @@ const CategoryList = ({ categoryType, shouldScrollRef }: CategoryListProp) => {
     setSelectedIcon('DollarSign')
   }
 
-  const color = {
-    button: {
-      income: 'bg-green-600 hover:bg-green-700 text-white',
-      expense: 'bg-red-600 hover:bg-red-700 text-white',
-    },
-    shade: {
-      income: 'bg-green-50',
-      expense: 'bg-red-50',
-    },
-    badge: {
-      income: 'bg-green-100 text-green-800',
-      expense: 'bg-red-100 text-red-800',
-    },
-    text: {
-      income: 'text-green-800',
-      expense: 'text-red-800',
-    },
-  }
-
   return isCategoriesLoading ? (
     <div className="flex justify-center items-center min-h-[50vh]">
       <Loader className="animate-spin text-green-500" />
@@ -128,7 +109,7 @@ const CategoryList = ({ categoryType, shouldScrollRef }: CategoryListProp) => {
             </legend>
             <div className="flex flex-col gap-4">
               {filteredCategories?.map((cat) => (
-                <CategoryItem type={cat.type} category={cat} key={cat.id} />
+                <CustomCategoryItem type={cat.type} category={cat} key={cat.id} />
               ))}
             </div>
             <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-green-500/10 to-transparent backdrop-blur-sm rounded-b-sm"></div>
@@ -139,3 +120,22 @@ const CategoryList = ({ categoryType, shouldScrollRef }: CategoryListProp) => {
   )
 }
 export default CategoryList
+
+const color = {
+  button: {
+    income: 'bg-green-600 hover:bg-green-700 text-white',
+    expense: 'bg-red-600 hover:bg-red-700 text-white',
+  },
+  shade: {
+    income: 'bg-green-50',
+    expense: 'bg-red-50',
+  },
+  badge: {
+    income: 'bg-green-100 text-green-800',
+    expense: 'bg-red-100 text-red-800',
+  },
+  text: {
+    income: 'text-green-800',
+    expense: 'text-red-800',
+  },
+}

@@ -12,12 +12,12 @@ import { useAtom } from 'jotai'
 import { ArrowLeft, ArrowRight, Pen, Trash, X } from 'lucide-react'
 import { useState } from 'react'
 
-type CategoryItemProp = {
+type CustomCategoryItemProp = {
   category: CategoryDto
   type: 'income' | 'expense'
 }
 
-const CategoryItem = ({ category, type }: CategoryItemProp) => {
+const CustomCategoryItem = ({ category, type }: CustomCategoryItemProp) => {
   const [isEditing, setIsEditing] = useAtom(isEditingAtom)
   const [inputVal, setInputVal] = useState(category.name)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
@@ -127,4 +127,4 @@ const CategoryItem = ({ category, type }: CategoryItemProp) => {
   )
 }
 
-export default CategoryItem
+export default CustomCategoryItem
