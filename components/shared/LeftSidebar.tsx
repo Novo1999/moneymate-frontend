@@ -5,7 +5,6 @@ import AccountTypeApiService from '@/app/ApiService/AccountTypeApiService'
 import UserApiService from '@/app/ApiService/UserApiService'
 import { useAuth } from '@/app/hooks/use-auth'
 import { accountTypeAtom } from '@/app/stores/accountType'
-import MoneyMateLogo from '@/assets/moneymate_logo.png'
 import Brand from '@/components/shared/Brand'
 import { activeViewAtom, dateRangeAtom } from '@/components/shared/store'
 import { Button } from '@/components/ui/button'
@@ -19,19 +18,23 @@ import { ActiveViewModes } from '@/types/activeViewMode'
 import { useQuery } from '@tanstack/react-query'
 import { format, isSameDay } from 'date-fns'
 import { useAtom } from 'jotai'
-import { BarChart3, Calendar, CalendarIcon, Clock, Eye, Loader, LucideIcon } from 'lucide-react'
-import Image from 'next/image'
-import Link from 'next/link'
+import { BarChart3, Calendar, CalendarIcon, Clock, InfinityIcon, Loader, LucideIcon } from 'lucide-react'
 import { useEffect, useMemo } from 'react'
 
-const viewModes: Array<{ value: ActiveViewModes; label: string; icon: LucideIcon }> = [
+import { CalendarClock, CalendarDays, CalendarRange } from 'lucide-react'
+
+const viewModes: Array<{
+  value: ActiveViewModes
+  label: string
+  icon: LucideIcon
+}> = [
   { value: 'today', label: 'Today', icon: Clock },
-  { value: 'day', label: 'Day', icon: Clock },
-  { value: 'week', label: 'Week', icon: Calendar },
-  { value: 'month', label: 'Month', icon: BarChart3 },
-  { value: 'year', label: 'Year', icon: Eye },
-  { value: 'all', label: 'All Time', icon: BarChart3 },
-  { value: 'custom', label: 'Custom Range', icon: CalendarIcon },
+  { value: 'day', label: 'Day', icon: Calendar },
+  { value: 'week', label: 'Week', icon: CalendarDays },
+  { value: 'month', label: 'Month', icon: CalendarRange },
+  { value: 'year', label: 'Year', icon: CalendarClock },
+  { value: 'all', label: 'All Time', icon: InfinityIcon },
+  { value: 'custom', label: 'Custom Range', icon: BarChart3 },
 ]
 
 export default function LeftSidebar() {
