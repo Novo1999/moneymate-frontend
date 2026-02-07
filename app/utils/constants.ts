@@ -198,7 +198,7 @@ const NAVIGATION_ITEMS = [
   {
     title: 'Transactions',
     icon: HandCoins,
-    href: '/#transactions',
+    href: '/',
   },
 ]
 

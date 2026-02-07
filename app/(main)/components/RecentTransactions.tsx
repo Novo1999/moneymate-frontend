@@ -55,7 +55,7 @@ const RecentTransactions = () => {
     return <Label className="text-primary capitalize underline underline-offset-8 flex justify-center">No Transactions found for {getTransactionNotFoundText(transactionFilters)}</Label>
   } else {
     return (
-      <div id="transactions" className="space-y-3 max-h-96 overflow-auto">
+      <div className="space-y-3 max-h-96 overflow-auto">
         {paginatedTransactions.map((transaction) => (
           <div
             key={transaction?.id}

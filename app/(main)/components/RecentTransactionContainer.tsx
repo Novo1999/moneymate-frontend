@@ -51,7 +51,7 @@ const RecentTransactionContainer = () => {
   }, [debouncedRangeValue])
 
   return (
-    <Card className="shadow-lg max-w-7xl mt-8">
+    <Card id="transactions" className="shadow-lg max-w-7xl mt-8">
       <CardHeader className="pb-4">
         <CardTitle className="text-lg sm:text-2xl text-primary">Recent Transactions ({data?.pages?.[0]?.count})</CardTitle>
       </CardHeader>
