@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Calendar as CalendarComponent } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar'
+import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar'
 import { Skeleton } from '@/components/ui/skeleton'
 import { getDateIntervalBasedOnActiveViewMode } from '@/lib/interval'
 import { ActiveViewModes } from '@/types/activeViewMode'
@@ -44,6 +44,7 @@ export default function LeftSidebar() {
   const [transactionInfoInterval, setTransactionInfoInterval] = useAtom(transactionInfoIntervalAtom)
   const transactionInfoIntervalDate = useMemo(() => new Date(transactionInfoInterval), [transactionInfoInterval])
   const { user, isLoading, updateUser } = useAuth()
+  const { setOpenMobile, isMobile } = useSidebar()
 
   const {
     data: accountTypes,
@@ -103,6 +104,8 @@ export default function LeftSidebar() {
     if (mode !== 'custom') {
       setDateRange(undefined)
     }
+    if (!isMobile) return
+    setOpenMobile(false)
   }
 
   const handleChangeAccountType = async (val: number) => {
@@ -110,6 +113,8 @@ export default function LeftSidebar() {
     if (user?.id) {
       await UserApiService.editUser(user?.id, { activeAccountTypeId: Number(val) })
       updateUser({ activeAccountTypeId: val })
+      if (!isMobile) return
+      setOpenMobile(false)
     }
   }
 

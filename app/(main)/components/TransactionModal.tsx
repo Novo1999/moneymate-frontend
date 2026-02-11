@@ -318,7 +318,7 @@ const TransactionModal = () => {
               )}
             />
 
-            <DialogFooter>
+            <DialogFooter className='flex flex-col gap-4'>
               <Button
                 type="button"
                 variant="outline"
@@ -331,7 +331,7 @@ const TransactionModal = () => {
               >
                 Cancel
               </Button>
-              <Button type="submit" onClick={handleSubmit} disabled={addTransactionMutation.isPending} className="bg-green-500 hover:bg-green-600">
+              <Button type="submit" onClick={handleSubmit} disabled={addTransactionMutation.isPending} className="bg-green-500 hover:bg-green-600 w-full sm:w-fit">
                 {getSubmitButtonText()}
               </Button>
             </DialogFooter>
