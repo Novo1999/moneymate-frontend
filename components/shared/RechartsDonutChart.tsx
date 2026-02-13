@@ -214,7 +214,7 @@ export default function RechartsDonutChart({ data, width, height }: RechartsDonu
 
   const chartData = useMemo(() => {
     const expenseData = data.filter((item) => item.type === 'expense')
-    const categoryTotals = expenseData.reduce(
+    let categoryTotals = expenseData.reduce(
       (acc, item) => {
         const category = item.category
         const money = parseFloat(item.money)
@@ -229,6 +229,20 @@ export default function RechartsDonutChart({ data, width, height }: RechartsDonu
       },
       {} as Record<string, number>,
     )
+
+    const notIncludedCategories = Object.values(ExpenseCategory).reduce(
+      (acc, value) => {
+        if (!(value in categoryTotals)) {
+          acc[value] = 0
+        }
+        return acc
+      },
+      {} as Record<ExpenseCategory, number>,
+    )
+    categoryTotals = {
+      ...categoryTotals,
+      ...notIncludedCategories,
+    }
 
     const colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#FF6384', '#C9CBCF', '#4BC0C0', '#FF6384', '#36A2EB']
 
@@ -248,7 +262,8 @@ export default function RechartsDonutChart({ data, width, height }: RechartsDonu
 
   const total = useMemo(() => data.filter((item) => item.type === 'expense').reduce((sum, item) => sum + parseFloat(item.money), 0), [data])
 
-  const memoizedPie = useMemo(() => <PieChartComponent chartData={chartData} responsive={responsiveConfig} />, [chartData, responsiveConfig])
+  const nonZeroCategories = chartData.filter((d) => d.money > 0)
+  const memoizedPie = useMemo(() => <PieChartComponent chartData={nonZeroCategories} responsive={responsiveConfig} />, [nonZeroCategories, responsiveConfig])
 
   if (!data || data.length === 0) {
     return (
@@ -262,11 +277,13 @@ export default function RechartsDonutChart({ data, width, height }: RechartsDonu
   }
 
   const hoveredCategory = chartData?.find((cd) => cd.category === categoryKey)
+  const zeroCategories = chartData.filter((d) => d.money === 0)
 
   return (
     <div className="w-full flex flex-col items-center justify-center min-h-[50vh]">
-      <div className="relative w-full max-w-4xl">
-        {memoizedPie}
+      <div className="relative w-full max-w-4xl mt-12">
+        <div className='relative z-10'>{memoizedPie}</div>
+        <ZeroWrapper zeroCategories={zeroCategories} />
         {/* Enhanced Center content - Mobile Responsive */}
         <div className="absolute inset-0 z-0 flex flex-col items-center justify-center pointer-events-none">
           <div className="text-center rounded-2xl bg-transparent px-2 sm:px-4">
@@ -308,6 +325,7 @@ const PieChartComponent = ({
     <ResponsiveContainer width="100%" height={responsive.height}>
       <PieChart style={{ outline: 'none' }}>
         <Pie
+          isAnimationActive={false}
           data={chartData}
           cx="50%"
           cy="50%"
@@ -338,5 +356,89 @@ const PieChartComponent = ({
         </Pie>
       </PieChart>
     </ResponsiveContainer>
+  )
+}
+
+const ZeroWrapper = ({
+  zeroCategories,
+}: {
+  zeroCategories: {
+    id: number
+    category: string
+    money: number
+    color: string
+    type: string
+    percentage: string
+  }[]
+}) => {
+  return (
+    <div className="absolute inset-0 flex flex-col justify-between z-0">
+      {/* Top row */}
+      <div className="flex justify-between px-10">{zeroCategories.slice(0, 5).map(CategoryItem)}</div>
+
+      {/* Middle row */}
+      <div className="flex justify-between px-4">
+        <div className="flex flex-col gap-4">{zeroCategories.slice(5, 7).map(CategoryItem)}</div>
+
+        <div className="flex flex-col gap-4">{zeroCategories.slice(7, 9).map(CategoryItem)}</div>
+      </div>
+
+      {/* Bottom row */}
+      <div className="flex justify-between px-10">{zeroCategories.slice(9).map(CategoryItem)}</div>
+    </div>
+  )
+}
+const formatCategory = (value: string) =>
+  value
+    .split('_')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
+
+const CategoryItem = (cat: { id: number; category: string; money: number; color: string; type: string; percentage: string }) => {
+  const Icon = categoryIconMap[cat.category as ExpenseCategory]
+  const [_, setAddTransactionAtomCategory] = useAtom(addTransactionCategoryAtom)
+
+  return (
+    <div onClick={() => setAddTransactionAtomCategory(cat.category)} key={cat.category} className="flex flex-col items-center cursor-pointer">
+      <div className="relative flex items-center justify-center">
+        {/* Outer colored border */}
+        <div
+          className="absolute rounded-full"
+          style={{
+            width: 52,
+            height: 52,
+            border: `4px solid ${cat.color}`,
+          }}
+        />
+
+        {/* Inner white gap */}
+        <div
+          className="absolute rounded-full bg-white"
+          style={{
+            width: 44,
+            height: 44,
+          }}
+        />
+
+        {/* Main colored circle */}
+        <div
+          className="relative rounded-full flex items-center justify-center shadow"
+          style={{
+            width: 40,
+            height: 40,
+            backgroundColor: cat.color,
+          }}
+        >
+          <Icon size={18} className="text-white" />
+        </div>
+      </div>
+
+      <div className="text-xs mt-2 font-semibold" style={{ color: cat.color }}>
+        0.0%
+      </div>
+      <div className="text-xs mt-2 font-semibold" style={{ color: cat.color }}>
+        {formatCategory(cat.category)}
+      </div>
+    </div>
   )
 }
