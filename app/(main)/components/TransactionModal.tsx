@@ -213,7 +213,7 @@ const TransactionModal = () => {
                 <FormItem>
                   <FormLabel>Amount</FormLabel>
                   <FormControl>
-                    <Input defaultValue={Number(field.value)} type="number" step="0.01" min="0" placeholder="Enter amount" onChange={(e) => field.onChange(Number(e.target.value))} />
+                    <Input defaultValue={field.value ? Number(field.value) : 0} type="number" step="0.01" min="0" placeholder="Enter amount" onChange={(e) => field.onChange(Number(e.target.value))} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -318,7 +318,7 @@ const TransactionModal = () => {
               )}
             />
 
-            <DialogFooter className='flex flex-col gap-4'>
+            <DialogFooter className="flex flex-col gap-4">
               <Button
                 type="button"
                 variant="outline"

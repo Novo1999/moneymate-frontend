@@ -88,7 +88,7 @@ const CustomLabel = ({
   const iconGlowRadius = isMobile ? 26 : isTablet ? 29 : 32
 
   return (
-    <g onClick={() => setAddTransactionAtomCategory(categoryKey)} onMouseEnter={() => setCategoryKey(categoryKey)} onMouseLeave={() => setCategoryKey('')}>
+    <g onClick={() => setAddTransactionAtomCategory(categoryKey)} onMouseEnter={() => setCategoryKey(categoryKey)} style={{ pointerEvents: 'auto' }} onMouseLeave={() => setCategoryKey('')}>
       <polyline
         points={`${lineStartX},${lineStartY} ${lineMidX},${lineMidY} ${iconX},${iconY}`}
         stroke={color}
@@ -213,6 +213,7 @@ export default function RechartsDonutChart({ data, width, height }: RechartsDonu
   const responsiveConfig = useMemo(() => responsive(), [responsive])
 
   const chartData = useMemo(() => {
+    if (!data || data.length === 0) return []
     const expenseData = data.filter((item) => item.type === 'expense')
     let categoryTotals = expenseData.reduce(
       (acc, item) => {
@@ -260,29 +261,31 @@ export default function RechartsDonutChart({ data, width, height }: RechartsDonu
     }))
   }, [data])
 
-  const total = useMemo(() => data.filter((item) => item.type === 'expense').reduce((sum, item) => sum + parseFloat(item.money), 0), [data])
+  const total = useMemo(() => (data ?? []).filter((item) => item.type === 'expense').reduce((sum, item) => sum + parseFloat(item.money), 0), [data])
 
   const nonZeroCategories = chartData.filter((d) => d.money > 0)
   const memoizedPie = useMemo(() => <PieChartComponent chartData={nonZeroCategories} responsive={responsiveConfig} />, [nonZeroCategories, responsiveConfig])
 
-  if (!data || data.length === 0) {
-    return (
-      <div className="flex items-center justify-center h-64 sm:h-80 md:h-96 text-gray-500 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border mx-4">
-        <div className="text-center px-4">
-          <div className="text-lg sm:text-xl font-semibold">No expense data</div>
-          <div className="text-sm">Add some expenses to see the chart</div>
-        </div>
-      </div>
-    )
-  }
-
   const hoveredCategory = chartData?.find((cd) => cd.category === categoryKey)
-  const zeroCategories = chartData.filter((d) => d.money === 0)
+  const zeroCategories =
+    !data || data.length === 0
+      ? Object.values(ExpenseCategory).map((cat, index) => {
+          const colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#FF6384', '#C9CBCF', '#4BC0C0', '#FF6384', '#36A2EB']
+          return {
+            id: index,
+            category: cat,
+            money: 0,
+            color: colors[index % colors.length],
+            type: 'expense',
+            percentage: '0.0',
+          }
+        })
+      : chartData.filter((d) => d.money === 0)
 
   return (
     <div className="w-full flex flex-col items-center justify-center min-h-[50vh]">
       <div className="relative w-full max-w-4xl mt-12">
-        <div className='relative z-10'>{memoizedPie}</div>
+        <div className="relative z-10 pointer-events-none">{memoizedPie}</div>
         <ZeroWrapper zeroCategories={zeroCategories} />
         {/* Enhanced Center content - Mobile Responsive */}
         <div className="absolute inset-0 z-0 flex flex-col items-center justify-center pointer-events-none">
@@ -350,6 +353,7 @@ const PieChartComponent = ({
                 filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.1))',
                 cursor: 'pointer',
                 outline: 'none',
+                pointerEvents: 'auto',
               }}
             />
           ))}
@@ -371,20 +375,37 @@ const ZeroWrapper = ({
     percentage: string
   }[]
 }) => {
+  const [_, setAddTransactionAtomCategory] = useAtom(addTransactionCategoryAtom)
   return (
     <div className="absolute inset-0 flex flex-col justify-between z-0">
       {/* Top row */}
-      <div className="flex justify-between px-10">{zeroCategories.slice(0, 5).map(CategoryItem)}</div>
+      <div className="flex justify-between px-10">
+        {zeroCategories.slice(0, 5).map((cat) => (
+          <CategoryItem onCategoryClick={setAddTransactionAtomCategory} key={cat.category} {...cat} />
+        ))}
+      </div>
 
       {/* Middle row */}
       <div className="flex justify-between px-4">
-        <div className="flex flex-col gap-4">{zeroCategories.slice(5, 7).map(CategoryItem)}</div>
+        <div className="flex flex-col gap-4">
+          {zeroCategories.slice(5, 7).map((cat) => (
+            <CategoryItem onCategoryClick={setAddTransactionAtomCategory} key={cat.category} {...cat} />
+          ))}
+        </div>
 
-        <div className="flex flex-col gap-4">{zeroCategories.slice(7, 9).map(CategoryItem)}</div>
+        <div className="flex flex-col gap-4">
+          {zeroCategories.slice(9).map((cat) => (
+            <CategoryItem onCategoryClick={setAddTransactionAtomCategory} key={cat.category} {...cat} />
+          ))}
+        </div>
       </div>
 
       {/* Bottom row */}
-      <div className="flex justify-between px-10">{zeroCategories.slice(9).map(CategoryItem)}</div>
+      <div className="flex justify-between px-10">
+        {zeroCategories.slice(9).map((cat) => (
+          <CategoryItem onCategoryClick={setAddTransactionAtomCategory} key={cat.category} {...cat} />
+        ))}
+      </div>
     </div>
   )
 }
@@ -394,12 +415,23 @@ const formatCategory = (value: string) =>
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ')
 
-const CategoryItem = (cat: { id: number; category: string; money: number; color: string; type: string; percentage: string }) => {
-  const Icon = categoryIconMap[cat.category as ExpenseCategory]
-  const [_, setAddTransactionAtomCategory] = useAtom(addTransactionCategoryAtom)
+const CategoryItem = ({
+  category,
+  color,
+  onCategoryClick,
+}: {
+  id: number
+  category: string
+  money: number
+  color: string
+  type: string
+  percentage: string
+  onCategoryClick: (category: string) => void
+}) => {
+  const Icon = categoryIconMap[category as ExpenseCategory]
 
   return (
-    <div onClick={() => setAddTransactionAtomCategory(cat.category)} key={cat.category} className="flex flex-col items-center cursor-pointer">
+    <div onClick={() => onCategoryClick(category)} key={category} className="flex flex-col items-center cursor-pointer">
       <div className="relative flex items-center justify-center">
         {/* Outer colored border */}
         <div
@@ -407,7 +439,7 @@ const CategoryItem = (cat: { id: number; category: string; money: number; color:
           style={{
             width: 52,
             height: 52,
-            border: `4px solid ${cat.color}`,
+            border: `4px solid ${color}`,
           }}
         />
 
@@ -426,18 +458,18 @@ const CategoryItem = (cat: { id: number; category: string; money: number; color:
           style={{
             width: 40,
             height: 40,
-            backgroundColor: cat.color,
+            backgroundColor: color,
           }}
         >
           <Icon size={18} className="text-white" />
         </div>
       </div>
 
-      <div className="text-xs mt-2 font-semibold" style={{ color: cat.color }}>
+      <div className="text-xs mt-2 font-semibold" style={{ color: color }}>
         0.0%
       </div>
-      <div className="text-xs mt-2 font-semibold" style={{ color: cat.color }}>
-        {formatCategory(cat.category)}
+      <div className="text-xs mt-2 font-semibold" style={{ color: color }}>
+        {formatCategory(category)}
       </div>
     </div>
   )
