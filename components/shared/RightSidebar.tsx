@@ -1,12 +1,17 @@
 'use client'
 
+import { rightSidebarOpenAtom } from '@/app/layout/store'
 import { NAVIGATION_ITEMS } from '@/app/utils/constants'
+import { useIsMobile } from '@/hooks/use-mobile'
 import { cn } from '@/lib/utils'
+import { useSetAtom } from 'jotai'
 import { usePathname, useRouter } from 'next/navigation'
 
 export default function RightSidebar({ className }: { className?: string }) {
   const pathname = usePathname()
   const router = useRouter()
+  const isMobile = useIsMobile()
+  const setRightSidebarOpen = useSetAtom(rightSidebarOpenAtom)
 
   const handleClickNavigation = async (item: (typeof NAVIGATION_ITEMS)[number]) => {
     if (item.title === 'Transactions') {
@@ -30,6 +35,9 @@ export default function RightSidebar({ className }: { className?: string }) {
       }
     } else {
       router.push(item.href)
+    }
+    if (isMobile) {
+      setRightSidebarOpen(false)
     }
   }
 
