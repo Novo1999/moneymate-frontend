@@ -181,7 +181,7 @@ export default function LeftSidebar() {
   return (
     <Sidebar>
       <SidebarHeader>
-        <Brand />
+        <Brand setOpenMobile={setOpenMobile} />
       </SidebarHeader>
 
       <SidebarContent>
