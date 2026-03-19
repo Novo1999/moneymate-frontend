@@ -5,11 +5,12 @@ import { CategoryDto } from '@/app/dto/CategoryDto'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
+import { useDraggable } from '@dnd-kit/core'
+import { CSS } from '@dnd-kit/utilities'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAtom, useSetAtom } from 'jotai'
-import { ArrowLeft, ArrowRight, Pen, Trash, X } from 'lucide-react'
+import { GripVertical, Pen, Trash } from 'lucide-react'
 import { useState } from 'react'
 
 type CustomCategoryItemProp = {
@@ -27,8 +28,22 @@ const CustomCategoryItem = ({ category, type }: CustomCategoryItemProp) => {
   const setSelectedIcon = useSetAtom(selectedIconAtom)
   const setModalType = useSetAtom(modalTypeAtom)
 
+  // Register this item as draggable; id must match category.id so CategoryPage can identify it on drop
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+    id: category.id!,
+  })
+
+  const style = {
+    // Translate the element while dragging (DragOverlay handles the ghost separately)
+    transform: CSS.Translate.toString(transform),
+    // Hide the original item while the DragOverlay ghost is visible
+    opacity: isDragging ? 0 : 1,
+    transition: isDragging ? undefined : 'opacity 200ms ease',
+  }
+
   const editCategoryMutation = useMutation({
-    mutationFn: ({ id, type }: { type?: CategoryDto['type'] | undefined; id?: number | undefined }) => CategoryApiService.editCategory(isEditing || id || 0, { name: inputVal, ...(type && { type }) }),
+    mutationFn: ({ id, type }: { type?: CategoryDto['type'] | undefined; id?: number | undefined }) =>
+      CategoryApiService.editCategory(isEditing || id || 0, { name: inputVal, ...(type && { type }) }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['categories'] })
       setIsEditing(0)
@@ -47,7 +62,6 @@ const CustomCategoryItem = ({ category, type }: CustomCategoryItemProp) => {
 
   const operationsDisabled = editCategoryMutation.isPending || deleteCategoryMutation.isPending
 
-  const handleEditCategory = (id?: number | undefined, type?: CategoryDto['type'] | undefined) => !operationsDisabled && inputVal && editCategoryMutation.mutateAsync({ id, type })
   const handleDeleteCategory = () => !operationsDisabled && deleteCategoryMutation.mutateAsync()
 
   const handleEditOpen = (category: CategoryDto) => {
@@ -58,63 +72,68 @@ const CustomCategoryItem = ({ category, type }: CustomCategoryItemProp) => {
     setModalType(category.type)
   }
 
-  const categoryMover = (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <Badge
-          variant={operationsDisabled ? 'disabled' : 'outline'}
-          onClick={() => handleEditCategory(category.id, type === 'income' ? 'expense' : 'income')}
-          className={cn('gap-2', isEditing === category.id ? 'flex' : 'flex lg:hidden lg:group-hover:flex')}
-        >
-          {type === 'expense' ? <ArrowLeft className="rotate-90 lg:rotate-0" /> : <ArrowRight className="rotate-90 lg:rotate-0" />}
-        </Badge>
-      </TooltipTrigger>
-      <TooltipContent>
-        <p className="capitalize">Move to {type === 'income' ? 'expense' : 'income'}</p>
-      </TooltipContent>
-    </Tooltip>
-  )
-
   return (
     <div
+      ref={setNodeRef}
+      style={style}
       key={category.id}
-      className="flex items-center flex-wrap gap-2 justify-between p-3 group *:transition-all *:duration-300 border rounded-lg hover:shadow-md transition-shadow cursor-pointer"
+      className="flex items-center flex-wrap gap-2 justify-between p-3 group *:transition-all *:duration-300 border rounded-lg hover:shadow-md transition-shadow"
     >
       <div className="flex gap-2 items-center">
+        {/* Drag handle — only this element triggers the drag, so clicks on Edit/Delete still work */}
+        <button
+          {...listeners}
+          {...attributes}
+          className={cn(
+            'cursor-grab active:cursor-grabbing p-1 rounded text-gray-400 hover:text-gray-600 hover:bg-gray-100 touch-none',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1',
+            type === 'income' ? 'focus-visible:ring-green-500' : 'focus-visible:ring-red-500'
+          )}
+          aria-label="Drag to move category"
+        >
+          <GripVertical className="h-4 w-4" />
+        </button>
+
         <CategoryIcon iconName={category.icon} />
         <span className="font-medium">{category.name}</span>
       </div>
+
       <div className="flex gap-2">
         {isEditing !== category.id && (
-          <Badge variant="secondary" className={cn('capitalize lg:group-hover:hidden', type === 'income' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800')}>
+          <Badge
+            variant="secondary"
+            className={cn('capitalize lg:group-hover:hidden', type === 'income' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800')}
+          >
             {type}
           </Badge>
         )}
-        {type === 'expense' && categoryMover}
+
         <Badge
           onClick={() => !operationsDisabled && handleEditOpen(category)}
           variant={operationsDisabled ? 'disabled' : 'secondary'}
-          className={cn('bg-green-100 hover:bg-green-200 text-green-800 gap-2', isEditing === category.id ? 'flex' : 'flex lg:hidden lg:group-hover:flex')}
+          className={cn('bg-green-100 hover:bg-green-200 text-green-800 gap-2', isEditing === category.id ? 'flex' : 'flex lg:hidden lg:group-hover:flex', "cursor-pointer")}
         >
           <Pen />
           Edit
         </Badge>
+
         <Badge
           onClick={() => setShowDeleteModal(true)}
           variant={operationsDisabled ? 'disabled' : 'destructive'}
-          className={cn('hover:bg-red-700 gap-2', isEditing === category.id ? 'flex' : 'flex lg:hidden lg:group-hover:flex')}
+          className={cn('hover:bg-red-700 gap-2', isEditing === category.id ? 'flex' : 'flex lg:hidden lg:group-hover:flex', "cursor-pointer")}
         >
           <Trash />
           Delete
         </Badge>
-        {type === 'income' && categoryMover}
       </div>
 
       <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Delete Category</DialogTitle>
-            <DialogDescription>Are you sure you want to delete {category.name}? This action cannot be undone.</DialogDescription>
+            <DialogDescription>
+              Are you sure you want to delete {category.name}? This action cannot be undone.
+            </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowDeleteModal(false)}>
