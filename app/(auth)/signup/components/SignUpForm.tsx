@@ -17,6 +17,8 @@ export function SignUpForm() {
   const { registerAsync, loginAsync, updateUser, isRegistering, isLoggingIn } = useAuth()
   const form = useFormContext<DynamicPageForm>()
 
+  const { isPending } = updateUser
+
   const onSubmit = async (data: DynamicPageForm) => {
     if (data.pageType !== 'signup') return
 
@@ -38,7 +40,7 @@ export function SignUpForm() {
         balance: 0,
       })
 
-      updateUser({
+      updateUser.mutate({
         id: loginResponse?.id,
         currency: data.currency,
         activeAccountTypeId: addUserAccountResponse?.data?.id,
@@ -55,7 +57,7 @@ export function SignUpForm() {
     }
   }
 
-  const isLoading = isRegistering || isLoggingIn
+  const isLoading = isRegistering || isLoggingIn || isPending
   const rootError = form.formState.errors.root?.message
 
   return (

@@ -50,7 +50,7 @@ export default function SettingsPage() {
         firstDayOfMonth,
       }
       await UserApiService.editUser(user?.id, updateData)
-      updateUser(updateData)
+      updateUser.mutate(updateData)
     },
     onSuccess: () => toast.success('Changes have been saved.'),
   })
@@ -65,7 +65,7 @@ export default function SettingsPage() {
   }, [user])
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-7xl mx-auto">
       <div className="flex items-center gap-3">
         <Settings className="h-6 w-6" />
         <h1 className="text-2xl font-bold">Settings</h1>

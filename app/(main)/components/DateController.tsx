@@ -41,14 +41,14 @@ const DateController = () => {
     if (activeView === 'today' && !isSameDay(prevDate, new Date())) {
       setActiveView('day')
       const interval = getDateIntervalBasedOnActiveViewMode('day', prevDate, dateRange)
-      updateUser({ id: user.id, interval, viewMode: 'day' })
+      updateUser.mutate({ id: user.id, interval, viewMode: 'day' })
     }
 
     setTransactionInfoInterval(prevDate.toISOString())
 
     if (user?.id) {
       const interval = getDateIntervalBasedOnActiveViewMode(activeView, prevDate, dateRange)
-      updateUser({ id: user.id, interval, viewMode: activeView })
+      updateUser.mutate({ id: user.id, interval, viewMode: activeView })
     }
   }
 
@@ -76,7 +76,7 @@ const DateController = () => {
 
     if (user?.id) {
       const interval = getDateIntervalBasedOnActiveViewMode(activeView, nextDate, dateRange)
-      updateUser({ id: user.id, interval })
+      updateUser.mutate({ id: user.id, interval })
     }
   }
 

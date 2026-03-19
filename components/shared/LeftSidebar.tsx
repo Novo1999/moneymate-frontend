@@ -98,7 +98,7 @@ export default function LeftSidebar() {
 
   const handleChangeActiveView = async (mode: ActiveViewModes) => {
     if (!user?.id) return
-    updateUser({ id: user?.id, viewMode: mode, interval: getDateIntervalBasedOnActiveViewMode(mode, transactionInfoIntervalDate, dateRange) })
+    updateUser.mutate({ id: user?.id, viewMode: mode, interval: getDateIntervalBasedOnActiveViewMode(mode, transactionInfoIntervalDate, dateRange) })
 
     // Clear date range when switching away from custom view
     if (mode !== 'custom') {
@@ -112,7 +112,7 @@ export default function LeftSidebar() {
     setAccountTypeId(val)
     if (user?.id) {
       await UserApiService.editUser(user?.id, { activeAccountTypeId: Number(val) })
-      updateUser({ activeAccountTypeId: val })
+      updateUser.mutate({ activeAccountTypeId: val })
       if (!isMobile) return
       setOpenMobile(false)
     }

@@ -91,9 +91,8 @@ export function useAuth() {
     logoutAsync: logoutMutation.mutateAsync,
     isLoggingOut: logoutMutation.isPending,
 
-    updateUser: updateUserMutation.mutate,
+    updateUser: updateUserMutation,
     updateUserAsync: updateUserMutation.mutateAsync,
-    isUpdating: updateUserMutation.isPending,
 
     refetch: userQuery.refetch,
     isAuthInitialized,

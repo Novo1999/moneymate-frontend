@@ -66,7 +66,7 @@ const AccountsPage = () => {
   }
 
   return (
-    <div className="min-h-[90vh] p-6 space-y-6">
+    <div className="min-h-[90vh] p-6 space-y-6 max-w-7xl mx-auto">
       <div className="flex items-center justify-between mb-6 flex-wrap gap-2">
         <p className="text-muted-foreground">Manage your account details and balance</p>
         <div className="flex gap-2 flex-wrap">

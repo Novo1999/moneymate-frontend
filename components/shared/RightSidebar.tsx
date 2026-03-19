@@ -1,13 +1,10 @@
 'use client'
 
-import { rightSidebarOpenAtom } from '@/app/layout/store'
 import { NAVIGATION_ITEMS } from '@/app/utils/constants'
 import { cn } from '@/lib/utils'
-import { useSetAtom } from 'jotai'
 import { usePathname, useRouter } from 'next/navigation'
 
 export default function RightSidebar({ className }: { className?: string }) {
-  const setRightSidebarOpen = useSetAtom(rightSidebarOpenAtom)
   const pathname = usePathname()
   const router = useRouter()
 
@@ -33,7 +30,6 @@ export default function RightSidebar({ className }: { className?: string }) {
       }
     } else {
       router.push(item.href)
-      setRightSidebarOpen(false)
     }
   }
 

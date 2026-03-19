@@ -77,8 +77,8 @@ const CategoryPage = () => {
   const mutationPending = editCategoryMutation.isPending || addCategoryMutation.isPending
 
   return (
-    <div className="min-h-[90vh]">
-      <div className="max-w-7xl">
+    <div className="min-h-[90vh] max-w-7xl mx-auto">
+      <div>
         <div className="flex gap-4 flex-col">
           <Label className="text-2xl font-bold">Transaction Categories</Label>
           <Label className="text-gray-400">Add Custom Categories for Income/Expense</Label>

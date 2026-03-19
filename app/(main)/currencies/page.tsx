@@ -5,7 +5,6 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
 import { Currency, getCurrencyDisplayName } from '@/types/currency'
-import { useMutation } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -18,17 +17,19 @@ const CurrenciesPage = () => {
     label: getCurrencyDisplayName(currency),
   }))
 
-  const { mutate: changeCurrencyMutate, isPending } = useMutation({
-    mutationFn: async (selectedCurrency: Currency) => {
-      if (selectedCurrency === user?.currency) return
-      if (!user?.id) return
-      const updateData = {
-        currency: selectedCurrency,
-      }
-      updateUser({ ...updateData, id: user?.id })
-      if (search) setSearch('')
-    },
-  })
+  const { mutate: changeCurrencyMutate, isPending } = updateUser
+
+  const handleChangeCurrency = (selectedCurrency: Currency) => {
+    if (isPending) return
+    if (selectedCurrency === user?.currency) return
+    if (!user?.id) return
+
+    changeCurrencyMutate({
+      id: user.id,
+      currency: selectedCurrency,
+    })
+    if (search) setSearch('')
+  }
 
   useEffect(() => {
     if (!isPending) {
@@ -39,7 +40,7 @@ const CurrenciesPage = () => {
   }, [isPending])
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 max-w-7xl mx-auto">
       <div className="flex gap-4 flex-col">
         <Label className="text-2xl font-bold">Currencies</Label>
         <Label className="text-gray-400">Select your preferred currency for the app</Label>
@@ -50,11 +51,12 @@ const CurrenciesPage = () => {
           user?.id &&
           currencyOptions?.map((opt) => (
             <Button
-              onClick={() => changeCurrencyMutate(opt.value)}
+              disabled={isPending}
+              onClick={() => handleChangeCurrency(opt.value)}
               className={cn(
                 'transform transition duration-300 w-full hover:bg-green-300',
                 user?.currency !== opt.value ? 'bg-green-200 text-black' : 'bg-custom-green',
-                search && (opt.label.toLowerCase().includes(search.toLowerCase()) || opt.value.toLowerCase().includes(search.toLowerCase())) ? 'scale-102 border-2 border-green-500' : 'scale-100'
+                search && (opt.label.toLowerCase().includes(search.toLowerCase()) || opt.value.toLowerCase().includes(search.toLowerCase())) ? 'scale-102 border-2 border-green-500' : 'scale-100',
               )}
               key={opt.value}
             >
