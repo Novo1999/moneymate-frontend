@@ -60,7 +60,6 @@ const CategoryList = ({ categoryType, shouldScrollRef }: CategoryListProp) => {
   const isIncome = categoryType === 'income'
 
   return (
-    // ref from useDroppable must go on the outermost element so the whole card is a drop target
     <div ref={setNodeRef} className="h-fit">
       <Card
         className={cn(

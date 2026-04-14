@@ -16,7 +16,6 @@ export default function AccountsPage() {
         <TransferBalance />
         <AccountDetails />
       </div>
-
       <EditAccountDetails />
     </div>
   )

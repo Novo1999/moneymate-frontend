@@ -28,22 +28,18 @@ const CustomCategoryItem = ({ category, type }: CustomCategoryItemProp) => {
   const setSelectedIcon = useSetAtom(selectedIconAtom)
   const setModalType = useSetAtom(modalTypeAtom)
 
-  // Register this item as draggable; id must match category.id so CategoryPage can identify it on drop
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: category.id!,
   })
 
   const style = {
-    // Translate the element while dragging (DragOverlay handles the ghost separately)
     transform: CSS.Translate.toString(transform),
-    // Hide the original item while the DragOverlay ghost is visible
     opacity: isDragging ? 0 : 1,
     transition: isDragging ? undefined : 'opacity 200ms ease',
   }
 
   const editCategoryMutation = useMutation({
-    mutationFn: ({ id, type }: { type?: CategoryDto['type'] | undefined; id?: number | undefined }) =>
-      CategoryApiService.editCategory(isEditing || id || 0, { name: inputVal, ...(type && { type }) }),
+    mutationFn: ({ id, type }: { type?: CategoryDto['type'] | undefined; id?: number | undefined }) => CategoryApiService.editCategory(isEditing || id || 0, { name: inputVal, ...(type && { type }) }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['categories'] })
       setIsEditing(0)
@@ -86,7 +82,7 @@ const CustomCategoryItem = ({ category, type }: CustomCategoryItemProp) => {
           className={cn(
             'cursor-grab active:cursor-grabbing p-1 rounded text-gray-400 hover:text-gray-600 hover:bg-gray-100 touch-none',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1',
-            type === 'income' ? 'focus-visible:ring-green-500' : 'focus-visible:ring-red-500'
+            type === 'income' ? 'focus-visible:ring-green-500' : 'focus-visible:ring-red-500',
           )}
           aria-label="Drag to move category"
         >
@@ -99,10 +95,7 @@ const CustomCategoryItem = ({ category, type }: CustomCategoryItemProp) => {
 
       <div className="flex gap-2">
         {isEditing !== category.id && (
-          <Badge
-            variant="secondary"
-            className={cn('capitalize lg:group-hover:hidden', type === 'income' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800')}
-          >
+          <Badge variant="secondary" className={cn('capitalize lg:group-hover:hidden', type === 'income' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800')}>
             {type}
           </Badge>
         )}
@@ -110,7 +103,7 @@ const CustomCategoryItem = ({ category, type }: CustomCategoryItemProp) => {
         <Badge
           onClick={() => !operationsDisabled && handleEditOpen(category)}
           variant={operationsDisabled ? 'disabled' : 'secondary'}
-          className={cn('bg-green-100 hover:bg-green-200 text-green-800 gap-2', isEditing === category.id ? 'flex' : 'flex lg:hidden lg:group-hover:flex', "cursor-pointer")}
+          className={cn('bg-green-100 hover:bg-green-200 text-green-800 gap-2', isEditing === category.id ? 'flex' : 'flex lg:hidden lg:group-hover:flex', 'cursor-pointer')}
         >
           <Pen />
           Edit
@@ -119,7 +112,7 @@ const CustomCategoryItem = ({ category, type }: CustomCategoryItemProp) => {
         <Badge
           onClick={() => setShowDeleteModal(true)}
           variant={operationsDisabled ? 'disabled' : 'destructive'}
-          className={cn('hover:bg-red-700 gap-2', isEditing === category.id ? 'flex' : 'flex lg:hidden lg:group-hover:flex', "cursor-pointer")}
+          className={cn('hover:bg-red-700 gap-2', isEditing === category.id ? 'flex' : 'flex lg:hidden lg:group-hover:flex', 'cursor-pointer')}
         >
           <Trash />
           Delete
@@ -130,9 +123,7 @@ const CustomCategoryItem = ({ category, type }: CustomCategoryItemProp) => {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Delete Category</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete {category.name}? This action cannot be undone.
-            </DialogDescription>
+            <DialogDescription>Are you sure you want to delete {category.name}? This action cannot be undone.</DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowDeleteModal(false)}>
