@@ -138,7 +138,7 @@ export default function LeftSidebar() {
     if (isLoadingAccountTypes) {
       return (
         <div>
-          <Skeleton className="h-10 w-full bg-custom-green" />
+          <Skeleton className="h-10 w-full bg-sidebar-accent" />
         </div>
       )
     }
@@ -152,20 +152,24 @@ export default function LeftSidebar() {
     }
 
     return isLoading ? (
-      <Loader className="animate-spin" />
+      <Loader className="animate-spin text-white" />
     ) : (
       <div>
         <Select value={accountTypeId?.toString()} onValueChange={(val) => handleChangeAccountType(Number(val))}>
-          <SelectTrigger className="border-green-500 w-full">
+          <SelectTrigger className="border-sidebar-border bg-sidebar-accent/50 text-white w-full focus:ring-sidebar-ring">
             <SelectValue placeholder="Select account type" />
           </SelectTrigger>
           <SelectContent>
             {accountTypes?.map((type) => (
-              <SelectItem key={type.id} value={type.id.toString()}>
+              <SelectItem
+                key={type.id}
+                value={type.id.toString()}
+                className="text-foreground"
+              >
                 <div className="flex items-center gap-4">
                   <span>{type.name}</span>
                   {type.balance !== undefined && (
-                    <span className="text-xs text-muted-foreground">
+                    <span className="text-xs opacity-70">
                       Balance: {type.balance.toLocaleString()} {user?.currency}
                     </span>
                   )}
@@ -180,22 +184,22 @@ export default function LeftSidebar() {
 
   return (
     <Sidebar>
-      <SidebarHeader>
+      <SidebarHeader className="border-b border-sidebar-border pb-4">
         <Brand setOpenMobile={setOpenMobile} />
       </SidebarHeader>
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Account Type</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-sidebar-foreground/60 uppercase tracking-wider text-[10px] font-bold">Account Type</SidebarGroupLabel>
           <SidebarGroupContent>{renderAccountTypeSelect()}</SidebarGroupContent>
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel>View Mode</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-sidebar-foreground/60 uppercase tracking-wider text-[10px] font-bold">View Mode</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {isLoading
-                ? Array.from({ length: 6 }).map((_, index) => <Skeleton key={index} className="h-8 w-full bg-custom-green" />)
+                ? Array.from({ length: 6 }).map((_, index) => <Skeleton key={index} className="h-8 w-full bg-sidebar-accent" />)
                 : viewModes.map((mode, index) => {
                     const Icon = mode.icon
 
@@ -203,6 +207,7 @@ export default function LeftSidebar() {
                       <SidebarMenuItem key={mode.value + index}>
                         <SidebarMenuButton
                           isActive={activeView === mode.value}
+                          className="data-[active=true]:bg-sidebar-accent data-[active=true]:font-bold"
                           onClick={() => {
                             setActiveView(mode.value)
                             handleChangeActiveView(mode.value)
@@ -219,12 +224,15 @@ export default function LeftSidebar() {
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel>Custom Date Range</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-sidebar-foreground/60 uppercase tracking-wider text-[10px] font-bold">Custom Date Range</SidebarGroupLabel>
           <SidebarGroupContent>
             <div className="px-2">
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button variant="outline" className={`w-full justify-start text-left font-normal ${!dateRange && 'text-muted-foreground'}`}>
+                  <Button
+                    variant="outline"
+                    className={`w-full justify-start text-left font-normal bg-sidebar-accent/50 border-sidebar-border hover:bg-sidebar-accent hover:text-white transition-colors ${!dateRange && 'text-sidebar-foreground/70'}`}
+                  >
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {dateRange?.from ? (
                       dateRange.to ? (

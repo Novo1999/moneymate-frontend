@@ -68,7 +68,7 @@ export default function LoginForm() {
 
           {loginError && <div className="text-destructive text-sm text-center bg-destructive/10 p-3 rounded-lg border border-destructive/20">{loginError}</div>}
 
-          <Button type="submit" className="w-full h-12 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700" disabled={isLoggingIn}>
+          <Button type="submit" className="w-full h-12" disabled={isLoggingIn}>
             {isLoggingIn ? 'Signing In...' : 'Sign In'}
           </Button>
 

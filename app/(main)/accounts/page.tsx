@@ -60,7 +60,7 @@ const AccountsPage = () => {
   if (isLoading) {
     return (
       <div className="min-h-[90vh] flex items-center justify-center">
-        <Loader className="animate-spin size-24 text-green-500" />
+        <Loader className="animate-spin size-24 text-primary" />
       </div>
     )
   }

@@ -166,7 +166,7 @@ const CategoryPage = () => {
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
-                <div className={`p-2 rounded-full ${modalType === 'income' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
+                <div className={`p-2 rounded-full ${modalType === 'income' ? 'bg-primary/10 text-primary' : 'bg-destructive/10 text-destructive'}`}>
                   <CategoryIcon iconName={selectedIcon} />
                 </div>
                 {isEditing ? 'Edit' : 'Add'} {modalType === 'income' ? 'Income' : 'Expense'} Category
@@ -196,8 +196,8 @@ const CategoryPage = () => {
                       className={`p-3 rounded-lg border-2 transition-colors hover:bg-gray-50 ${
                         selectedIcon === icon
                           ? modalType === 'income'
-                            ? 'border-green-500 bg-green-50'
-                            : 'border-red-500 bg-red-50'
+                            ? 'border-primary bg-primary/5'
+                            : 'border-destructive bg-destructive/5'
                           : 'border-gray-200'
                       }`}
                     >
@@ -205,8 +205,8 @@ const CategoryPage = () => {
                         className={`h-5 w-5 mx-auto ${
                           selectedIcon === icon
                             ? modalType === 'income'
-                              ? 'text-green-600'
-                              : 'text-red-600'
+                              ? 'text-primary'
+                              : 'text-destructive'
                             : 'text-gray-600'
                         }`}
                         iconName={icon}
@@ -225,7 +225,7 @@ const CategoryPage = () => {
                 onClick={handleSubmit}
                 disabled={!categoryName.trim() || mutationPending}
                 className={cn(
-                  modalType === 'income' ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700',
+                  modalType === 'income' ? 'bg-primary hover:bg-primary/90' : 'bg-destructive hover:bg-destructive/90',
                   'min-w-[8rem]'
                 )}
               >

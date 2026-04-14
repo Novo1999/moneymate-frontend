@@ -149,7 +149,7 @@ const DateController = () => {
   if (activeView === 'all' || activeView === 'custom') {
     return (
       <div className="flex justify-center gap-4 items-center">
-        <p className="text-center font-bold text-green-500">{renderDateBasedOnViewMode()}</p>
+        <p className="text-center font-bold text-primary">{renderDateBasedOnViewMode()}</p>
       </div>
     )
   }
@@ -157,7 +157,7 @@ const DateController = () => {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-[20vh]">
-        <Loader className="animate-spin text-green-500" />
+        <Loader className="animate-spin text-primary" />
       </div>
     )
   }
@@ -167,7 +167,7 @@ const DateController = () => {
       <Button disabled={isFetchingTransactions} onClick={handlePrevDate}>
         <ChevronLeft />
       </Button>
-      <p className="text-center font-bold text-green-500">{renderDateBasedOnViewMode()}</p>
+      <p className="text-center font-bold text-primary">{renderDateBasedOnViewMode()}</p>
       {canGoForward() && (
         <Button disabled={isFetchingTransactions} onClick={handleNextDate}>
           <ChevronRight />

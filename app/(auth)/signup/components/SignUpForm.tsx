@@ -123,7 +123,7 @@ export function SignUpForm() {
 
         <CurrencyPicker />
 
-        <Button type="submit" className="w-full h-12 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700" disabled={isLoading}>
+        <Button type="submit" className="w-full h-12" disabled={isLoading}>
           {isLoading ? 'Creating Account...' : 'Create Account'}
         </Button>
       </form>

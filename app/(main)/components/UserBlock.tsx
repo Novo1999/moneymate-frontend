@@ -13,14 +13,14 @@ const UserBlock = () => {
   }
 
   return (
-    <Card className="backdrop-blur-sm shadow-sm h-40 max-w-7xl mb-8 w-full">
+    <Card className="saas-card h-40 max-w-7xl mb-8 w-full">
       <CardContent className="p-6 flex justify-between items-center flex-wrap">
         {isLoading ? (
-          <Loader className="text-green-500 animate-spin" />
+          <Loader className="text-primary animate-spin" />
         ) : (
           <>
             <div className="flex items-center gap-4 flex-wrap">
-              <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
+              <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center">
                 <span className="text-md font-bold text-white">{user?.currency}</span>
               </div>
               <div>

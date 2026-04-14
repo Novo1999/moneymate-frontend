@@ -48,7 +48,7 @@ const RecentTransactions = () => {
   if (isLoading) {
     return (
       <div className="min-h-96 flex justify-center items-center">
-        <Loader className="animate-spin text-green-500" />
+        <Loader className="animate-spin text-primary" />
       </div>
     )
   } else if (!isLoading && paginatedTransactions.length === 0) {
@@ -87,7 +87,7 @@ const RecentTransactions = () => {
                 </Button>
               </div>
 
-              <p className={`font-bold text-base sm:text-lg whitespace-nowrap ${transaction?.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
+              <p className={`font-bold text-base sm:text-lg whitespace-nowrap ${transaction?.type === 'income' ? 'text-primary' : 'text-destructive'}`}>
                 {transaction?.type === 'income' ? '+' : '-'}
                 {user?.currency} {Math.abs(Number(transaction?.money)).toFixed(2)}
               </p>

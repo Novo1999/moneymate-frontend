@@ -36,33 +36,47 @@ const CurrenciesPage = () => {
       toast.dismiss('currency')
       return
     }
-    toast.loading('Changing Currency...', { id: 'currency', position: 'top-center', style: { background: 'oklch(72.3% 0.219 149.579)', color: '#fff' } })
+    toast.loading('Changing Currency...', { id: 'currency', position: 'top-center' })
   }, [isPending])
 
   return (
-    <div className="flex flex-col gap-4 max-w-7xl mx-auto">
-      <div className="flex gap-4 flex-col">
-        <Label className="text-2xl font-bold">Currencies</Label>
-        <Label className="text-gray-400">Select your preferred currency for the app</Label>
+    <div className="flex flex-col gap-6 max-w-7xl mx-auto p-6 bg-card rounded-xl border shadow-sm">
+      <div className="flex flex-col gap-1">
+        <h1 className="text-3xl font-bold tracking-tight">Currencies</h1>
+        <p className="text-muted-foreground">Select your preferred currency for the application.</p>
       </div>
-      <Input value={search} onChange={(e) => setSearch(e.target.value)} type="search" className="w-fit" placeholder="Search Currency" />
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 max-w-7xl">
-        {currencyOptions?.length > 0 &&
-          user?.id &&
-          currencyOptions?.map((opt) => (
-            <Button
-              disabled={isPending}
-              onClick={() => handleChangeCurrency(opt.value)}
-              className={cn(
-                'transform transition duration-300 w-full hover:bg-green-300',
-                user?.currency !== opt.value ? 'bg-green-200 text-black' : 'bg-custom-green',
-                search && (opt.label.toLowerCase().includes(search.toLowerCase()) || opt.value.toLowerCase().includes(search.toLowerCase())) ? 'scale-102 border-2 border-green-500' : 'scale-100',
-              )}
-              key={opt.value}
-            >
-              {opt.label}
-            </Button>
-          ))}
+      
+      <div className="flex items-center gap-4">
+        <Input 
+          value={search} 
+          onChange={(e) => setSearch(e.target.value)} 
+          type="search" 
+          className="max-w-xs saas-input" 
+          placeholder="Search currency (e.g. USD, Euro)..." 
+        />
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+        {currencyOptions
+          .filter(opt => !search || opt.label.toLowerCase().includes(search.toLowerCase()) || opt.value.toLowerCase().includes(search.toLowerCase()))
+          .map((opt) => {
+            const isSelected = user?.currency === opt.value
+            return (
+              <Button
+                variant={isSelected ? "default" : "outline"}
+                disabled={isPending}
+                onClick={() => handleChangeCurrency(opt.value)}
+                className={cn(
+                  "h-12 justify-start px-4 transition-all duration-200 font-medium",
+                  isSelected ? "shadow-md scale-[1.02]" : "hover:border-primary/50 hover:bg-primary/5"
+                )}
+                key={opt.value}
+              >
+                <span className="truncate">{opt.label}</span>
+                {isSelected && <span className="ml-auto text-xs bg-white/20 px-2 py-0.5 rounded-full">Active</span>}
+              </Button>
+            )
+          })}
       </div>
     </div>
   )

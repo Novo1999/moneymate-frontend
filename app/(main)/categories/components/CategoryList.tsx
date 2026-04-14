@@ -61,24 +61,26 @@ const CategoryList = ({ categoryType, shouldScrollRef, categories }: CategoryLis
     setSelectedIcon('DollarSign')
   }
 
+  const isIncome = categoryType === 'income'
+
   return (
     // ref from useDroppable must go on the outermost element so the whole card is a drop target
     <div ref={setNodeRef} className="h-fit">
       <Card
         className={cn(
-          'shadow-lg h-fit relative pb-8 transition-colors duration-200',
+          'saas-card h-fit relative pb-8 transition-all duration-200',
           // Highlight the card when a draggable is hovering over it
-          isOver && categoryType === 'income' && 'ring-2 ring-green-400 bg-green-50/30',
-          isOver && categoryType === 'expense' && 'ring-2 ring-red-400 bg-red-50/30'
+          isOver && isIncome && 'ring-2 ring-primary bg-primary/5',
+          isOver && !isIncome && 'ring-2 ring-destructive bg-destructive/5'
         )}
       >
-        <CardHeader className={cn('border-b py-6', color.shade[categoryType])}>
+        <CardHeader className={cn('border-b py-6', isIncome ? 'bg-primary/5' : 'bg-destructive/5')}>
           <div className="flex items-center justify-between flex-wrap gap-2">
-            <CardTitle className={cn('text-xl font-semibold flex items-center gap-2 capitalize', color.text[categoryType])}>
+            <CardTitle className={cn('text-xl font-bold flex items-center gap-2 capitalize', isIncome ? 'text-primary' : 'text-destructive')}>
               {categoryType} Categories
             </CardTitle>
             <div className="flex gap-2 flex-wrap">
-              <Button onClick={handleAddCategory} size="sm" className={color.button[categoryType]}>
+              <Button onClick={handleAddCategory} size="sm" variant={isIncome ? "default" : "destructive"}>
                 <Plus className="h-4 w-4 mr-1" />
                 Add
               </Button>
@@ -87,22 +89,22 @@ const CategoryList = ({ categoryType, shouldScrollRef, categories }: CategoryLis
 
           {/* Drop hint shown only while dragging over */}
           {isOver && (
-            <p className={cn('text-xs mt-2 font-medium animate-pulse', categoryType === 'income' ? 'text-green-600' : 'text-red-600')}>
+            <p className={cn('text-xs mt-2 font-semibold animate-pulse', isIncome ? 'text-primary' : 'text-destructive')}>
               Drop here to move to {categoryType}
             </p>
           )}
         </CardHeader>
 
-        <CardContent ref={scrollContainerRef} className="p-6 max-h-[50vh] overflow-y-scroll">
+        <CardContent ref={scrollContainerRef} className="p-6 max-h-[50vh] overflow-y-auto">
           {/* Built-in (non-custom) categories */}
           <div className="space-y-3">
-            {Object.values(categoryType === 'income' ? IncomeCategory : ExpenseCategory).map((category) => (
+            {Object.values(isIncome ? IncomeCategory : ExpenseCategory).map((category) => (
               <div
                 key={category}
-                className="flex items-center justify-between p-3 border rounded-lg hover:shadow-md transition-shadow cursor-pointer"
+                className="flex items-center justify-between p-3 border rounded-lg hover:shadow-sm hover:border-primary/30 transition-all cursor-pointer bg-white"
               >
                 <span className="font-medium">{formatCategoryName(category)}</span>
-                <Badge variant="secondary" className={cn('capitalize', color.badge[categoryType])}>
+                <Badge variant={isIncome ? "outline" : "secondary"} className={cn('capitalize font-semibold', isIncome ? 'border-primary/30 text-primary' : 'bg-destructive/10 text-destructive border-transparent')}>
                   {categoryType}
                 </Badge>
               </div>
@@ -111,16 +113,15 @@ const CategoryList = ({ categoryType, shouldScrollRef, categories }: CategoryLis
 
           {/* Custom categories — draggable */}
           {filteredCategories.length > 0 && (
-            <fieldset className="border p-2 mt-4">
-              <legend ref={legendRef} className="text-xs font-bold capitalize">
-                Custom {categoryType} Categories
+            <fieldset className="border border-dashed rounded-lg p-4 mt-6">
+              <legend ref={legendRef} className="text-[10px] font-bold uppercase tracking-widest px-2 text-muted-foreground">
+                Custom {categoryType}
               </legend>
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-3">
                 {filteredCategories.map((cat) => (
                   <CustomCategoryItem type={cat.type} category={cat} key={cat.id} />
                 ))}
               </div>
-              <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-green-500/10 to-transparent backdrop-blur-sm rounded-b-sm" />
             </fieldset>
           )}
         </CardContent>
@@ -131,21 +132,3 @@ const CategoryList = ({ categoryType, shouldScrollRef, categories }: CategoryLis
 
 export default CategoryList
 
-const color = {
-  button: {
-    income: 'bg-green-600 hover:bg-green-700 text-white',
-    expense: 'bg-red-600 hover:bg-red-700 text-white',
-  },
-  shade: {
-    income: 'bg-green-50',
-    expense: 'bg-red-50',
-  },
-  badge: {
-    income: 'bg-green-100 text-green-800',
-    expense: 'bg-red-100 text-red-800',
-  },
-  text: {
-    income: 'text-green-800',
-    expense: 'text-red-800',
-  },
-}
