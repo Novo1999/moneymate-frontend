@@ -75,20 +75,20 @@ const ExpenseOverview = () => {
   })
 
   if (!isAuthInitialized) {
-    return <Skeleton className="max-w-7xl min-h-[757px] bg-white/80" />
+    return <Skeleton className="w-full min-h-[757px] bg-white/80" />
   }
 
   return (
-    <div className="max-w-7xl grid grid-cols-1 xl:grid-cols-3 gap-6">
+    <div className="w-full grid grid-cols-1 xl:grid-cols-3 gap-8">
       {/* Chart Section */}
       <div className="lg:col-span-2">
-        <Card className="saas-card">
+        <Card className="saas-card h-full flex flex-col">
           <CardHeader className="pb-4">
             <CardTitle className="text-2xl text-primary">Expense Overview</CardTitle>
           </CardHeader>
-          <CardContent className="pt-0 px-0">
+          <CardContent className="pt-0 px-0 flex-1 flex flex-col">
             <DateController />
-            <div className="flex flex-col lg:flex-row min-h-[70vh] justify-center items-center gap-8">
+            <div className="flex flex-col lg:flex-row flex-1 min-h-[50vh] justify-center items-center gap-8">
               {transactionInfoLoading ? <Loader className="text-primary animate-spin" /> : transactionInfo && <DynamicChart data={transactionInfo?.transactions} />}
             </div>
           </CardContent>

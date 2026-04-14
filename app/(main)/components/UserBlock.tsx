@@ -9,11 +9,11 @@ const UserBlock = () => {
   const { user, logout, isLoading, isAuthInitialized } = useAuth()
 
   if (!isAuthInitialized) {
-    return <Skeleton className="bg-white/80 backdrop-blur-sm h-40 shadow-sm max-w-7xl mb-8" />
+    return <Skeleton className="bg-white/80 backdrop-blur-sm h-32 shadow-sm w-full" />
   }
 
   return (
-    <Card className="saas-card h-40 max-w-7xl mb-8 w-full">
+    <Card className="saas-card w-full">
       <CardContent className="p-6 flex justify-between items-center flex-wrap">
         {isLoading ? (
           <Loader className="text-primary animate-spin" />

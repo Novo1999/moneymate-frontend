@@ -4,12 +4,12 @@ import UserBlock from '@/app/(main)/components/UserBlock'
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen rounded-xl p-1 flex flex-col xl:items-center 2xl:py-12">
-      <UserBlock />
-
-      <ExpenseOverview />
-
-      <RecentTransactionContainer />
+    <div className="min-h-screen flex flex-col items-center p-4 lg:p-8 2xl:py-12">
+      <div className="w-full max-w-7xl flex flex-col gap-8">
+        <UserBlock />
+        <ExpenseOverview />
+        <RecentTransactionContainer />
+      </div>
     </div>
   )
 }
