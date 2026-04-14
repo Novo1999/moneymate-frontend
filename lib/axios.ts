@@ -11,7 +11,6 @@ const axiosInstance = axios.create({
   withCredentials: true,
 })
 
-// Add request interceptor to attach token
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('accessToken')
@@ -34,12 +33,10 @@ axiosInstance.interceptors.response.use(
       try {
         const newAccessToken = await AuthApiService.refreshToken()
 
-        // Retry original request with new token
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`
         return axiosInstance(originalRequest)
       } catch (error) {
         console.log('🚀 ~ error:', error)
-        // Clear tokens and redirect to login
         localStorage.removeItem('accessToken')
         localStorage.removeItem('refreshToken')
         toast.error('Session Expired. Please login again.')

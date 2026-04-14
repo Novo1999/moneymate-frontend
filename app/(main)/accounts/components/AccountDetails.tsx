@@ -1,3 +1,4 @@
+'use client'
 import AccountTypeApiService from '@/app/ApiService/AccountTypeApiService'
 import { accountTypeAtom } from '@/app/stores/accountType'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'

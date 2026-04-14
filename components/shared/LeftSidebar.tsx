@@ -57,19 +57,16 @@ export default function LeftSidebar() {
     gcTime: 10 * 60 * 1000,
   })
 
-  // Set default account type and interval when data loads
   useEffect(() => {
     if (!user) return
 
     setActiveView(user?.viewMode)
     setAccountTypeId(user?.activeAccountTypeId ?? 0)
 
-    // Set interval from user data
     if (user?.interval?.to) {
       setTransactionInfoInterval(user.interval.to)
     }
 
-    // If custom view mode and interval exists, set the date range
     if (user?.viewMode === 'custom' && user?.interval?.from && user?.interval?.to) {
       setDateRange({
         from: new Date(user.interval.from),
@@ -78,14 +75,10 @@ export default function LeftSidebar() {
     }
   }, [user, setAccountTypeId, setActiveView, setTransactionInfoInterval, setDateRange])
 
-  // Update transaction interval when date range changes
   useEffect(() => {
     if (dateRange?.from && dateRange?.to) {
-      // Check if from and to dates are different
       if (!isSameDay(dateRange.from, dateRange.to)) {
-        // Set the interval to the 'to' date when both dates are selected
         setTransactionInfoInterval(dateRange.to.toISOString())
-        // Automatically switch to custom view when a date range is selected
         if (activeView !== 'custom') {
           setActiveView('custom')
           if (user?.id) {
@@ -100,7 +93,6 @@ export default function LeftSidebar() {
     if (!user?.id) return
     updateUser.mutate({ id: user?.id, viewMode: mode, interval: getDateIntervalBasedOnActiveViewMode(mode, transactionInfoIntervalDate, dateRange) })
 
-    // Clear date range when switching away from custom view
     if (mode !== 'custom') {
       setDateRange(undefined)
     }
@@ -118,7 +110,6 @@ export default function LeftSidebar() {
     }
   }
 
-  // Helper text for date range picker
   const getDateRangeHelperText = () => {
     if (!dateRange?.from && !dateRange?.to) {
       return null

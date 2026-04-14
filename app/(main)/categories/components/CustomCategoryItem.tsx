@@ -80,7 +80,6 @@ const CustomCategoryItem = ({ category, type }: CustomCategoryItemProp) => {
       className="flex items-center flex-wrap gap-2 justify-between p-3 group *:transition-all *:duration-300 border rounded-lg hover:shadow-md transition-shadow"
     >
       <div className="flex gap-2 items-center">
-        {/* Drag handle — only this element triggers the drag, so clicks on Edit/Delete still work */}
         <button
           {...listeners}
           {...attributes}

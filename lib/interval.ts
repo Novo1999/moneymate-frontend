@@ -44,7 +44,6 @@ export const getDateIntervalBasedOnActiveViewMode = (activeView: ActiveViewModes
           to: customRange.to.toISOString(),
         }
       }
-      // Fallback if custom range not fully selected
       return {
         from: new Date().toISOString(),
         to: addDays(new Date(), 1).toISOString(),
