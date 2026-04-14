@@ -52,7 +52,6 @@ export default class CategoryApiService {
     try {
       const response = await axiosInstance.patch(`/categories/edit/${id}`, categoryData)
 
-      toast.success('Category updated successfully!')
       return response.data
     } catch (error) {
       handleApiError(error, 'Failed to update category')

@@ -82,7 +82,7 @@ const ExpenseOverview = () => {
     <div className="w-full grid grid-cols-1 xl:grid-cols-3 gap-8">
       {/* Chart Section */}
       <div className="lg:col-span-2">
-        <Card className="saas-card h-full flex flex-col">
+        <Card className="custom-card h-full flex flex-col">
           <CardHeader className="pb-4">
             <CardTitle className="text-2xl text-primary">Expense Overview</CardTitle>
           </CardHeader>
@@ -98,7 +98,7 @@ const ExpenseOverview = () => {
       {/* Summary Cards */}
       <div className="space-y-6">
         {/* Balance Card */}
-        <Card className="saas-card bg-primary text-white border-0">
+        <Card className="custom-card bg-primary text-white border-0">
           <CardContent className="text-center p-8">
             {!accountType ? (
               <p className="text-white">No Details to Show</p>
@@ -115,7 +115,7 @@ const ExpenseOverview = () => {
         </Card>
 
         {/* Monthly Spending */}
-        <Card className="saas-card">
+        <Card className="custom-card">
           <CardContent className="text-center p-8">
             <h3 className="text-lg font-semibold text-foreground mb-3">This Month Spending</h3>
             <p className="text-4xl font-bold text-destructive mb-2">{monthlySpendingLoading ? <Loader className="animate-spin mx-auto" /> : monthlySpending}</p>
@@ -124,7 +124,7 @@ const ExpenseOverview = () => {
         </Card>
 
         {/* Quick Actions */}
-        <Card className="saas-card">
+        <Card className="custom-card">
           <CardHeader className="pb-4">
             <CardTitle className="text-xl">Quick Actions</CardTitle>
           </CardHeader>

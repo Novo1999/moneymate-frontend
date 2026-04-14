@@ -1,12 +1,14 @@
 import CustomCategoryItem from '@/app/(main)/categories/components/CustomCategoryItem'
 import { categoryNameAtom, isModalOpenAtom, modalTypeAtom, selectedIconAtom } from '@/app/(main)/categories/store/categoryAtoms'
-import { CategoryDto } from '@/app/dto/CategoryDto'
+import CategoryApiService from '@/app/ApiService/CategoryApiService'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { formatCategoryName } from '@/lib/category'
 import { cn } from '@/lib/utils'
 import { ExpenseCategory, IncomeCategory } from '@/types/categories'
 import { useDroppable } from '@dnd-kit/core'
+import { useQuery } from '@tanstack/react-query'
 import { useSetAtom } from 'jotai'
 import { Plus } from 'lucide-react'
 import { RefObject, useEffect, useRef } from 'react'
@@ -14,25 +16,19 @@ import { RefObject, useEffect, useRef } from 'react'
 type CategoryListProp = {
   categoryType: 'income' | 'expense'
   shouldScrollRef: RefObject<boolean>
-  // Categories are now fetched in CategoryPage and passed down
-  // so the DndContext optimistic updates are the single source of truth
-  categories: CategoryDto[]
 }
 
-const formatCategoryName = (category: string) => {
-  return category
-    .split('_')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ')
-}
+const CategoryList = ({ categoryType, shouldScrollRef }: CategoryListProp) => {
+  const { data: categories = [] } = useQuery({
+    queryKey: ['categories'],
+    queryFn: () => CategoryApiService.getAllCategories(),
+  })
 
-const CategoryList = ({ categoryType, shouldScrollRef, categories }: CategoryListProp) => {
   const setIsModalOpen = useSetAtom(isModalOpenAtom)
   const setCategoryName = useSetAtom(categoryNameAtom)
   const setSelectedIcon = useSetAtom(selectedIconAtom)
   const setModalType = useSetAtom(modalTypeAtom)
 
-  // Register this card as a droppable zone; id matches the categoryType string
   const { isOver, setNodeRef } = useDroppable({ id: categoryType })
 
   const scrollContainerRef = useRef<HTMLDivElement | null>(null)
@@ -68,50 +64,40 @@ const CategoryList = ({ categoryType, shouldScrollRef, categories }: CategoryLis
     <div ref={setNodeRef} className="h-fit">
       <Card
         className={cn(
-          'saas-card h-fit relative pb-8 transition-all duration-200',
-          // Highlight the card when a draggable is hovering over it
+          'custom-card h-fit relative pb-8 transition-all duration-200',
           isOver && isIncome && 'ring-2 ring-primary bg-primary/5',
-          isOver && !isIncome && 'ring-2 ring-destructive bg-destructive/5'
+          isOver && !isIncome && 'ring-2 ring-destructive bg-destructive/5',
         )}
       >
         <CardHeader className={cn('border-b py-6', isIncome ? 'bg-primary/5' : 'bg-destructive/5')}>
           <div className="flex items-center justify-between flex-wrap gap-2">
-            <CardTitle className={cn('text-xl font-bold flex items-center gap-2 capitalize', isIncome ? 'text-primary' : 'text-destructive')}>
-              {categoryType} Categories
-            </CardTitle>
+            <CardTitle className={cn('text-xl font-bold flex items-center gap-2 capitalize', isIncome ? 'text-primary' : 'text-destructive')}>{categoryType} Categories</CardTitle>
             <div className="flex gap-2 flex-wrap">
-              <Button onClick={handleAddCategory} size="sm" variant={isIncome ? "default" : "destructive"}>
+              <Button onClick={handleAddCategory} size="sm" variant={isIncome ? 'default' : 'destructive'}>
                 <Plus className="h-4 w-4 mr-1" />
                 Add
               </Button>
             </div>
           </div>
 
-          {/* Drop hint shown only while dragging over */}
-          {isOver && (
-            <p className={cn('text-xs mt-2 font-semibold animate-pulse', isIncome ? 'text-primary' : 'text-destructive')}>
-              Drop here to move to {categoryType}
-            </p>
-          )}
+          {isOver && <p className={cn('text-xs mt-2 font-semibold animate-pulse', isIncome ? 'text-primary' : 'text-destructive')}>Drop here to move to {categoryType}</p>}
         </CardHeader>
 
         <CardContent ref={scrollContainerRef} className="p-6 max-h-[50vh] overflow-y-auto">
-          {/* Built-in (non-custom) categories */}
           <div className="space-y-3">
             {Object.values(isIncome ? IncomeCategory : ExpenseCategory).map((category) => (
-              <div
-                key={category}
-                className="flex items-center justify-between p-3 border rounded-lg hover:shadow-sm hover:border-primary/30 transition-all cursor-pointer bg-white"
-              >
+              <div key={category} className="flex items-center justify-between p-3 border rounded-lg hover:shadow-sm hover:border-primary/30 transition-all cursor-pointer bg-white">
                 <span className="font-medium">{formatCategoryName(category)}</span>
-                <Badge variant={isIncome ? "outline" : "secondary"} className={cn('capitalize font-semibold', isIncome ? 'border-primary/30 text-primary' : 'bg-destructive/10 text-destructive border-transparent')}>
+                <Badge
+                  variant={isIncome ? 'outline' : 'secondary'}
+                  className={cn('capitalize font-semibold', isIncome ? 'border-primary/30 text-primary' : 'bg-destructive/10 text-destructive border-transparent')}
+                >
                   {categoryType}
                 </Badge>
               </div>
             ))}
           </div>
 
-          {/* Custom categories — draggable */}
           {filteredCategories.length > 0 && (
             <fieldset className="border border-dashed rounded-lg p-4 mt-6">
               <legend ref={legendRef} className="text-[10px] font-bold uppercase tracking-widest px-2 text-muted-foreground">
@@ -131,4 +117,3 @@ const CategoryList = ({ categoryType, shouldScrollRef, categories }: CategoryLis
 }
 
 export default CategoryList
-

@@ -13,7 +13,7 @@ const UserBlock = () => {
   }
 
   return (
-    <Card className="saas-card w-full">
+    <Card className="custom-card w-full">
       <CardContent className="p-6 flex justify-between items-center flex-wrap">
         {isLoading ? (
           <Loader className="text-primary animate-spin" />
