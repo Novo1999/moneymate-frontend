@@ -1,5 +1,5 @@
 'use client'
-import { editFormAtom, editOpenAtom } from '@/app/(main)/accounts/components/store'
+import { editFormAtom, editOpenAtom } from '@/app/(main)/accounts/store/accountAtoms'
 import AccountTypeApiService from '@/app/ApiService/AccountTypeApiService'
 import { EditAccountDetailsDto } from '@/app/dto/EditAccountDetailsDto'
 import { accountTypeAtom } from '@/app/stores/accountType'

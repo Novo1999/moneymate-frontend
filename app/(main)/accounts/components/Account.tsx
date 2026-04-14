@@ -1,6 +1,6 @@
 'use client'
 
-import { markedAccountAtom } from '@/app/(main)/accounts/components/store'
+import { markedAccountAtom } from '@/app/(main)/accounts/store/accountAtoms'
 import AccountTypeApiService from '@/app/ApiService/AccountTypeApiService'
 import { userAtom } from '@/app/stores/auth'
 import {

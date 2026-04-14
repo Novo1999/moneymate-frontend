@@ -1,5 +1,5 @@
 'use client'
-import { markedAccountAtom } from '@/app/(main)/accounts/components/store'
+import { markedAccountAtom } from '@/app/(main)/accounts/store/accountAtoms'
 import AccountTypeApiService from '@/app/ApiService/AccountTypeApiService'
 import pluralize from '@/app/utils/pluralize'
 import {

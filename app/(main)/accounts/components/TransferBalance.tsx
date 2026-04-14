@@ -4,10 +4,10 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAtom, useAtomValue } from 'jotai'
 import { ArrowLeftRight } from 'lucide-react'
 
-import { transferOpenAtom } from '@/app/(main)/accounts/components/store'
 import AccountTypeApiService from '@/app/ApiService/AccountTypeApiService'
 import { accountTypeAtom } from '@/app/stores/accountType'
 
+import { transferOpenAtom } from '@/app/(main)/accounts/store/accountAtoms'
 import { TransferDto } from '@/app/dto/TransferDto'
 import { transferBalanceSchema } from '@/app/zod/transferBalance.schema'
 import { Button } from '@/components/ui/button'
