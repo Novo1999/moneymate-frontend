@@ -11,14 +11,14 @@ import { Button } from '@/components/ui/button'
 import { Calendar as CalendarComponent } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar'
+import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar'
 import { Skeleton } from '@/components/ui/skeleton'
 import { getDateIntervalBasedOnActiveViewMode } from '@/lib/interval'
 import { ActiveViewModes } from '@/types/activeViewMode'
 import { useQuery } from '@tanstack/react-query'
 import { format, isSameDay } from 'date-fns'
 import { useAtom } from 'jotai'
-import { BarChart3, Calendar, CalendarIcon, Clock, InfinityIcon, Loader, LucideIcon } from 'lucide-react'
+import { BarChart3, Calendar, CalendarIcon, Clock, InfinityIcon, Loader, LogOut, LucideIcon } from 'lucide-react'
 import { useEffect, useMemo } from 'react'
 
 import { CalendarClock, CalendarDays, CalendarRange } from 'lucide-react'
@@ -43,7 +43,7 @@ export default function LeftSidebar() {
   const [activeView, setActiveView] = useAtom(activeViewAtom)
   const [transactionInfoInterval, setTransactionInfoInterval] = useAtom(transactionInfoIntervalAtom)
   const transactionInfoIntervalDate = useMemo(() => new Date(transactionInfoInterval), [transactionInfoInterval])
-  const { user, isLoading, updateUser } = useAuth()
+  const { user, isLoading, updateUser, logout, isLoggingOut } = useAuth()
   const { setOpenMobile, isMobile } = useSidebar()
 
   const {
@@ -247,6 +247,21 @@ export default function LeftSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+
+      <SidebarFooter className="border-t border-sidebar-border">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              onClick={() => logout()}
+              disabled={isLoggingOut}
+              className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+            >
+              {isLoggingOut ? <Loader className="h-4 w-4 animate-spin" /> : <LogOut className="h-4 w-4" />}
+              <span>Logout</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   )
 }

@@ -11,4 +11,5 @@ export interface UserDto {
   viewMode: ActiveViewModes
   activeAccountTypeId: number
   interval: {from: string, to: string}
+  avatarUrl?: string | null
 }
