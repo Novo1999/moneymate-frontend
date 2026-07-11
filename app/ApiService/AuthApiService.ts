@@ -22,6 +22,23 @@ export default class AuthApiService {
     }
   }
 
+  /** Exchanges a Google ID token (from Google Identity Services) for a MoneyMate session. */
+  static async googleLogin(idToken: string) {
+    try {
+      const response = await axiosInstance.post('/auth/google', { idToken })
+
+      const { accessToken, refreshToken, ...userData } = response.data.data
+
+      localStorage.setItem('accessToken', accessToken)
+      localStorage.setItem('refreshToken', refreshToken)
+
+      toast.success('Login successful!')
+      return userData
+    } catch (error) {
+      handleApiError(error, 'Google sign-in failed')
+    }
+  }
+
   static async register(name: string, email: string, password: string, currency: string) {
     try {
       const response = await axiosInstance.post('/auth/signUp', {

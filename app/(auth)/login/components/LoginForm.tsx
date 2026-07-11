@@ -3,6 +3,7 @@
 import { useAuth } from '@/app/hooks/use-auth'
 import { DynamicPageForm } from '@/app/zod/auth.schema'
 import { Button } from '@/components/ui/button'
+import GoogleSignInButton from '@/components/shared/GoogleSignInButton'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { ApiErrorResponse } from '@/types/error'
@@ -88,6 +89,8 @@ export default function LoginForm() {
           </Button>
         </form>
       </Form>
+
+      <GoogleSignInButton />
 
       <div className="mt-8 text-center flex justify-center items-center">
         <p className="text-sm text-muted-foreground">Don&apos;t have an account?</p>

@@ -4,6 +4,7 @@ import CurrencyPicker from '@/app/(auth)/signup/components/CurrencyPicker'
 import AccountTypeApiService from '@/app/ApiService/AccountTypeApiService'
 import { useAuth } from '@/app/hooks/use-auth'
 import { DynamicPageForm } from '@/app/zod/auth.schema'
+import GoogleSignInButton from '@/components/shared/GoogleSignInButton'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
@@ -127,6 +128,8 @@ export function SignUpForm() {
           {isLoading ? 'Creating Account...' : 'Create Account'}
         </Button>
       </form>
+
+      <GoogleSignInButton />
     </Form>
   )
 }

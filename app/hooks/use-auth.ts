@@ -42,6 +42,15 @@ export function useAuth() {
     onError: (error) => error,
   })
 
+  const googleLoginMutation = useMutation({
+    mutationFn: async (idToken: string) => await AuthApiService.googleLogin(idToken),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: authKeys.currentUser })
+      router.push('/')
+    },
+    onError: (error) => error,
+  })
+
   const registerMutation = useMutation({
     mutationFn: async ({ name, email, password, currency }: { name: string; email: string; password: string; currency: string }) => {
       const data = await AuthApiService.register(name, email, password, currency)
@@ -86,6 +95,9 @@ export function useAuth() {
     login: loginMutation.mutate,
     loginAsync: loginMutation.mutateAsync,
     isLoggingIn: loginMutation.isPending,
+
+    loginWithGoogle: googleLoginMutation.mutate,
+    isGoogleLoggingIn: googleLoginMutation.isPending,
 
     logout: logoutMutation.mutate,
     logoutAsync: logoutMutation.mutateAsync,
